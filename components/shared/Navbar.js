@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/hooks/useCart';
 
 export default function Navbar() {
   const { getCartCount, isLoaded } = useCart();

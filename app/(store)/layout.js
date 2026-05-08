@@ -1,9 +1,9 @@
 'use client';
 
-import { CartProvider } from '@/context/CartContext';
+import { CartProvider } from '@/hooks/useCart';
 import { ToastProvider } from '@/components/ui/Toast';
-import Navbar from '@/components/store/Navbar';
-import Footer from '@/components/store/Footer';
+import Navbar from '@/components/shared/Navbar';
+import Footer from '@/components/shared/Footer';
 
 export default function StoreLayout({ children }) {
   return (

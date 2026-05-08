@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getProducts, getFeaturedProducts, urlFor } from '@/lib/sanity';
-import ProductCardWrapper from './ProductCardWrapper';
+import ProductCardWrapper from '@/components/features/product/ProductCardWrapper';
 
 export const revalidate = 60; // Revalidate every 60 seconds
 

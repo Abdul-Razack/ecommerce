@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/components/ui/Toast';
 
 export default function CheckoutPage() {
@@ -90,7 +90,7 @@ export default function CheckoutPage() {
     setLoading(true);
     try {
       // Step 1: Create Razorpay order
-      const orderRes = await fetch('/api/payment/create', {
+      const orderRes = await fetch('/api/razorpay/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: total }),
@@ -113,7 +113,7 @@ export default function CheckoutPage() {
         order_id: orderData.order.id,
         handler: async function (response) {
           // Step 3: Verify payment
-          const verifyRes = await fetch('/api/payment/verify', {
+          const verifyRes = await fetch('/api/razorpay/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

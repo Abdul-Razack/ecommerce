@@ -1,5 +1,5 @@
 import { getProducts } from '@/lib/sanity';
-import ProductCardWrapper from '../ProductCardWrapper';
+import ProductCardWrapper from '@/components/features/product/ProductCardWrapper';
 import Link from 'next/link';
 
 export const revalidate = 60;

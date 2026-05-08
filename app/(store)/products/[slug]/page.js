@@ -1,6 +1,6 @@
 import { getProduct, getProducts, urlFor } from '@/lib/sanity';
 import { notFound } from 'next/navigation';
-import ProductDetailClient from './ProductDetailClient';
+import ProductDetailClient from '@/components/features/product/ProductDetailClient';
 
 export const revalidate = 60;
 

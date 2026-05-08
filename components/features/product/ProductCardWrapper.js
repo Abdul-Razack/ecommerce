@@ -1,6 +1,6 @@
 'use client';
 
-import ProductCard from '@/components/store/ProductCard';
+import ProductCard from '@/components/features/product/ProductCard';
 
 export default function ProductCardWrapper({ products }) {
   return (

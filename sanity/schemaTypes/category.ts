@@ -1,15 +1,17 @@
-export default {
+import { defineType, defineField } from "sanity";
+
+export const category = defineType({
   name: 'category',
   title: 'Category',
   type: 'document',
   fields: [
-    {
+    defineField({
       name: 'name',
       title: 'Category Name',
       type: 'string',
       validation: (Rule) => Rule.required(),
-    },
-    {
+    }),
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -18,14 +20,14 @@ export default {
         maxLength: 200,
       },
       validation: (Rule) => Rule.required(),
-    },
-    {
+    }),
+    defineField({
       name: 'image',
       title: 'Category Image',
       type: 'image',
       options: {
         hotspot: true,
       },
-    },
+    }),
   ],
-};
+});

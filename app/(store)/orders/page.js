@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import OrderTimeline from '@/components/store/OrderTimeline';
+import OrderTimeline from '@/components/features/orders/OrderTimeline';
 
 function OrdersContent() {
   const searchParams = useSearchParams();

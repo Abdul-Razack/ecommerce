@@ -28,8 +28,8 @@ export const writeClient = isSanityConfigured
 
 const builder = client ? imageUrlBuilder(client) : null;
 
-export function urlFor(source) {
-  if (!builder) return { url: () => '/placeholder.png', width: () => ({ height: () => ({ url: () => '/placeholder.png' }) }) };
+export function urlFor(source: any) {
+  if (!builder) return { url: () => '/placeholder.png', width: () => ({ height: () => ({ url: () => '/placeholder.png' }) }) } as any;
   return builder.image(source);
 }
 
@@ -58,7 +58,7 @@ export async function getProducts() {
 }
 
 // Fetch single product by slug
-export async function getProduct(slug) {
+export async function getProduct(slug: string) {
   if (!client) return null;
   try {
     return await client.fetch(`

@@ -17,14 +17,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         try {
-          const result = await sql`
-            SELECT * FROM admin_users WHERE email = ${credentials.email}
+          const result: any[] = await sql`
+            SELECT * FROM admin_users WHERE email = ${credentials.email as string}
           `;
 
           if (result.length === 0) return null;
 
           const admin = result[0];
-          const isValid = await bcrypt.compare(credentials.password, admin.password);
+          const isValid = await bcrypt.compare(credentials.password as string, admin.password);
 
           if (!isValid) return null;
 
@@ -44,13 +44,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role;
+        (token as any).role = (user as any).role;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.role = token.role;
+      if (token && session.user) {
+        (session.user as any).role = (token as any).role;
       }
       return session;
     },
@@ -61,5 +61,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
     strategy: 'jwt',
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.AUTH_SECRET,
 });

@@ -1,17 +1,15 @@
-'use client';
-
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
-import { schema } from './sanity/schema';
+import { schemaTypes } from './sanity/schemaTypes';
 
-const config = defineConfig({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+export default defineConfig({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   title: 'E-Commerce Store',
   apiVersion: '2024-01-01',
   basePath: '/studio',
   plugins: [structureTool()],
-  schema,
+  schema: {
+    types: schemaTypes,
+  },
 });
-
-export default config;

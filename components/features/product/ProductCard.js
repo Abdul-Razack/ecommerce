@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/hooks/useCart';
 import { urlFor } from '@/lib/sanity';
 
 export default function ProductCard({ product }) {
