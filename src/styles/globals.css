@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Premium Onyx & Bone Palette */
+  --onyx: #121212;
+  --bone: #F9F9F7;
+  --neutral-soft: #F1F1EF;
+  --chrome: #E5FF00; /* Kinetic Highlight */
+  --glass-white: rgba(255, 255, 255, 0.03);
+  --glass-dark: rgba(18, 18, 18, 0.85);
+}
+
+@layer base {
+  body {
+    @apply bg-bone text-onyx antialiased relative overflow-x-hidden;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.02em;
+
+    /* Custom Kinetic Cursor Base */
+    cursor: default;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-black tracking-tighter uppercase;
+  }
+
+  .technical {
+    font-family: 'Inter', sans-serif;
+    @apply font-black text-[10px] uppercase tracking-[0.3em];
+  }
+
+  .editorial {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer components {
+  /* Museum-Grade Shadow System */
+  .shadow-kinetic {
+    box-shadow: 0 30px 60px -12px rgba(0,0,0,0.15), 0 18px 36px -18px rgba(0,0,0,0.2);
+  }
+
+  .shadow-architectural {
+    box-shadow: 0 50px 100px -20px rgba(0,0,0,0.12), 0 30px 60px -30px rgba(0,0,0,0.15);
+  }
+
+  .shadow-chrome {
+    box-shadow: 0 0 40px -5px rgba(229, 255, 0, 0.3);
+  }
+
+  /* Tactile Interaction Logic */
+  .tactile-card {
+    @apply transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)];
+  }
+
+  .tactile-card:hover {
+    @apply -translate-y-3 shadow-architectural;
+  }
+
+  /* Atmospheric Seam */
+  .section-seam {
+    @apply absolute inset-x-0 -top-10 h-20 bg-gradient-to-b from-transparent via-onyx/[0.05] to-transparent pointer-events-none;
+  }
+
+  /* Kinetic Discovery Engine */
+  .minimal-slider {
+    @apply flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar gap-8;
+    scroll-padding: 2rem;
+  }
+
+  .minimal-slider > * {
+    @apply snap-start flex-none;
+  }
+
+  /* Hide Scrollbar Cross-Browser */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Frosted Overlays */
+  .glass-chrome {
+    @apply bg-bone/80 backdrop-blur-xl border border-white/20;
+  }
+}
+
+@layer utilities {
+  .animate-kinetic-reveal {
+    animation: kineticReveal 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  @keyframes kineticReveal {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
