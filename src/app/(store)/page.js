@@ -147,7 +147,7 @@ export default async function Homepage() {
       </section>
 
       {/* 04. LATEST DEPLOYMENTS: MINIMAL SLIDER */}
-      <section className="py-20 bg-[#F1F1EF] border-t border-onyx/5 overflow-hidden">
+      <section id="registry" className="py-20 bg-[#F1F1EF] border-t border-onyx/5 overflow-hidden">
         <Container>
           <div className="flex flex-col md:flex-row items-baseline justify-between mb-16 gap-8 px-4 md:px-0">
             <div className="space-y-4">

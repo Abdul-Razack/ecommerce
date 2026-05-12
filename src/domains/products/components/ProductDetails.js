@@ -55,7 +55,12 @@ export default function ProductDetails({ product, relatedProducts }) {
           <div className="lg:col-span-5 flex flex-col justify-start pt-4 space-y-10 animate-kinetic-reveal [animation-delay:200ms]">
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <span className="technical text-onyx/40">{product.category || 'Series_Experimental'}</span>
+                <div className="flex items-center gap-3">
+                  <span className="h-5 w-[3px] bg-chrome" />
+                  <span className="technical text-[10px] font-black uppercase tracking-[0.3em] text-onyx">
+                    {product.category || 'Standard_Issue'}
+                  </span>
+                </div>
                 <div className="w-8 h-px bg-onyx/10" />
                 <span className="technical text-onyx/20 text-[8px]">SKU_{product._id?.slice(-6)}</span>
               </div>

@@ -9,6 +9,7 @@ import Input from '@/shared/ui/Input';
 import Card from '@/shared/ui/Card';
 import Badge from '@/shared/ui/Badge';
 import Skeleton from '@/shared/ui/Skeleton';
+import Section from '@/shared/ui/Section';
 import Link from 'next/link';
 
 function OrdersContent() {
@@ -51,7 +52,7 @@ function OrdersContent() {
   return (
     <div className="bg-gray-50 min-h-screen">
       <Section 
-        title="Order Tracking" 
+        title="My Orders" 
         description="Monitor the progress of your premium activewear orders. Enter your registered email to search your history."
         className="bg-white border-b border-gray-100"
         action={

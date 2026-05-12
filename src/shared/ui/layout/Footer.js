@@ -23,7 +23,7 @@ export default function Footer() {
             <div className="relative max-w-sm mt-8">
               <input 
                 type="email" 
-                placeholder="Registry Email" 
+                placeholder="Order Tracking Email" 
                 className="w-full bg-white/5 border border-white/10 rounded-full py-4 px-6 text-sm technical focus:outline-none focus:border-chrome/50"
               />
               <button className="absolute right-2 top-2 bottom-2 px-6 rounded-full bg-bone text-onyx text-[9px] font-black tracking-widest hover:bg-chrome transition-all uppercase">
@@ -37,7 +37,7 @@ export default function Footer() {
             {[
               { title: 'Collection', links: ['New Arrivals', 'Performance', 'Experimental'] },
               { title: 'Protocol', links: ['Size Protocol', 'Operational Returns', 'Our Ethos'] },
-              { title: 'Support', links: ['Order Tracking', 'Privacy Protocol', 'Registry Security'] }
+              { title: 'Support', links: ['Order Tracking', 'Privacy Protocol', 'Secure Registry'] }
             ].map((col) => (
               <div key={col.title} className="space-y-4">
                 <span className="technical text-[10px] text-white/20">{col.title}</span>

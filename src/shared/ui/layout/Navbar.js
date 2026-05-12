@@ -41,7 +41,7 @@ export default function Navbar() {
           {[
             { name: 'Identity', href: '/about' },
             { name: 'Directory', href: '/shop' },
-            { name: 'Registry', href: '#registry' }
+            { name: 'Orders', href: '/orders' }
           ].map((link) => (
             <Link 
               key={link.name}
