@@ -32,12 +32,12 @@ export default function Navbar() {
         }
       `}>
         {/* Brand */}
-        <Link href="/" className="text-lg font-black tracking-[0.2em] mr-10 hover:scale-105 transition-transform flex items-center gap-2">
+        <Link href="/" className="text-base md:text-lg font-black tracking-[0.2em] md:mr-10 hover:scale-105 transition-transform flex items-center gap-2">
           ENERGY <span className="text-[8px] opacity-20">®</span>
         </Link>
 
-        {/* Directory Links */}
-        <div className="flex items-center gap-6 mr-10 border-r border-onyx/5 pr-10 h-6">
+        {/* Directory Links: Desktop Only */}
+        <div className="hidden md:flex items-center gap-6 mr-10 border-r border-onyx/5 pr-10 h-6">
           {[
             { name: 'Identity', href: '/about' },
             { name: 'Directory', href: '/shop' },

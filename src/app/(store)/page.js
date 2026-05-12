@@ -92,8 +92,8 @@ export default async function Homepage() {
               <div className="absolute inset-0 bg-gradient-to-t from-onyx/80 via-transparent to-transparent" />
               <div className="absolute inset-0 p-8 md:p-16 flex flex-col justify-between z-10">
                 <div>
-                  <span className="technical text-white/40 tracking-[0.4em] md:tracking-[0.6em] animate-pulse text-[10px]">Lead_Deployment // 2026</span>
-                  <h2 className="text-5xl md:text-[7rem] text-white leading-[0.85] md:leading-[0.8] uppercase font-black mt-6 tracking-tighter">
+                  <span className="technical text-white/40 tracking-[0.4em] animate-pulse text-[8px] md:text-[10px]">Lead_Deployment // 2026</span>
+                  <h2 className="text-4xl md:text-[7rem] text-white leading-[0.9] md:leading-[0.8] uppercase font-black mt-4 md:mt-6 tracking-tighter">
                     {latestProducts[0]?.name?.split(' ')[0] || 'Elite'} <br />
                     <span className="editorial italic lowercase font-normal text-white/30">performer</span>
                   </h2>
@@ -115,13 +115,13 @@ export default async function Homepage() {
                 href={`/shop?category=${allCategories[0]}`}
                 className="bg-onyx rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 flex flex-col justify-center border border-white/10 min-h-[220px] md:min-h-[310px] group cursor-pointer transition-all duration-700 hover:bg-onyx/90 shadow-architectural tactile-card text-white"
               >
-                <div className="space-y-4 md:space-y-6">
-                  <span className="technical text-white/40 text-[10px]">Operational_Tier_01</span>
-                  <h3 className="text-4xl md:text-5xl leading-[0.8] uppercase font-black tracking-tighter text-white">
+                <div className="space-y-4">
+                  <span className="technical text-white/40 text-[9px]">Operational_Tier_01</span>
+                  <h3 className="text-3xl md:text-5xl leading-[0.9] uppercase font-black tracking-tighter text-white">
                     {allCategories[0] || 'Elite'} <br />
                     <span className="editorial italic lowercase font-normal text-white/30">silhouettes</span>
                   </h3>
-                  <span className="technical border-b border-chrome pb-2 group-hover:text-chrome transition-all w-max block mt-4 md:text-xs">Deploy_Category</span>
+                  <span className="technical border-b border-chrome pb-2 group-hover:text-chrome transition-all w-max block mt-4 text-[10px] md:text-xs">Deploy_Category</span>
                 </div>
               </Link>
 
@@ -130,13 +130,13 @@ export default async function Homepage() {
                 href={`/shop?category=${allCategories[1] || 'all'}`}
                 className="bg-[#F1F1EF]/40 backdrop-blur-xl rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 flex flex-col justify-center relative overflow-hidden min-h-[220px] md:min-h-[310px] group cursor-pointer transition-all duration-700 hover:bg-[#F1F1EF]/60 shadow-architectural tactile-card border border-onyx/5"
               >
-                <div className="relative z-10 space-y-4 md:space-y-6">
-                  <span className="technical text-onyx/40 text-[10px]">Operational_Tier_02</span>
-                  <h3 className="text-4xl md:text-5xl leading-[0.8] uppercase font-black tracking-tighter text-onyx">
+                <div className="relative z-10 space-y-4">
+                  <span className="technical text-onyx/40 text-[9px]">Operational_Tier_02</span>
+                  <h3 className="text-3xl md:text-5xl leading-[0.9] uppercase font-black tracking-tighter text-onyx">
                     {allCategories[1] || 'Experimental'} <br />
                     <span className="editorial italic lowercase font-normal text-onyx/30">series</span>
                   </h3>
-                  <div className="technical text-onyx/60 group-hover:text-onyx transition-colors flex items-center gap-4 mt-4 md:text-xs">
+                  <div className="technical text-onyx/60 group-hover:text-onyx transition-colors flex items-center gap-4 mt-4 text-[10px] md:text-xs">
                     Explore Selection <span className="text-chrome">→</span>
                   </div>
                 </div>
