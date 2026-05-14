@@ -2,8 +2,8 @@ import '@/styles/globals.css';
 import { Providers } from '@/providers/Providers';
 
 export const metadata = {
-  title: 'ENERGY - Premium Activewear Store',
-  description: 'Discover premium activewear designed for performance and styled for life.',
+  title: 'Aura Ethnic - Premium Women\'s Leggings Store',
+  description: 'Discover premium daily activewear and ethnic leggings designed for extreme comfort and style.',
 };
 
 export default function RootLayout({ children }) {

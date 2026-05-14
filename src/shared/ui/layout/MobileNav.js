@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
 
-const MobileNav = () => {
+const MobileNav = ({ user, signInUrl, onSignOut }) => {
   const pathname = usePathname();
   const { getCartCount } = useCart();
   const [mounted, setMounted] = React.useState(false);
@@ -16,26 +16,59 @@ const MobileNav = () => {
   }, []);
 
   const navItems = [
-    { href: '/', label: 'HOME', icon: <HomeIcon /> },
-    { href: '/shop', label: 'SHOP', icon: <ShopIcon /> },
-    { href: '/cart', label: 'CART', icon: <CartIcon count={cartCount} /> },
-    { href: '/orders', label: 'ORDERS', icon: <OrdersIcon /> },
+    { href: '/', label: 'HOME', icon: <HomeIcon />, isExternal: false },
+    { href: '/shop', label: 'SHOP', icon: <ShopIcon />, isExternal: false },
+    { href: '/cart', label: 'CART', icon: <CartIcon count={cartCount} />, isExternal: false },
+    { href: '/orders', label: 'ORDERS', icon: <OrdersIcon />, isExternal: false },
+    user 
+      ? { onClick: onSignOut, label: 'LOGOUT', icon: <UserIcon /> }
+      : { href: signInUrl, label: 'LOGIN', icon: <UserIcon />, isExternal: true }
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-2xl border-t border-white/10 flex justify-around items-center h-24 z-50 px-6 pb-4 rounded-t-[2.5rem] shadow-depth-3">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-2xl border-t border-white/10 flex justify-around items-center h-24 z-50 px-4 pb-4 rounded-t-[2.5rem] shadow-depth-3">
       {navItems.map((item) => {
         const isActive = mounted && pathname === item.href;
+        const content = (
+          <>
+            <div className={`transition-all duration-500 ${isActive ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'text-white/40'}`}>
+              {item.icon}
+            </div>
+            <span className="text-[6px] md:text-[7px] font-black uppercase tracking-[0.2em] leading-none">{item.label}</span>
+          </>
+        );
+
+        if (item.onClick) {
+          return (
+            <button 
+              key={item.label} 
+              onClick={() => item.onClick()}
+              className="flex flex-col items-center justify-center gap-3 text-white/30 hover:text-white transition-all duration-500 scale-100 hover:scale-110 bg-transparent border-none p-0 cursor-pointer"
+            >
+              {content}
+            </button>
+          );
+        }
+
+        if (item.isExternal) {
+          return (
+            <a 
+              key={item.label} 
+              href={item.href}
+              className="flex flex-col items-center justify-center gap-3 text-white/30 hover:text-white transition-all duration-500 scale-100 hover:scale-110"
+            >
+              {content}
+            </a>
+          );
+        }
+
         return (
           <Link 
             key={item.href} 
             href={item.href}
             className={`flex flex-col items-center justify-center gap-3 transition-all duration-500 ${isActive ? 'text-white scale-110' : 'text-white/30'}`}
           >
-            <div className={`transition-all duration-500 ${isActive ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'text-white/40'}`}>
-              {item.icon}
-            </div>
-            <span className="text-[7px] font-black uppercase tracking-[0.3em] leading-none">{item.label}</span>
+            {content}
           </Link>
         );
       })}

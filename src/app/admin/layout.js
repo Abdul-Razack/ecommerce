@@ -53,8 +53,8 @@ function AdminLayoutInner({ children }) {
       {/* Sidebar */}
       <aside className="w-64 border-r border-zinc-100 flex flex-col fixed inset-y-0 left-0 bg-white z-20">
         <div className="p-8 pb-12">
-          <Link href="/admin" className="text-xl font-bold tracking-[0.2em] text-black">
-            ENERGY
+          <Link href="/admin" className="text-xl font-bold tracking-tight uppercase text-black">
+            AURA ETHNIC
           </Link>
           <p className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 mt-2">
             Administrator

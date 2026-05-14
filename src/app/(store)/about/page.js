@@ -8,7 +8,7 @@ import Link from 'next/link';
  * Refined editorial narrative with high-class atmospheric depth.
  */
 export const metadata = {
-  title: 'Our Protocol - ENERGY',
+  title: 'Our Manifesto - Aura Ethnic',
   description: 'The story behind India\'s premium quality women leggings brand.',
 };
 
@@ -49,7 +49,7 @@ export default function AboutPage() {
                 </h2>
               </div>
               <p className="text-xl text-onyx/60 max-w-2xl leading-relaxed editorial italic">
-                ENERGY was founded on a singular premise: that women leggings should provide extreme comfort, flexibility, and durability. We believe in top-grade fabrics that match your daily flow.
+                Aura Ethnic was founded on a singular premise: that women leggings should provide extreme comfort, flexibility, and durability. We believe in top-grade fabrics that match your daily flow.
               </p>
               
               {/* Pillars Grid */}
@@ -101,7 +101,7 @@ export default function AboutPage() {
             <ValueCard 
               number="03"
               title="COLLECTIVE"
-              description="ENERGY brings the finest range of women activewear and daily leggings, catering to comfort-seekers across India."
+              description="Aura Ethnic brings the finest range of women activewear and daily leggings, catering to comfort-seekers across India."
             />
           </div>
         </Container>

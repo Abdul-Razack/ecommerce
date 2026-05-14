@@ -15,7 +15,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-b border-white/5 pb-16">
           {/* Brand & Manifesto */}
           <div className="md:col-span-4 space-y-6">
-            <h2 className="text-4xl font-black tracking-tighter">ENERGY <span className="text-xs align-top opacity-20">®</span></h2>
+            <h2 className="text-3xl font-black tracking-tight uppercase">AURA ETHNIC <span className="text-xs align-top opacity-20">®</span></h2>
             <p className="editorial italic text-white/40 max-w-xs text-sm leading-relaxed">
               Premium Quality Leggings for every woman. Unmatched Comfort and Style.
             </p>

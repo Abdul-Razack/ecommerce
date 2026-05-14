@@ -67,8 +67,8 @@ export default async function Homepage() {
               </div>
             </div>
             <div className="lg:col-span-6 relative">
-              <div className="relative aspect-[4/5] w-full max-w-[450px] mx-auto rounded-[3rem] overflow-hidden shadow-kinetic animate-kinetic-reveal [animation-delay:800ms]">
-                <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-[2s]" alt="Identity" />
+              <div className="relative aspect-[4/5] w-full max-w-[450px] mx-auto rounded-[3rem] overflow-hidden">
+                <img src="/images/hero.webp" className="w-full h-full object-cover" alt="Aura Ethnic Hero" />
               </div>
             </div>
           </div>
