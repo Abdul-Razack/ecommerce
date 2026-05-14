@@ -266,7 +266,7 @@ export default function CheckoutPage() {
             <nav className="flex items-center gap-6 text-[11px] font-black uppercase tracking-[0.3em] text-gray-300">
               <span className={`transition-all duration-500 ${step >= 1 ? 'text-black' : ''}`}>01 Review</span>
               <span className="w-8 h-[1px] bg-gray-100" />
-              <span className={`transition-all duration-500 ${step >= 2 ? 'text-black' : ''}`}>02 Shipping</span>
+              <span className={`transition-all duration-500 ${step >= 2 ? 'text-black' : ''}`}>02 Delivery Address</span>
               <span className="w-8 h-[1px] bg-gray-100" />
               <span className={`transition-all duration-500 ${step >= 3 ? 'text-black' : ''}`}>03 Payment</span>
             </nav>
@@ -283,7 +283,7 @@ export default function CheckoutPage() {
               <Card variant="outline" padding="p-8 md:p-12" className="animate-fade-in">
                 <div className="flex items-center justify-between border-b border-border-light pb-8 mb-10">
                   <h2 className="text-2xl font-black uppercase tracking-tight text-black">1. Order Review</h2>
-                  <Badge variant="neutral">{cartItems.length} SILHOUETTES</Badge>
+                  <Badge variant="neutral">{cartItems.length} ITEMS</Badge>
                 </div>
                 
                 <div className="divide-y divide-border-light">
@@ -316,7 +316,7 @@ export default function CheckoutPage() {
                 
                 <div className="mt-16">
                   <Button onClick={nextStep} fullWidth size="lg">
-                    Continue to Shipping
+                    Continue to Delivery
                   </Button>
                 </div>
               </Card>
@@ -326,11 +326,11 @@ export default function CheckoutPage() {
               <Card variant="outline" padding="p-8 md:p-12" className="animate-fade-in">
                 <div className="space-y-16">
                   <div className="space-y-10">
-                    <h2 className="text-2xl font-black uppercase tracking-tight text-black">2. Shipping Intelligence</h2>
+                    <h2 className="text-2xl font-black uppercase tracking-tight text-black">2. Delivery Address</h2>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <Input 
-                        label="Identity / Full Name" 
+                        label="Full Name" 
                         name="name" 
                         value={formData.name} 
                         onChange={handleChange} 
@@ -338,7 +338,7 @@ export default function CheckoutPage() {
                         error={errors.name}
                       />
                       <Input 
-                        label="Electronic Mail" 
+                        label="Email Address" 
                         type="email" 
                         name="email" 
                         value={formData.email} 
@@ -348,7 +348,7 @@ export default function CheckoutPage() {
                       />
                       <div className="md:col-span-2">
                         <Input 
-                          label="Mobile Terminal" 
+                          label="Mobile Number" 
                           type="tel" 
                           name="phone" 
                           value={formData.phone} 
@@ -361,7 +361,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-10">
-                    <h3 className="text-xl font-bold text-black uppercase tracking-tight">Deployment Location</h3>
+                    <h3 className="text-xl font-bold text-black uppercase tracking-tight">Address Details</h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="md:col-span-2 space-y-3">
@@ -401,12 +401,12 @@ export default function CheckoutPage() {
               <Card variant="outline" padding="p-8 md:p-12" className="animate-fade-in">
                 <div className="space-y-16">
                   <div className="space-y-10">
-                    <h2 className="text-2xl font-black uppercase tracking-tight text-black">3. Monetary Authorization</h2>
+                    <h2 className="text-2xl font-black uppercase tracking-tight text-black">3. Payment Method</h2>
                     <div className="grid grid-cols-1 gap-6">
                       <PaymentOption 
                         active={paymentMethod === 'online'} 
                         onClick={() => setPaymentMethod('online')}
-                        title="Electronic Transfer"
+                        title="Online Payment"
                         desc="Secured via Razorpay (UPI, Credit/Debit, Net Banking)"
                         icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>}
                       />
@@ -414,7 +414,7 @@ export default function CheckoutPage() {
                         active={paymentMethod === 'cod'} 
                         onClick={() => setPaymentMethod('cod')}
                         title="Cash on Delivery"
-                        desc="Settlement upon physical arrival (₹50 service fee)"
+                        desc="Pay on Delivery (₹50 extra)"
                         icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>}
                       />
                     </div>
@@ -422,7 +422,7 @@ export default function CheckoutPage() {
 
                   <div className="space-y-10">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-bold text-black uppercase tracking-tight">Deployment Confirmation</h3>
+                      <h3 className="text-xl font-bold text-black uppercase tracking-tight">Delivery Address</h3>
                       <button onClick={() => setStep(2)} className="text-[11px] font-black text-black underline uppercase tracking-[0.2em] hover:text-zinc-500 transition-colors">Modify</button>
                     </div>
                     <Card variant="flat" padding="p-10" className="space-y-4 rounded-3xl border border-border-light shadow-depth-1">
@@ -453,7 +453,7 @@ export default function CheckoutPage() {
                       className="flex-[2]"
                       disabled={loading}
                     >
-                      {loading ? 'Processing...' : paymentMethod === 'cod' ? 'Confirm Deployment' : `Authorize ₹${total.toLocaleString('en-IN')}`}
+                      {loading ? 'Processing...' : paymentMethod === 'cod' ? 'Place Order' : `Pay ₹${total.toLocaleString('en-IN')}`}
                     </Button>
                   </div>
                 </div>
@@ -465,7 +465,7 @@ export default function CheckoutPage() {
           <div className="lg:col-span-4">
             <div className="lg:sticky top-12 space-y-10">
               <Card variant="shadow" padding="p-10" className="space-y-10 rounded-3xl">
-                <h3 className="text-xl font-black text-black uppercase tracking-[0.2em] text-center border-b border-border-light pb-8">Financial Overview</h3>
+                <h3 className="text-xl font-black text-black uppercase tracking-[0.2em] text-center border-b border-border-light pb-8">Order Summary</h3>
                 
                 <div className="max-h-[400px] overflow-y-auto pr-4 space-y-8 custom-scrollbar">
                   {cartItems.map((item) => (
@@ -487,25 +487,25 @@ export default function CheckoutPage() {
 
                 <div className="pt-10 border-t border-dashed border-zinc-200 space-y-5">
                   <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
-                    <span className="text-zinc-400">Silhouettes Subtotal</span>
+                    <span className="text-zinc-400">Items Subtotal</span>
                     <span className="text-black">₹{subtotal.toLocaleString('en-IN')}</span>
                   </div>
                   <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
-                    <span className="text-zinc-400">Logistics / Shipping</span>
+                    <span className="text-zinc-400">Delivery Charges</span>
                     <span className={deliveryCharge === 0 ? 'text-green-600' : 'text-black'}>
-                      {deliveryCharge === 0 ? 'COMPLIMENTARY' : `₹${deliveryCharge}`}
+                      {deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}
                     </span>
                   </div>
                   {paymentMethod === 'cod' && (
                     <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
-                      <span className="text-zinc-400">Manual Handling</span>
+                      <span className="text-zinc-400">Cash on Delivery Fee</span>
                       <span className="text-black">₹50</span>
                     </div>
                   )}
                 </div>
 
                 <div className="pt-10 border-t-2 border-black flex justify-between items-baseline">
-                  <span className="text-sm font-black text-black uppercase tracking-[0.3em]">Total Value</span>
+                  <span className="text-sm font-black text-black uppercase tracking-[0.3em]">Total Amount</span>
                   <div className="text-right">
                     <span className="text-4xl font-black text-black">₹{total.toLocaleString('en-IN')}</span>
                   </div>
@@ -513,8 +513,8 @@ export default function CheckoutPage() {
               </Card>
 
               <div className="bg-white border border-border-light rounded-3xl p-10 space-y-10 shadow-depth-1">
-                <SummaryFeature icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>} title="Secure Terminal" desc="SSL Authorized Encryption" />
-                <SummaryFeature icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="3" width="15" height="13" /><polyline points="16 8 20 8 23 11 23 16 16 16" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>} title="Rapid Logistics" desc="3-5 Business Days Delivery" />
+                <SummaryFeature icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>} title="Secure Payment" desc="SSL Authorized Encryption" />
+                <SummaryFeature icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="3" width="15" height="13" /><polyline points="16 8 20 8 23 11 23 16 16 16" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>} title="Fast Delivery" desc="3-5 Business Days Delivery" />
               </div>
             </div>
           </div>

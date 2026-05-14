@@ -54,8 +54,8 @@ export default function CartDrawer() {
         {/* Header */}
         <div className="flex items-center justify-between p-10 border-b border-onyx/5">
           <div>
-            <h2 className="text-2xl font-black text-onyx">YOUR BAG</h2>
-            <p className="technical text-onyx/30 text-[8px] mt-1">Operational_Unit_Manifest // {cartItems.length}_Items</p>
+            <h2 className="text-2xl font-black text-onyx">YOUR CART</h2>
+            <p className="technical text-onyx/30 text-[8px] mt-1">Shopping Cart // {cartItems.length} Items</p>
           </div>
           <button onClick={closeCart} className="w-12 h-12 rounded-full border border-onyx/10 flex items-center justify-center hover:bg-onyx hover:text-white transition-all">✕</button>
         </div>
@@ -64,8 +64,8 @@ export default function CartDrawer() {
         <div className="flex-1 overflow-y-auto px-10 py-8 custom-scrollbar space-y-10">
           {cartItems.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
-              <p className="editorial italic text-3xl text-onyx/20">Empty Manifest</p>
-              <Button onClick={closeCart} className="technical underline underline-offset-8 decoration-chrome decoration-4">Return To Directory</Button>
+              <p className="editorial italic text-3xl text-onyx/20">Your Cart is Empty</p>
+              <Button onClick={closeCart} className="technical underline underline-offset-8 decoration-chrome decoration-4">Continue Shopping</Button>
             </div>
           ) : (
             cartItems.map((item) => (
@@ -87,7 +87,7 @@ export default function CartDrawer() {
                       <span className="technical text-[10px]">{item.quantity}</span>
                       <button onClick={() => updateQuantity(item._id, item.quantity + 1)} className="text-xs hover:text-chrome">+</button>
                     </div>
-                    <button onClick={() => removeFromCart(item._id)} className="technical text-[8px] text-onyx/20 hover:text-onyx transition-colors">REMOVE_ENTRY</button>
+                    <button onClick={() => removeFromCart(item._id)} className="technical text-[8px] text-onyx/20 hover:text-onyx transition-colors">REMOVE</button>
                   </div>
                 </div>
               </div>
@@ -104,18 +104,18 @@ export default function CartDrawer() {
                 <span>₹{subtotal}</span>
               </div>
               <div className="flex justify-between technical text-[9px] text-onyx/40">
-                <span>Deployment Fee</span>
-                <span className={delivery === 0 ? 'text-onyx font-black' : ''}>{delivery === 0 ? 'FREE_CREDIT' : `₹${delivery}`}</span>
+                <span>Delivery Charges</span>
+                <span className={delivery === 0 ? 'text-onyx font-black' : ''}>{delivery === 0 ? 'FREE' : `₹${delivery}`}</span>
               </div>
               <div className="flex justify-between text-lg font-black pt-4 border-t border-onyx/10">
-                <span className="technical">Total_Value</span>
+                <span className="technical">Total Amount</span>
                 <span>₹{total}</span>
               </div>
             </div>
             
             <Link href="/checkout" onClick={closeCart}>
               <Button className="h-20 w-full rounded-full bg-onyx text-white hover:scale-[1.02] active:scale-95 transition-all text-xs font-black tracking-[0.4em] shadow-kinetic relative overflow-hidden group">
-                <span className="relative z-10">INITIATE CHECKOUT</span>
+                <span className="relative z-10">PLACE ORDER</span>
                 <div className="absolute inset-0 bg-chrome translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               </Button>
             </Link>

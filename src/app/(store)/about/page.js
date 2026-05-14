@@ -9,7 +9,7 @@ import Link from 'next/link';
  */
 export const metadata = {
   title: 'Our Protocol - ENERGY',
-  description: 'The philosophy behind the world\'s most intentional performance silhouettes.',
+  description: 'The story behind India\'s premium quality women leggings brand.',
 };
 
 export default function AboutPage() {
@@ -20,10 +20,10 @@ export default function AboutPage() {
       <section className="relative h-[70vh] flex flex-col justify-center overflow-hidden">
         <Container>
           <div className="max-w-4xl space-y-8 z-10 relative">
-            <span className="technical text-onyx/30 tracking-[0.6em] animate-kinetic-reveal">Our_Identity // Phase_01</span>
+            <span className="technical text-onyx/30 tracking-[0.6em] animate-kinetic-reveal">Premium Leggings for Women</span>
             <h1 className="text-[clamp(3.5rem,10vw,8rem)] leading-[0.8] animate-kinetic-reveal [animation-delay:200ms] uppercase font-black">
               Beyond <br/> 
-              <span className="editorial italic lowercase font-normal text-onyx/30">performance</span>
+              <span className="editorial italic lowercase font-normal text-onyx/30">comfort</span>
             </h1>
           </div>
         </Container>
@@ -49,18 +49,18 @@ export default function AboutPage() {
                 </h2>
               </div>
               <p className="text-xl text-onyx/60 max-w-2xl leading-relaxed editorial italic">
-                ENERGY was founded on a singular premise: that performance silhouettes should be as disciplined as the elite who wear them. We don't believe in templates. We believe in clinical precision.
+                ENERGY was founded on a singular premise: that women leggings should provide extreme comfort, flexibility, and durability. We believe in top-grade fabrics that match your daily flow.
               </p>
               
               {/* Pillars Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8">
                 <div className="space-y-4">
-                  <h4 className="technical text-onyx font-black">Engineering</h4>
-                  <p className="text-sm text-onyx/50 leading-relaxed uppercase tracking-tight">Proprietary compression fabrics designed for recovery and zero-distraction movement.</p>
+                  <h4 className="technical text-onyx font-black">Fabric Grade</h4>
+                  <p className="text-sm text-onyx/50 leading-relaxed uppercase tracking-tight">Top-tier stretchable fabrics designed for sweat-wicking, skin-friendliness, and non-transparency.</p>
                 </div>
                 <div className="space-y-4">
-                  <h4 className="technical text-onyx font-black">Aesthetics</h4>
-                  <p className="text-sm text-onyx/50 leading-relaxed uppercase tracking-tight">A visual language rooted in cinematic minimalism and high-stakes operational utility.</p>
+                  <h4 className="technical text-onyx font-black">Elegance</h4>
+                  <p className="text-sm text-onyx/50 leading-relaxed uppercase tracking-tight">A rich aesthetic language delivering unmatched color depth and perfect form retention.</p>
                 </div>
               </div>
             </div>
@@ -91,17 +91,17 @@ export default function AboutPage() {
             <ValueCard 
               number="01"
               title="PRECISION"
-              description="Every seam and laser-cut edge is placed with clinical accuracy to optimize human operational efficiency."
+              description="Every seam is stitched with extreme care to ensure maximum durability and dynamic flexibility."
             />
             <ValueCard 
               number="02"
               title="DISCIPLINE"
-              description="We adhere to a minimalist protocol that removes all visual and physical noise from the athlete's environment."
+              description="We focus on pure comfort and breathability, giving you zero distractions through your busy days."
             />
             <ValueCard 
               number="03"
               title="COLLECTIVE"
-              description="ENERGY is a global network of elite performers pushing the boundaries of what is operationally possible."
+              description="ENERGY brings the finest range of women activewear and daily leggings, catering to comfort-seekers across India."
             />
           </div>
         </Container>
@@ -116,7 +116,7 @@ export default function AboutPage() {
             </h2>
             <Link href="/shop" className="inline-block pt-8">
               <Button className="h-20 px-16 rounded-full bg-chrome text-onyx text-[12px] font-black tracking-[0.5em] shadow-kinetic hover:scale-105 transition-transform uppercase">
-                EXPLORE_DIRECTORY
+                EXPLORE SHOP
               </Button>
             </Link>
           </div>

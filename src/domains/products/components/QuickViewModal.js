@@ -75,14 +75,14 @@ export default function QuickViewModal({ product, isOpen, onClose }) {
 
           <div className="flex gap-4">
             <Button size="lg" fullWidth onClick={handleAddToCart} className="bg-black text-white hover:bg-zinc-800 uppercase tracking-[0.25em] text-[10px] font-bold h-14">
-              Add to Bag
+              ADD TO CART
             </Button>
           </div>
 
           <div className="mt-12 pt-8 border-t border-zinc-100 flex flex-col gap-4">
             <div className="flex items-center gap-4">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M5 18H3c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v2M21 16v-4a2 2 0 00-2-2h-2v6h2c1.1 0 2-.9 2-2z" /><circle cx="8" cy="18" r="2" /><circle cx="16" cy="18" r="2" /></svg>
-              <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 font-bold">Complimentary Shipping</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 font-bold">Free Delivery</span>
             </div>
             <div className="flex items-center gap-4">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>

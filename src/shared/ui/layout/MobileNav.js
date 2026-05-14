@@ -16,9 +16,9 @@ const MobileNav = () => {
   }, []);
 
   const navItems = [
-    { href: '/', label: 'IDENTITY', icon: <HomeIcon /> },
-    { href: '/shop', label: 'SILHOUETTES', icon: <ShopIcon /> },
-    { href: '/cart', label: 'BAG', icon: <CartIcon count={cartCount} /> },
+    { href: '/', label: 'HOME', icon: <HomeIcon /> },
+    { href: '/shop', label: 'SHOP', icon: <ShopIcon /> },
+    { href: '/cart', label: 'CART', icon: <CartIcon count={cartCount} /> },
     { href: '/orders', label: 'ORDERS', icon: <OrdersIcon /> },
   ];
 

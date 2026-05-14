@@ -39,8 +39,8 @@ export default function Navbar() {
         {/* Directory Links: Refined for all screens */}
         <div className="flex items-center gap-4 md:gap-8 mx-4 md:mx-10 md:border-r border-onyx/10 md:pr-10 h-6 overflow-x-auto hide-scrollbar whitespace-nowrap">
           {[
-            { name: 'Identity', href: '/about' },
-            { name: 'Directory', href: '/shop' },
+            { name: 'About', href: '/about' },
+            { name: 'Shop', href: '/shop' },
             { name: 'Orders', href: '/orders' }
           ].map((link) => (
             <Link 

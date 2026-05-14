@@ -12,7 +12,7 @@ export default function ProductCard({ product, onQuickView }) {
   const { addToCart } = useCart();
   
   // Clean product name (Remove suffixes like - page_018)
-  const cleanName = product.name?.split('-')[0].trim() || 'Experimental Silhouette';
+  const cleanName = product.name?.split('-')[0].trim() || 'Premium Product';
 
   return (
     <div className="group flex flex-col h-full animate-deploy">
@@ -56,7 +56,7 @@ export default function ProductCard({ product, onQuickView }) {
         {/* Badge */}
         {product.flags?.isFeatured && (
           <div className="absolute top-6 left-6 technical bg-onyx text-white px-4 py-1.5 rounded-full">
-            Top_Tier
+            Bestseller
           </div>
         )}
       </div>
@@ -73,14 +73,14 @@ export default function ProductCard({ product, onQuickView }) {
           <div className="flex items-center gap-2">
             <span className="w-4 h-px bg-onyx/20" />
             <p className="technical text-[9px] uppercase tracking-widest text-onyx/60">
-              {product.category || 'Standard_Issue'}
+              {product.category || 'General'}
             </p>
           </div>
           <button 
             onClick={() => onQuickView?.(product)}
             className="technical text-[8px] opacity-20 hover:opacity-100 hover:text-chrome transition-all tracking-widest uppercase"
           >
-            Deploy_Silhouette
+            Quick View
           </button>
         </div>
       </div>

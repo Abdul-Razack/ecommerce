@@ -17,13 +17,13 @@ export default function Footer() {
           <div className="md:col-span-4 space-y-6">
             <h2 className="text-4xl font-black tracking-tighter">ENERGY <span className="text-xs align-top opacity-20">®</span></h2>
             <p className="editorial italic text-white/40 max-w-xs text-sm leading-relaxed">
-              Engineering silhouettes for those who lead with silent intensity. Discipline is the only interface.
+              Premium Quality Leggings for every woman. Unmatched Comfort and Style.
             </p>
             {/* Newsletter: Compact Pill */}
             <div className="relative max-w-sm mt-8">
               <input 
                 type="email" 
-                placeholder="Order Tracking Email" 
+                placeholder="Your Email Address" 
                 className="w-full bg-white/5 border border-white/10 rounded-full py-4 px-6 text-sm technical focus:outline-none focus:border-chrome/50"
               />
               <button className="absolute right-2 top-2 bottom-2 px-6 rounded-full bg-bone text-onyx text-[9px] font-black tracking-widest hover:bg-chrome transition-all uppercase">
@@ -35,9 +35,9 @@ export default function Footer() {
           {/* Links: Compact Grid */}
           <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-8">
             {[
-              { title: 'Collection', links: ['New Arrivals', 'Performance', 'Experimental'] },
-              { title: 'Protocol', links: ['Size Protocol', 'Operational Returns', 'Our Ethos'] },
-              { title: 'Support', links: ['Order Tracking', 'Privacy Protocol', 'Secure Registry'] }
+              { title: 'Shop', links: ['Polo Patiala', 'MTS Churidar Leggings', 'Ankle Length Leggings'] },
+              { title: 'Policy', links: ['Size Guide', 'Returns & Replacements', 'About Us'] },
+              { title: 'Support', links: ['Order Tracking', 'Privacy Policy', 'Secure Payment'] }
             ].map((col) => (
               <div key={col.title} className="space-y-4">
                 <span className="technical text-[10px] text-white/20">{col.title}</span>
@@ -57,7 +57,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row items-center justify-between pt-10 text-[10px] technical opacity-20 uppercase tracking-[0.2em]">
-          <span>© 2026 Onyx & Bone Operational Collective</span>
+          <span>© 2026 Premium Leggings Collective</span>
           <div className="flex gap-8 mt-4 md:mt-0">
             {['Instagram', 'Twitter', 'Laboratory'].map(social => (
               <span key={social} className="hover:text-white cursor-pointer transition-colors uppercase">{social}</span>

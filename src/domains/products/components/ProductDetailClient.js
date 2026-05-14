@@ -97,7 +97,7 @@ export default function ProductDetailClient({ product }) {
             <div className="mt-4">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '24px', borderTop: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-                  <span style={{ width: '20px', textAlign: 'center' }}>🚚</span> Free shipping on orders above ₹999
+                  <span style={{ width: '20px', textAlign: 'center' }}>🚚</span> Free delivery on orders above ₹999
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
                   <span style={{ width: '20px', textAlign: 'center' }}>💵</span> Cash on Delivery available (+₹50)

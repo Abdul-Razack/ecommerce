@@ -25,8 +25,28 @@ export default function ProductCardWrapper({ products }) {
   }, [searchTerm]);
 
   const categories = useMemo(() => {
+    const predefined = [
+      'Polo Patiala',
+      'Two Way Pant Legging',
+      'MTS Churidar Leggings',
+      'Capri Leggings',
+      'Ankle Length Leggings',
+      'Normal Leggings',
+      'Ankle Rib Leggings',
+      'Ankle Leggings (Pocket)',
+      'Shimmer Leggings',
+      'Palazo',
+      'Ankitha Cigarette Pant',
+      'Tight Two Way Leggings',
+      'Cycling Leggings'
+    ];
     const cats = new Set(products.map(p => p.category).filter(Boolean));
-    return ['all', ...Array.from(cats)];
+    const existing = Array.from(cats);
+    
+    // Filter out any from active list that are already predefined
+    const otherCats = existing.filter(cat => !predefined.includes(cat));
+    
+    return ['all', ...predefined, ...otherCats];
   }, [products]);
 
   const filteredAndSorted = useMemo(() => {
@@ -48,7 +68,7 @@ export default function ProductCardWrapper({ products }) {
       {/* 2026 Kinetic Filter Bar */}
       <div className="flex flex-col md:flex-row justify-between items-end gap-12 border-b border-onyx/5 pb-16">
         <div className="space-y-4">
-          <p className="technical text-onyx/30">Registry_Directory // {filteredAndSorted.length}_Units</p>
+          <p className="technical text-onyx/30">Shop Directory // {filteredAndSorted.length} Items</p>
           <div className="flex items-center gap-6">
             <h2 className="text-5xl font-black text-onyx leading-none">
               {category === 'all' ? 'The Collective' : category}
@@ -71,23 +91,23 @@ export default function ProductCardWrapper({ products }) {
           {/* Precision Selectors */}
           <div className="flex gap-10">
             <div className="flex flex-col gap-3">
-              <span className="technical text-onyx/20 text-[8px]">Series_Filter</span>
+              <span className="technical text-onyx/20 text-[8px]">Category</span>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="bg-transparent font-black text-[10px] uppercase tracking-widest outline-none cursor-pointer"
               >
-                {categories.map(c => <option key={c} value={c}>{c === 'all' ? 'All Series' : c}</option>)}
+                {categories.map(c => <option key={c} value={c}>{c === 'all' ? 'All Categories' : c}</option>)}
               </select>
             </div>
             <div className="flex flex-col gap-3">
-              <span className="technical text-onyx/20 text-[8px]">Order_By</span>
+              <span className="technical text-onyx/20 text-[8px]">Sort By</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="bg-transparent font-black text-[10px] uppercase tracking-widest outline-none cursor-pointer"
               >
-                <option value="newest">Chronological</option>
+                <option value="newest">Newest</option>
                 <option value="price-low">Value: Low-High</option>
                 <option value="price-high">Value: High-Low</option>
               </select>
@@ -114,7 +134,7 @@ export default function ProductCardWrapper({ products }) {
                   <div className="flex items-center gap-4">
                     <span className="h-[2px] w-8 bg-chrome" />
                     <span className="technical text-[9px] font-bold tracking-[0.2em] text-onyx/30">
-                      {productsInCat.length}_UNITS_DEPLOYED
+                      {productsInCat.length} ITEMS AVAILABLE
                     </span>
                   </div>
                 </div>
@@ -139,7 +159,7 @@ export default function ProductCardWrapper({ products }) {
         </div>
       ) : (
         <div className="py-40 text-center space-y-8">
-          <p className="editorial italic text-4xl text-onyx/20">Empty Manifest</p>
+          <p className="editorial italic text-4xl text-onyx/20">No Products Found</p>
           <button
             onClick={() => { setCategory('all'); setSearchTerm(''); }}
             className="technical font-black underline underline-offset-8 decoration-acid decoration-4"
@@ -182,7 +202,7 @@ export default function ProductCardWrapper({ products }) {
                       <div className="flex items-center gap-3 mb-2">
                         <span className="h-4 w-[2px] bg-chrome" />
                         <span className="technical text-[9px] font-black uppercase tracking-[0.2em] text-onyx">
-                          {selectedProduct.category || 'Core_Series'}
+                          {selectedProduct.category || 'General'}
                         </span>
                       </div>
                       <h3 className="text-2xl font-black uppercase tracking-tight">
@@ -199,11 +219,11 @@ export default function ProductCardWrapper({ products }) {
                     </div>
                     <div>
                       <p className="technical text-[7px] opacity-30 uppercase tracking-widest mb-1">Series</p>
-                      <p className="text-[10px] font-bold uppercase tracking-wider">Experimental_v26</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider">Premium_v26</p>
                     </div>
                     <div>
                       <p className="technical text-[7px] opacity-30 uppercase tracking-widest mb-1">Performance</p>
-                      <p className="text-[10px] font-bold uppercase tracking-wider">Elite_Tactical</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider">High Quality</p>
                     </div>
                     <div>
                       <p className="technical text-[7px] opacity-30 uppercase tracking-widest mb-1">Status</p>
@@ -218,7 +238,7 @@ export default function ProductCardWrapper({ products }) {
                     }}
                     className="w-full h-16 bg-onyx text-white technical text-[9px] font-black tracking-[0.4em] rounded-full hover:bg-chrome hover:text-onyx transition-all shadow-kinetic uppercase"
                   >
-                    ADD_TO_BAG
+                    ADD TO CART
                   </button>
                 </div>
               </div>

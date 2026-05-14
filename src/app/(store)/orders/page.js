@@ -137,7 +137,7 @@ function OrdersContent() {
                     </div>
 
                     <div className="lg:w-80 border-t lg:border-t-0 lg:border-l border-gray-100 pt-10 lg:pt-0 lg:pl-16 flex-shrink-0">
-                      <h4 className="text-[10px] uppercase tracking-[0.3em] font-black text-gray-400 mb-8">Manifest Details</h4>
+                      <h4 className="text-[10px] uppercase tracking-[0.3em] font-black text-gray-400 mb-8">Order Details</h4>
                       <div className="space-y-6">
                         {order.items?.map((item, idx) => (
                           <div key={idx} className="flex gap-5 items-center">
@@ -175,7 +175,7 @@ function OrdersContent() {
             </p>
             <Link href="/shop">
               <Button size="lg" className="px-16 font-bold uppercase tracking-widest text-[11px] rounded-xl h-16">
-                Exploration Store
+                Explore Shop
               </Button>
             </Link>
           </div>

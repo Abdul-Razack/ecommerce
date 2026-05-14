@@ -67,7 +67,7 @@ export default function ProductDetails({ product, relatedProducts }) {
               <h1 className="text-4xl md:text-6xl font-black leading-[0.9] tracking-tighter uppercase">{cleanName}</h1>
               <div className="flex items-baseline gap-4 pt-2">
                 <p className="text-3xl font-black text-onyx">₹{product.price}</p>
-                <span className="technical text-chrome text-[10px]">Taxes_Included</span>
+                <span className="technical text-chrome text-[10px]">Inclusive of all taxes</span>
               </div>
             </div>
 
@@ -80,7 +80,7 @@ export default function ProductDetails({ product, relatedProducts }) {
               <div className="flex gap-12 pt-4">
                 <div className="flex flex-col gap-2">
                   <span className="technical text-onyx/20 text-[8px]">Availability</span>
-                  <span className="text-[9px] font-black uppercase tracking-[0.2em]">{product.stock > 0 ? 'Deployable' : 'Stationed'}</span>
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em]">{product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="technical text-onyx/20 text-[8px]">Construction</span>
@@ -96,10 +96,10 @@ export default function ProductDetails({ product, relatedProducts }) {
                   onClick={() => addToCart(product)}
                   className="h-16 flex-grow rounded-full bg-onyx text-white hover:bg-chrome hover:text-onyx transition-all text-[10px] font-black tracking-[0.4em] shadow-kinetic uppercase"
                 >
-                  DEPLOY_TO_BAG
+                  ADD TO CART
                 </Button>
               </div>
-              <p className="technical text-center opacity-20 text-[8px]">Complimentary Shipping // Global_Registry_Security</p>
+              <p className="technical text-center opacity-20 text-[8px]">Free Delivery // Secure Payment</p>
             </div>
           </div>
         </div>
@@ -112,12 +112,12 @@ export default function ProductDetails({ product, relatedProducts }) {
             <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <span className="technical text-onyx/20 text-[8px]">Registry_Related // 04</span>
+                  <span className="technical text-onyx/20 text-[8px]">Related Products</span>
                   <div className="w-12 h-px bg-onyx/10" />
                 </div>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">Compatible <br />Series</h2>
+                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">Similar <br />Products</h2>
               </div>
-              <p className="technical text-onyx/40 md:text-right max-w-xs text-[10px]">Complementary silos engineered <br />for high-stakes layering.</p>
+              <p className="technical text-onyx/40 md:text-right max-w-xs text-[10px]">Customers who viewed this item <br />also viewed.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {relatedProducts.slice(0, 4).map(p => <ProductCard key={p._id} product={p} />)}
