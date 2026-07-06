@@ -13,7 +13,7 @@ module.exports = {
         // 2026 DTC Palette: Onyx & Bone
         onyx: '#0D0D0D',
         bone: '#F9F9F7',
-        chrome: '#E5E5E1', // High-Class Metallic
+        chrome: '#C5A059', // Premium DTC Gold accent
         background: '#F9F9F7',
         foreground: '#0D0D0D',
       },

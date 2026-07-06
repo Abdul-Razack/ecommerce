@@ -50,10 +50,21 @@ export const product = defineType({
       options: { hotspot: true },
     }),
     defineField({
+      name: "externalImageUrl",
+      title: "External Featured Image URL",
+      type: "string",
+    }),
+    defineField({
       name: "gallery",
       title: "Image Gallery",
       type: "array",
       of: [{ type: "image", options: { hotspot: true } }],
+    }),
+    defineField({
+      name: "externalGalleryUrls",
+      title: "External Gallery Image URLs",
+      type: "array",
+      of: [{ type: "string" }],
     }),
     defineField({
       name: "category",

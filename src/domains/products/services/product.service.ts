@@ -18,9 +18,11 @@ export const productService = {
         comparePrice,
         stock,
         description,
-        "imageUrl": coalesce(images[0].asset->url, mainImage.asset->url),
+        "imageUrl": coalesce(mainImage.asset->url, externalImageUrl),
         "gallery": gallery[].asset->url,
-        "category": category->name
+        "externalGalleryUrls": externalGalleryUrls,
+        "category": category->name,
+        variants
       }
     `);
   },
@@ -37,9 +39,11 @@ export const productService = {
         price,
         comparePrice,
         description,
-        "imageUrl": coalesce(images[0].asset->url, mainImage.asset->url),
+        "imageUrl": coalesce(mainImage.asset->url, externalImageUrl),
         gallery,
-        "category": category->name
+        "externalGalleryUrls": externalGalleryUrls,
+        "category": category->name,
+        variants
       }
     `, { slug });
   },
@@ -54,7 +58,7 @@ export const productService = {
         name, 
         "slug": slug.current, 
         price, 
-        "imageUrl": coalesce(images[0].asset->url, mainImage.asset->url), 
+        "imageUrl": coalesce(mainImage.asset->url, externalImageUrl), 
         "category": category->name
       }
     `, { category, currentId });
@@ -70,7 +74,7 @@ export const productService = {
         name, 
         "slug": slug.current, 
         price, 
-        "imageUrl": coalesce(images[0].asset->url, mainImage.asset->url), 
+        "imageUrl": coalesce(mainImage.asset->url, externalImageUrl), 
         "category": category->name
       }
     `);

@@ -154,7 +154,7 @@ export default function CheckoutPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.order.amount,
         currency: 'INR',
-        name: 'Energy',
+        name: 'Posh Pigeon',
         description: `Order of ${getCartCount()} items`,
         order_id: orderData.order.id,
         handler: async function (response) {

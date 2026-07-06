@@ -41,6 +41,7 @@ function AdminLayoutInner({ children }) {
 
   const navItems = [
     { href: '/admin', label: 'Dashboard' },
+    { href: '/admin/products', label: 'Products' },
     { href: '/admin/orders', label: 'Orders' },
     { href: '/admin/stock', label: 'Inventory' },
     { href: '/admin/reports', label: 'Performance' },
@@ -54,7 +55,7 @@ function AdminLayoutInner({ children }) {
       <aside className="w-64 border-r border-zinc-100 flex flex-col fixed inset-y-0 left-0 bg-white z-20">
         <div className="p-8 pb-12">
           <Link href="/admin" className="text-xl font-bold tracking-tight uppercase text-black">
-            AURA ETHNIC
+            POSH PIGEON
           </Link>
           <p className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 mt-2">
             Administrator

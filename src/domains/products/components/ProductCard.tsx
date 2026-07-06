@@ -11,8 +11,14 @@ import { useCart } from '@/hooks/useCart';
 export default function ProductCard({ product, onQuickView }) {
   const { addToCart } = useCart();
   
-  // Clean product name (Remove suffixes like - page_018)
-  const cleanName = product.name?.split('-')[0].trim() || 'Premium Product';
+  // Clean product name (Remove suffixes like - page_018 and format "Page XX")
+  let cleanName = product.name?.split('-')[0].trim() || 'Premium Product';
+  if (/^page \d+$/i.test(cleanName)) {
+    const pageNum = cleanName.match(/\d+/)[0];
+    cleanName = product.category 
+      ? `Premium ${product.category} ${pageNum}` 
+      : `Premium Posh Wear ${pageNum}`;
+  }
 
   return (
     <div className="group flex flex-col h-full animate-deploy">
@@ -64,9 +70,42 @@ export default function ProductCard({ product, onQuickView }) {
       {/* Info Layer: Refined Hierarchy */}
       <div className="mt-8 px-2 space-y-4">
         <div className="flex justify-between items-baseline border-b border-onyx/5 pb-4">
-          <h3 className="text-[12px] font-black uppercase tracking-tight leading-none group-hover:text-chrome transition-colors">
-            {cleanName}
-          </h3>
+          <div>
+            <h3 className="text-[12px] font-black uppercase tracking-tight leading-none group-hover:text-chrome transition-colors">
+              {cleanName}
+            </h3>
+            {/* Color Swatches */}
+            {(() => {
+              const productColors = Array.from(new Set(product.variants?.map(v => v.color).filter(Boolean) || []));
+              if (productColors.length === 0) return null;
+              return (
+                <div className="flex gap-1.5 mt-2">
+                  {productColors.map((color: any, idx) => {
+                    const lowerColor = color.toLowerCase();
+                    const colorMap: Record<string, string> = {
+                      blue: '#2563EB',
+                      grey: '#71717A',
+                      gray: '#71717A',
+                      red: '#DC2626',
+                      yellow: '#FBBF24',
+                      black: '#000000',
+                      white: '#FFFFFF',
+                      gold: '#C5A059',
+                    };
+                    const bgVal = colorMap[lowerColor] || lowerColor;
+                    return (
+                      <span 
+                        key={idx} 
+                        className="w-2 h-2 rounded-full border border-black/10 shadow-sm inline-block"
+                        style={{ backgroundColor: bgVal }}
+                        title={color}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </div>
           <span className="technical text-onyx font-bold opacity-100">₹{product.price}</span>
         </div>
         <div className="flex justify-between items-center">

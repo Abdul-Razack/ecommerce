@@ -8,8 +8,8 @@ import Link from 'next/link';
  * Refined editorial narrative with high-class atmospheric depth.
  */
 export const metadata = {
-  title: 'Our Manifesto - Aura Ethnic',
-  description: 'The story behind India\'s premium quality women leggings brand.',
+  title: 'Our Manifesto - Posh Pigeon',
+  description: 'The story behind India\'s premium quality women\'s clothing brand.',
 };
 
 export default function AboutPage() {
@@ -20,7 +20,7 @@ export default function AboutPage() {
       <section className="relative h-[70vh] flex flex-col justify-center overflow-hidden">
         <Container>
           <div className="max-w-4xl space-y-8 z-10 relative">
-            <span className="technical text-onyx/30 tracking-[0.6em] animate-kinetic-reveal">Premium Leggings for Women</span>
+            <span className="technical text-onyx/30 tracking-[0.6em] animate-kinetic-reveal">Premium Clothing for Women</span>
             <h1 className="text-[clamp(3.5rem,10vw,8rem)] leading-[0.8] animate-kinetic-reveal [animation-delay:200ms] uppercase font-black">
               Beyond <br/> 
               <span className="editorial italic lowercase font-normal text-onyx/30">comfort</span>
@@ -49,7 +49,7 @@ export default function AboutPage() {
                 </h2>
               </div>
               <p className="text-xl text-onyx/60 max-w-2xl leading-relaxed editorial italic">
-                Aura Ethnic was founded on a singular premise: that women leggings should provide extreme comfort, flexibility, and durability. We believe in top-grade fabrics that match your daily flow.
+                Posh Pigeon was founded on a singular premise: that women's wear should provide extreme comfort, style, and durability. From leggings and nighties to inskirts and sarees, we believe in top-grade fabrics that match your daily flow.
               </p>
               
               {/* Pillars Grid */}
@@ -101,7 +101,7 @@ export default function AboutPage() {
             <ValueCard 
               number="03"
               title="COLLECTIVE"
-              description="Aura Ethnic brings the finest range of women activewear and daily leggings, catering to comfort-seekers across India."
+              description="Posh Pigeon brings the finest range of women's apparel, from premium leggings and nighties to comfortable inskirts and elegant sarees, catering to comfort-seekers across India."
             />
           </div>
         </Container>

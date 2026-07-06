@@ -2,8 +2,8 @@ import '@/styles/globals.css';
 import { Providers } from '@/providers/Providers';
 
 export const metadata = {
-  title: 'Aura Ethnic - Premium Women\'s Leggings Store',
-  description: 'Discover premium daily activewear and ethnic leggings designed for extreme comfort and style.',
+  title: 'Posh Pigeon - Premium Women\'s Apparel',
+  description: 'Discover premium women\'s clothing including leggings, nighties, inskirts, and sarees designed for comfort and style.',
 };
 
 export default function RootLayout({ children }) {

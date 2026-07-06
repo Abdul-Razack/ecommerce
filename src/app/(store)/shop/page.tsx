@@ -7,7 +7,7 @@ import Button from '@/shared/ui/Button';
 export const revalidate = 60;
 
 export const metadata = {
-  title: 'All Products - Energy',
+  title: 'All Products - Posh Pigeon',
   description: 'Browse our complete collection of premium products at the best prices.',
 };
 
@@ -27,19 +27,21 @@ export default async function ProductsPage({ searchParams }) {
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Header */}
-      <div className="bg-zinc-50 border-b border-zinc-100 py-16">
+      {/* Hero Section */}
+      <div className="bg-[#F8F6F4] py-12 md:py-16 border-b border-zinc-150">
         <Container>
-          <div className="flex flex-col items-center text-center">
-            <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-zinc-400 mb-4 block">
-              Our Collection
-            </span>
-            <h1 className="text-4xl font-bold tracking-tight text-black mb-2 uppercase">
-              {category ? category.replace(/-/g, ' ') : 'All Products'}
-            </h1>
-            <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">
-              Showing {products.length} Items
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            <div className="md:col-span-5 space-y-4">
+              <h1 className="text-4xl md:text-6xl font-black tracking-tight text-black uppercase">Shop</h1>
+              <div className="flex items-center gap-2 text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em]">
+                <Link href="/" className="hover:text-black transition-colors">Home</Link>
+                <span>&gt;</span>
+                <span className="text-black">Shop</span>
+              </div>
+            </div>
+            <div className="md:col-span-7 rounded-2xl overflow-hidden shadow-tactile border border-zinc-100 aspect-[21/9]">
+              <img src="/shop_banner_rack.png" className="w-full h-full object-cover" alt="Shop Apparel Banner" />
+            </div>
           </div>
         </Container>
       </div>

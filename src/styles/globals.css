@@ -7,7 +7,7 @@
   --onyx: #121212;
   --bone: #F9F9F7;
   --neutral-soft: #F1F1EF;
-  --chrome: #E5FF00; /* Kinetic Highlight */
+  --chrome: #C5A059; /* DTC Gold Highlight */
   --glass-white: rgba(255, 255, 255, 0.03);
   --glass-dark: rgba(18, 18, 18, 0.85);
 }
@@ -47,7 +47,7 @@
   }
 
   .shadow-chrome {
-    box-shadow: 0 0 40px -5px rgba(229, 255, 0, 0.3);
+    box-shadow: 0 0 40px -5px rgba(197, 160, 89, 0.3);
   }
 
   /* Tactile Interaction Logic */

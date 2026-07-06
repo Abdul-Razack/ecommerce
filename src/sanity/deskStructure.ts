@@ -2,7 +2,7 @@ import { BulkUploadTool } from './components/BulkUploadTool';
 
 export const deskStructure = (S) =>
   S.list()
-    .title("Aura Ethnic Admin")
+    .title("Posh Pigeon Admin")
     .items([
       // Content Section
       S.listItem()

@@ -10,14 +10,14 @@ import Container from './Container';
  */
 export default function Footer() {
   return (
-    <footer className="bg-onyx text-white rounded-t-[3rem] py-20 relative overflow-hidden">
+    <footer className="bg-onyx text-white rounded-t-[3rem] py-20 relative overflow-hidden mt-24 md:mt-32">
       <Container>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-b border-white/5 pb-16">
           {/* Brand & Manifesto */}
           <div className="md:col-span-4 space-y-6">
-            <h2 className="text-3xl font-black tracking-tight uppercase">AURA ETHNIC <span className="text-xs align-top opacity-20">®</span></h2>
+            <img src="images/logo.png" alt="Posh Pigeon Logo" className="h-8 w-auto object-contain" />
             <p className="editorial italic text-white/40 max-w-xs text-sm leading-relaxed">
-              Premium Quality Leggings for every woman. Unmatched Comfort and Style.
+              Premium Quality apparel for every woman. Unmatched Comfort and Style.
             </p>
             {/* Newsletter: Compact Pill */}
             <div className="relative max-w-sm mt-8">
@@ -35,7 +35,7 @@ export default function Footer() {
           {/* Links: Compact Grid */}
           <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-8">
             {[
-              { title: 'Shop', links: ['Polo Patiala', 'MTS Churidar Leggings', 'Ankle Length Leggings'] },
+              { title: 'Shop', links: ['Leggings', 'Nighty', 'Inskirt', 'Sarees'] },
               { title: 'Policy', links: ['Size Guide', 'Returns & Replacements', 'About Us'] },
               { title: 'Support', links: ['Order Tracking', 'Privacy Policy', 'Secure Payment'] }
             ].map((col) => (
@@ -57,7 +57,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row items-center justify-between pt-10 text-[10px] technical opacity-20 uppercase tracking-[0.2em]">
-          <span>© 2026 Premium Leggings Collective</span>
+          <span>© 2026 Posh Pigeon Collective</span>
           <div className="flex gap-8 mt-4 md:mt-0">
             {['Instagram', 'Twitter', 'Laboratory'].map(social => (
               <span key={social} className="hover:text-white cursor-pointer transition-colors uppercase">{social}</span>

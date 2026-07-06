@@ -6,7 +6,7 @@ export const categoryService = {
    */
   async getCategories() {
     return await client.fetch(`
-      *[_type == "category"] | order(name asc) {
+      *[_type == "category" && name in ["Leggings", "Nighty", "Inskirt", "Sarees"]] | order(name asc) {
         _id, name, slug, image
       }
     `);

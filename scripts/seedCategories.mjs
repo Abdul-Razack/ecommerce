@@ -11,10 +11,7 @@ const client = createClient({
   useCdn: false,
 });
 
-const CATEGORIES = [
-  "Leggings", "Bottomwear", "Women's Fashion", 
-  "Patiala", "Premium Collection", "New Arrivals", "Accessories"
-];
+const CATEGORIES = ["Leggings", "Nighty", "Inskirt", "Sarees"];
 
 async function main() {
   console.log('Seeding categories...');
@@ -35,18 +32,18 @@ async function main() {
     console.log(`✓ Category: ${name}`);
   }
 
-  // Assign to products
-  const products = await client.fetch('*[_type == "product" && !defined(category)]');
-  console.log(`Assigning categories to ${products.length} products...`);
+  // Assign to products in transaction (batch)
+  const products = await client.fetch('*[_type == "product"]');
+  console.log(`Assigning categories to ${products.length} products via transaction...`);
 
+  const transaction = client.transaction();
   for (const product of products) {
     const randomCat = categoryIds[Math.floor(Math.random() * categoryIds.length)];
-    await client
-      .patch(product._id)
-      .set({ category: { _type: 'reference', _ref: randomCat } })
-      .commit();
+    transaction.patch(product._id, p => p.set({ category: { _type: 'reference', _ref: randomCat } }));
   }
 
+  await transaction.commit();
+  console.log('✓ Successfully assigned all product categories!');
   console.log('Done!');
 }
 

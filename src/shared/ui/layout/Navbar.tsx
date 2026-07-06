@@ -37,17 +37,17 @@ export default function Navbar({ user, signInUrl, onSignOut }) {
         pointer-events-auto flex items-center justify-between
         max-w-fit px-5 h-12 rounded-full transition-all duration-700
         ${isScrolled 
-          ? 'glass-chrome scale-95 shadow-kinetic text-onyx translate-y-[-5px]' 
-          : 'bg-[#F1F1EF]/40 backdrop-blur-xl border border-onyx/5 shadow-tactile text-onyx'
+          ? 'bg-black/95 scale-95 shadow-kinetic text-white translate-y-[-5px] border border-white/10' 
+          : 'bg-black text-white border border-white/10 shadow-tactile'
         }
       `}>
-        {/* Brand */}
-        <Link href="/" className="text-sm md:text-lg font-black tracking-tight uppercase flex-shrink-0 flex items-center gap-1">
-          AURA ETHNIC <span className="text-[7px] md:text-[8px] opacity-20">®</span>
+        {/* Brand Logo */}
+        <Link href="/" className="flex-shrink-0 flex items-center">
+          <img src="images/logo.png" alt="Posh Pigeon Logo" className="h-6 md:h-7 w-auto object-contain" />
         </Link>
 
         {/* Directory Links: Refined for all screens */}
-        <div className="flex items-center gap-4 md:gap-8 mx-4 md:mx-8 md:border-r border-onyx/10 md:pr-8 h-6 overflow-x-auto hide-scrollbar whitespace-nowrap">
+        <div className="flex items-center gap-4 md:gap-8 mx-4 md:mx-8 md:border-r border-white/10 md:pr-8 h-6 overflow-x-auto hide-scrollbar whitespace-nowrap">
           {[
             { name: 'About', href: '/about' },
             { name: 'Shop', href: '/shop' },
@@ -56,7 +56,7 @@ export default function Navbar({ user, signInUrl, onSignOut }) {
             <Link 
               key={link.name}
               href={link.href}
-              className={`text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${pathname === link.href ? 'text-onyx opacity-100' : 'opacity-20 hover:opacity-100'}`}
+              className={`text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${pathname === link.href ? 'text-white opacity-100' : 'text-white/40 hover:text-white hover:opacity-100'}`}
             >
               {link.name}
             </Link>
@@ -117,7 +117,7 @@ export default function Navbar({ user, signInUrl, onSignOut }) {
             ) : (
               <a 
                 href={signInUrl}
-                className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] opacity-30 hover:opacity-100 hover:text-chrome transition-all"
+                className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] text-white opacity-40 hover:opacity-100 hover:text-chrome transition-all"
               >
                 LOGIN
               </a>
