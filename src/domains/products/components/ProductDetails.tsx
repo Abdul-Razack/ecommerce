@@ -417,7 +417,7 @@ export default function ProductDetails({ product, relatedProducts }) {
         </div>
 
         {/* Product Detail & Spec Breakdown Section */}
-        <div className="mt-32 border-t border-onyx/10 pt-20 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 animate-kinetic-reveal [animation-delay:400ms]">
+        <div className="mt-16 border-t border-onyx/10 pt-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 animate-kinetic-reveal [animation-delay:400ms]">
           <div className="lg:col-span-4">
             <div className="sticky top-32 space-y-4">
               <div className="flex items-center gap-4">
@@ -459,7 +459,7 @@ export default function ProductDetails({ product, relatedProducts }) {
 
       {/* Related Assets: Nice Difference Background */}
       {relatedProducts?.length > 0 && (
-        <section className="mt-40 py-24 bg-[#F1F1EF] border-t border-onyx/5">
+        <section className="mt-16 py-16 bg-[#F1F1EF] border-t border-onyx/5">
           <Container>
             <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
               <div className="space-y-4">

@@ -28,7 +28,7 @@ const Button = ({
     <button
       className={`
         relative inline-flex items-center justify-center
-        rounded-xl font-black uppercase tracking-[0.2em]
+        rounded-full font-black uppercase tracking-[0.2em]
         transition-all duration-300
         disabled:opacity-50 disabled:cursor-not-allowed
         ${variants[variant]}

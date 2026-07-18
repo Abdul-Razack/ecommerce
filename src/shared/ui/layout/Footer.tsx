@@ -15,8 +15,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-b border-white/5 pb-16">
           {/* Brand & Manifesto */}
           <div className="md:col-span-4 space-y-6">
-            <img src="images/logo.png" alt="Posh Pigeon Logo" className="h-8 w-auto object-contain" />
-            <p className="editorial italic text-white/40 max-w-xs text-sm leading-relaxed">
+            <img src="/images/logo.png" alt="Posh Pigeon Logo" className="h-10 w-auto object-contain opacity-80" />
+            <p className="text-sm text-zinc-400 max-w-xs leading-relaxed">
               Premium Quality apparel for every woman. Unmatched Comfort and Style.
             </p>
             {/* Newsletter: Compact Pill */}
@@ -35,17 +35,17 @@ export default function Footer() {
           {/* Links: Compact Grid */}
           <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-8">
             {[
-              { title: 'Shop', links: ['Leggings', 'Nighty', 'Inskirt', 'Sarees'] },
-              { title: 'Policy', links: ['Size Guide', 'Returns & Replacements', 'About Us'] },
-              { title: 'Support', links: ['Order Tracking', 'Privacy Policy', 'Secure Payment'] }
+              { title: 'Shop', links: [{name: 'Leggings', href: '/shop?category=leggings'}, {name: 'Nighty', href: '/shop?category=nighty'}, {name: 'Inskirt', href: '/shop?category=inskirt'}, {name: 'Sarees', href: '/shop?category=sarees'}] },
+              { title: 'Policy', links: [{name: 'Size Guide', href: '/about'}, {name: 'Returns & Replacements', href: '/about'}, {name: 'About Us', href: '/about'}] },
+              { title: 'Support', links: [{name: 'Order Tracking', href: '/orders'}, {name: 'Privacy Policy', href: '/about'}, {name: 'Secure Payment', href: '/about'}] }
             ].map((col) => (
               <div key={col.title} className="space-y-4">
                 <span className="technical text-[10px] text-white/20">{col.title}</span>
                 <ul className="space-y-2">
                   {col.links.map((link) => (
-                    <li key={link}>
-                      <Link href="/shop" className="text-xs technical opacity-60 hover:opacity-100 hover:text-chrome transition-all block">
-                        {link}
+                    <li key={link.name}>
+                      <Link href={link.href} className="text-xs technical opacity-60 hover:opacity-100 hover:text-chrome transition-all block">
+                        {link.name}
                       </Link>
                     </li>
                   ))}

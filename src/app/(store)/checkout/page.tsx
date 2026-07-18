@@ -29,11 +29,47 @@ export default function CheckoutPage() {
 
   const [paymentMethod, setPaymentMethod] = useState('online');
   const [loading, setLoading] = useState(false);
+  
+  const [customerId, setCustomerId] = useState(null);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [saveAddress, setSaveAddress] = useState(false);
 
   // Close cart drawer on mount to prevent overlay interference
   useEffect(() => {
     closeCart();
     
+    // Fetch customer profile
+    fetch('/api/customer/profile')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.customer) {
+          setCustomerId(data.customer._id);
+          setSavedAddresses(data.customer.savedAddresses || []);
+          
+          if (!localStorage.getItem('userAddress')) {
+            setFormData(prev => ({
+              ...prev,
+              name: data.customer.name || prev.name,
+              email: data.customer.email || prev.email,
+              phone: data.customer.phone || prev.phone,
+            }));
+            
+            // Auto-fill default address if available
+            const defaultAddress = data.customer.savedAddresses?.find(a => a.isDefault) || data.customer.savedAddresses?.[0];
+            if (defaultAddress) {
+              setFormData(prev => ({
+                ...prev,
+                address: defaultAddress.street,
+                city: defaultAddress.city,
+                state: defaultAddress.state,
+                pincode: defaultAddress.zipCode,
+              }));
+            }
+          }
+        }
+      })
+      .catch(err => console.error('Error fetching profile:', err));
+
     const savedAddress = localStorage.getItem('userAddress');
     if (savedAddress) {
       try {
@@ -116,6 +152,8 @@ export default function CheckoutPage() {
           paymentType: 'cod',
           paymentStatus: 'pending',
           deliveryCharge: deliveryCharge + codCharge,
+          customerId,
+          saveAddress,
         }),
       });
 
@@ -182,6 +220,8 @@ export default function CheckoutPage() {
                 razorpayOrderId: response.razorpay_order_id,
                 razorpayPaymentId: response.razorpay_payment_id,
                 deliveryCharge,
+                customerId,
+                saveAddress,
               }),
             });
 
@@ -361,7 +401,32 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-10">
-                    <h3 className="text-xl font-bold text-black uppercase tracking-tight">Address Details</h3>
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-xl font-bold text-black uppercase tracking-tight">Address Details</h3>
+                      {savedAddresses.length > 0 && (
+                        <select 
+                          className="text-xs uppercase tracking-widest font-black border border-gray-200 rounded p-2 outline-none cursor-pointer hover:border-black"
+                          onChange={(e) => {
+                            if (!e.target.value) return;
+                            const addr = savedAddresses.find(a => a._key === e.target.value);
+                            if (addr) {
+                              setFormData(prev => ({
+                                ...prev,
+                                address: addr.street,
+                                city: addr.city,
+                                state: addr.state,
+                                pincode: addr.zipCode
+                              }));
+                            }
+                          }}
+                        >
+                          <option value="">Use Saved Address...</option>
+                          {savedAddresses.map(addr => (
+                            <option key={addr._key} value={addr._key}>{addr.street}, {addr.city}</option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="md:col-span-2 space-y-3">
@@ -383,6 +448,18 @@ export default function CheckoutPage() {
                         <Input label="Postal Code" name="pincode" value={formData.pincode} onChange={handleChange} placeholder="6-digit PIN" error={errors.pincode} />
                       </div>
                     </div>
+                    
+                    {customerId && (
+                      <div className="pt-2">
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${saveAddress ? 'bg-black border-black text-white' : 'border-gray-300 group-hover:border-black'}`}>
+                            {saveAddress && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                          </div>
+                          <input type="checkbox" className="hidden" checked={saveAddress} onChange={() => setSaveAddress(!saveAddress)} />
+                          <span className="text-sm font-bold text-gray-900 select-none">Save this address to my profile for future purchases</span>
+                        </label>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col md:flex-row gap-6 pt-10 border-t border-border-light">

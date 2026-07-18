@@ -19,7 +19,7 @@ const MobileNav = ({ user, signInUrl, onSignOut }) => {
     { href: '/', label: 'HOME', icon: <HomeIcon />, isExternal: false },
     { href: '/shop', label: 'SHOP', icon: <ShopIcon />, isExternal: false },
     { href: '/cart', label: 'CART', icon: <CartIcon count={cartCount} />, isExternal: false },
-    { href: '/orders', label: 'ORDERS', icon: <OrdersIcon />, isExternal: false },
+    { href: user ? '/account/orders' : '/orders', label: 'ORDERS', icon: <OrdersIcon />, isExternal: false },
     user 
       ? { onClick: onSignOut, label: 'LOGOUT', icon: <UserIcon /> }
       : { href: signInUrl, label: 'LOGIN', icon: <UserIcon />, isExternal: true }

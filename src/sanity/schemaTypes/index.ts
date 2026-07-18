@@ -5,6 +5,7 @@ import { order } from "./order";
 import { homePage } from "./homePage";
 import { adminUser } from "./adminUser";
 import { bentoGrid } from "./bentoGrid";
+import { customer } from "./customer";
 
 export const schemaTypes = [
   product, 
@@ -13,5 +14,6 @@ export const schemaTypes = [
   order, 
   homePage,
   adminUser,
-  bentoGrid
+  bentoGrid,
+  customer
 ];

@@ -51,6 +51,9 @@ export const deskStructure = (S) =>
                 .title("Orders")
                 .child(S.documentTypeList("order").title("Customer Orders")),
               S.listItem()
+                .title("Customers")
+                .child(S.documentTypeList("customer").title("Registered Customers")),
+              S.listItem()
                 .title("Bulk Catalog Ingestion")
                 .child(
                   S.component(BulkUploadTool)
@@ -63,6 +66,6 @@ export const deskStructure = (S) =>
       // Automatic list for other types
       S.divider(),
       ...S.documentTypeListItems().filter(
-        (listItem) => !["homePage", "adminUser", "product", "category", "order"].includes(listItem.getId())
+        (listItem) => !["homePage", "adminUser", "product", "category", "order", "customer"].includes(listItem.getId())
       ),
     ]);

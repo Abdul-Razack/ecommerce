@@ -8,18 +8,32 @@ import ProductCard from '@/domains/products/components/ProductCard';
 export const dynamic = 'force-dynamic';
 
 export default async function Homepage() {
-  // 01. Fetch Latest Deployments (New Arrivals)
-  const latestProducts = await client.fetch(`*[_type == "product"] | order(_createdAt desc)[0...4] {
-    _id,
-    name,
-    price,
-    comparePrice,
-    stock,
-    "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
-    "category": category->name,
-    "slug": slug.current,
-    variants
-  }`, {}, { next: { revalidate: 0 } });
+  // Fetch multiple sets of products for different sections
+  const [latestProducts, topSellingProducts, recommendedProducts, allProducts] = await Promise.all([
+    client.fetch(`*[_type == "product"] | order(_createdAt desc)[0...4] {
+      _id, name, price, comparePrice, stock,
+      "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
+      "category": category->name, "slug": slug.current, variants
+    }`, {}, { next: { revalidate: 0 } }),
+    
+    client.fetch(`*[_type == "product"] | order(price desc)[0...4] {
+      _id, name, price, comparePrice, stock,
+      "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
+      "category": category->name, "slug": slug.current, variants
+    }`, {}, { next: { revalidate: 0 } }),
+    
+    client.fetch(`*[_type == "product"] | order(_createdAt asc)[0...4] {
+      _id, name, price, comparePrice, stock,
+      "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
+      "category": category->name, "slug": slug.current, variants
+    }`, {}, { next: { revalidate: 0 } }),
+
+    client.fetch(`*[_type == "product"] | order(name asc)[0...8] {
+      _id, name, price, comparePrice, stock,
+      "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
+      "category": category->name, "slug": slug.current, variants
+    }`, {}, { next: { revalidate: 0 } })
+  ]);
 
   return (
     <main className="bg-white pt-24 pb-40">
@@ -144,7 +158,28 @@ export default async function Homepage() {
         </Container>
       </section>
 
-      {/* 03. SPRING SALE PROMOTIONAL BANNER SECTION */}
+      {/* 03. TOP SELLING SECTION */}
+      <section className="py-20 border-t border-zinc-100">
+        <Container>
+          <div className="flex justify-between items-end mb-16">
+            <div className="space-y-4">
+              <h2 className="text-3xl font-black uppercase tracking-tight text-black">Top Selling</h2>
+              <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">Discover what others are loving right now.</p>
+            </div>
+            <Link href="/shop" className="text-[10px] font-black uppercase tracking-widest hover:text-zinc-500 underline decoration-2 underline-offset-4 hidden md:block">
+              Shop Bestsellers
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            {topSellingProducts.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* 04. SPRING SALE PROMOTIONAL BANNER SECTION */}
       <section className="py-12 border-t border-zinc-100">
         <Container>
           <div className="bg-[#1A3A2B] rounded-3xl overflow-hidden shadow-kinetic grid grid-cols-1 md:grid-cols-12 relative items-stretch min-h-[280px]">
@@ -185,7 +220,7 @@ export default async function Homepage() {
         </Container>
       </section>
 
-      {/* 04. NEW ARRIVALS CARD SECTION */}
+      {/* 05. NEW ARRIVALS CARD SECTION */}
       <section className="py-20 border-t border-zinc-100 bg-[#FAF9F5]">
         <Container>
           <div className="text-center space-y-4 mb-16">
@@ -196,10 +231,7 @@ export default async function Homepage() {
           {latestProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
               {latestProducts.map((product) => (
-                <ProductCard 
-                  key={product._id} 
-                  product={product} 
-                />
+                <ProductCard key={product._id} product={product} />
               ))}
             </div>
           ) : (
@@ -210,18 +242,62 @@ export default async function Homepage() {
         </Container>
       </section>
 
-      {/* 05. FINAL CTA */}
-      <section className="py-40 text-center bg-white border-t border-zinc-100">
+      {/* 06. RECOMMENDED PICKS */}
+      <section className="py-20 border-t border-zinc-100">
         <Container>
-          <div className="max-w-4xl mx-auto space-y-12">
-            <h2 className="text-6xl md:text-[8rem] font-black tracking-tighter leading-[0.8] uppercase">
-              JOIN THE <br/> <span className="text-chrome">COLLECTION</span>
-            </h2>
-            <Link href="/shop" className="inline-block pt-8">
-              <Button className="h-20 px-16 rounded-full bg-onyx text-white text-[12px] font-black tracking-[0.5em] shadow-kinetic hover:scale-105 transition-transform uppercase">
-                EXPLORE SHOP
+          <div className="flex justify-between items-end mb-16">
+            <div className="space-y-4">
+              <h2 className="text-3xl font-black uppercase tracking-tight text-black">Recommended For You</h2>
+              <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">Curated picks based on current trends.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            {recommendedProducts.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* 07. ALL PRODUCTS PREVIEW GRID */}
+      <section className="py-20 border-t border-zinc-100 bg-[#FAF9F5]">
+        <Container>
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-3xl font-black uppercase tracking-tight text-black">All Products Preview</h2>
+            <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">A glimpse into our complete catalog</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
+            {allProducts.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+          
+          <div className="mt-16 text-center">
+            <Link href="/shop">
+              <Button variant="outline" className="h-16 px-16 rounded-full border-2 border-black hover:bg-black hover:text-white transition-all text-[11px] font-black tracking-[0.3em] uppercase">
+                View Entire Collection
               </Button>
             </Link>
+          </div>
+        </Container>
+      </section>
+
+      {/* 08. FINAL CTA */}
+      <section className="py-24 text-center bg-white border-t border-zinc-100">
+        <Container>
+          <div className="max-w-5xl mx-auto bg-[#F1F1EF] border border-zinc-200 rounded-[3rem] md:rounded-[5rem] py-20 md:py-24 px-8 md:px-12 shadow-sm">
+            <div className="max-w-3xl mx-auto space-y-8">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-[1.1] uppercase">
+                JOIN THE <span className="text-chrome">COLLECTION</span>
+              </h2>
+              <Link href="/shop" className="inline-block pt-8">
+                <Button className="h-16 md:h-20 px-12 md:px-16 bg-onyx text-white text-[10px] md:text-[12px] font-black tracking-[0.5em] shadow-kinetic hover:scale-105 transition-transform uppercase">
+                  EXPLORE SHOP
+                </Button>
+              </Link>
+            </div>
           </div>
         </Container>
       </section>

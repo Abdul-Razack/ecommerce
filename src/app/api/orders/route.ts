@@ -48,6 +48,12 @@ export async function POST(request) {
       paymentType: paymentType || 'cod',
       razorpayOrderId: razorpayOrderId || null,
       razorpayPaymentId: razorpayPaymentId || null,
+      ...(body.customerId && {
+        customerRef: {
+          _type: 'reference',
+          _ref: body.customerId
+        }
+      })
     };
 
     // Use Order Service to create the document
@@ -58,6 +64,24 @@ export async function POST(request) {
       _id: item._id,
       quantity: item.quantity
     })));
+
+    // Save address to customer profile if requested
+    if (body.saveAddress && body.customerId) {
+      const { writeClient } = await import('@/shared/lib/sanity');
+      const newAddress = {
+        _key: crypto.randomUUID(),
+        street: address,
+        city: city,
+        state: state,
+        zipCode: pincode,
+        country: 'India',
+        isDefault: false
+      };
+      await writeClient.patch(body.customerId)
+        .setIfMissing({ savedAddresses: [] })
+        .append('savedAddresses', [newAddress])
+        .commit();
+    }
 
     return NextResponse.json({
       success: true,

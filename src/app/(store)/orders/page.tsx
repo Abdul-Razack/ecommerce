@@ -52,26 +52,27 @@ function OrdersContent() {
   return (
     <div className="bg-gray-50 min-h-screen">
       <Section 
+        spacing=""
         title="My Orders" 
         description="Monitor the progress of your premium activewear orders. Enter your registered email to search your history."
-        className="bg-white border-b border-gray-100"
+        className="bg-white border-b border-gray-100 pt-32 md:pt-40 pb-20"
         action={
           <form onSubmit={handleSearch} className="flex-shrink-0">
-            <div className="flex items-end gap-3 max-w-md">
-              <Input
-                label="Registered Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="john@example.com"
-                required
-                className="w-72"
-              />
-              <Button type="submit" disabled={loading} className="h-[60px] px-10 font-bold uppercase tracking-widest text-[11px] rounded-xl">
-                {loading ? '...' : 'Search'}
-              </Button>
-            </div>
-          </form>
+              <div className="flex flex-col md:flex-row items-end gap-3 w-full md:max-w-md mt-6 md:mt-0">
+                <Input
+                  label="Registered Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="john@example.com"
+                  required
+                  className="w-full md:w-72"
+                />
+                <Button type="submit" disabled={loading} className="h-[60px] w-full md:w-auto px-10 font-bold uppercase tracking-widest text-[11px] rounded-xl">
+                  {loading ? '...' : 'Search'}
+                </Button>
+              </div>
+            </form>
         }
       />
 
@@ -183,7 +184,7 @@ function OrdersContent() {
           <div className="flex flex-col items-center justify-center py-40 text-center border-2 border-dashed border-gray-200 rounded-[2rem] bg-white mt-16 group hover:border-black transition-colors duration-500">
             <div className="text-6xl mb-10 opacity-20 group-hover:opacity-100 transition-opacity duration-500">🔍</div>
             <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.4em] group-hover:text-black transition-colors duration-500">
-              Authentication Required to View Orders
+              Enter your email above to track your orders
             </h3>
           </div>
         )}

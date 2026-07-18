@@ -22,6 +22,13 @@ export const order = defineType({
       ]
     }),
     defineField({
+      name: "customerRef",
+      title: "Customer Profile",
+      type: "reference",
+      to: [{ type: "customer" }],
+      description: "Reference to the registered customer profile",
+    }),
+    defineField({
       name: "shippingAddress",
       title: "Shipping Address",
       type: "text",
@@ -84,6 +91,22 @@ export const order = defineType({
       name: "trackingId",
       title: "Tracking ID",
       type: "string",
+    }),
+    defineField({
+      name: "trackingUpdates",
+      title: "Tracking Updates",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "status", type: "string", title: "Status (e.g. Shipped, In Transit)" },
+            { name: "location", type: "string", title: "Location" },
+            { name: "timestamp", type: "datetime", title: "Timestamp" },
+            { name: "description", type: "string", title: "Description/Message" }
+          ]
+        }
+      ]
     }),
   ],
 });

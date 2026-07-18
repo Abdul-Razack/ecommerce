@@ -32,18 +32,22 @@ export default function Navbar({ user, signInUrl, onSignOut }) {
   const userDisplayName = user?.firstName || user?.email?.split('@')[0];
 
   return (
-    <header className="fixed top-6 left-0 right-0 z-[100] flex justify-center pointer-events-none">
-      <nav className={`
-        pointer-events-auto flex items-center justify-between
-        max-w-fit px-5 h-12 rounded-full transition-all duration-700
-        ${isScrolled 
-          ? 'bg-black/95 scale-95 shadow-kinetic text-white translate-y-[-5px] border border-white/10' 
-          : 'bg-black text-white border border-white/10 shadow-tactile'
-        }
-      `}>
+    <>
+      {/* Top scroll mask to hide elements peeking behind the floating navbar */}
+      <div className={`fixed top-0 left-0 right-0 h-12 bg-white/90 backdrop-blur-md z-[90] transition-opacity duration-500 pointer-events-none ${isScrolled ? 'opacity-100' : 'opacity-0'}`} />
+      
+      <header className="fixed top-6 left-0 right-0 z-[100] flex justify-center pointer-events-none">
+        <nav className={`
+          pointer-events-auto flex items-center justify-between
+          max-w-fit px-5 h-12 rounded-full transition-all duration-700
+          ${isScrolled 
+            ? 'bg-black/95 scale-95 shadow-kinetic text-white translate-y-[-5px] border border-white/10' 
+            : 'bg-black text-white border border-white/10 shadow-tactile'
+          }
+        `}>
         {/* Brand Logo */}
         <Link href="/" className="flex-shrink-0 flex items-center">
-          <img src="images/logo.png" alt="Posh Pigeon Logo" className="h-6 md:h-7 w-auto object-contain" />
+          <img src="/images/logo.png" alt="Posh Pigeon Logo" className="h-6 md:h-7 w-auto object-contain" />
         </Link>
 
         {/* Directory Links: Refined for all screens */}
@@ -51,7 +55,7 @@ export default function Navbar({ user, signInUrl, onSignOut }) {
           {[
             { name: 'About', href: '/about' },
             { name: 'Shop', href: '/shop' },
-            { name: 'Orders', href: '/orders' }
+            { name: 'Orders', href: user ? '/account/orders' : '/orders' }
           ].map((link) => (
             <Link 
               key={link.name}
@@ -140,6 +144,7 @@ export default function Navbar({ user, signInUrl, onSignOut }) {
           animation: deploy 0.25s cubic-bezier(0.2, 0, 0.2, 1) forwards;
         }
       `}</style>
-    </header>
+      </header>
+    </>
   );
 }
