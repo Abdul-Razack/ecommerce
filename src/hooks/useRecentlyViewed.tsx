@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 
-const RecentlyViewedContext = createContext();
+const RecentlyViewedContext = createContext<any>(undefined);
 
 export function RecentlyViewedProvider({ children }) {
   const [recentItems, setRecentItems] = useState([]);

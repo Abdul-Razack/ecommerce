@@ -38,6 +38,15 @@ interface Category {
 
 const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
+interface ColorVariantGroup {
+  id: string;
+  color: string;
+  imageAssetIds: string[];
+  uploadedImages: Array<{ assetId: string; url: string }>;
+  externalImageUrls: string[];
+  sizes: { [size: string]: { stock: number; price?: number } };
+}
+
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -59,13 +68,16 @@ export default function AdminProductsPage() {
   const [formImageAssetId, setFormImageAssetId] = useState('');
   const [formImageUrl, setFormImageUrl] = useState('');
   const [formExternalImageUrl, setFormExternalImageUrl] = useState('');
+  const [formUploadedGallery, setFormUploadedGallery] = useState<Array<{ assetId: string; url: string }>>([]);
   const [formExternalGalleryUrls, setFormExternalGalleryUrls] = useState<string[]>([]);
   
-  // Variants (Color + Size Stock) state
-  const [formVariants, setFormVariants] = useState<Variant[]>([]);
+  // Color-wise Grouped Variants state
+  const [formColorGroups, setFormColorGroups] = useState<ColorVariantGroup[]>([]);
 
   // Local helper states
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [uploadingColorId, setUploadingColorId] = useState<string | null>(null);
   const [submitLoading, setSubmitLoading] = useState(false);
 
   useEffect(() => {
@@ -87,6 +99,61 @@ export default function AdminProductsPage() {
     }
   };
 
+  const parseFlatVariantsToGroups = (flat: any[] | undefined): ColorVariantGroup[] => {
+    if (!flat || flat.length === 0) return [];
+    const groupsMap: { [color: string]: ColorVariantGroup } = {};
+    
+    flat.forEach((v) => {
+      const color = v.color || '';
+      if (!groupsMap[color]) {
+        const uploadedImages = (v.images || []).map((img: any) => ({
+          assetId: img.assetId || '',
+          url: img.url || ''
+        }));
+        const imageAssetIds = uploadedImages.map((img: any) => img.assetId).filter(Boolean);
+        const externalImageUrls = v.externalImageUrls || [];
+        
+        groupsMap[color] = {
+          id: Math.random().toString(36).substring(2, 9),
+          color,
+          imageAssetIds,
+          uploadedImages,
+          externalImageUrls,
+          sizes: {}
+        };
+        // Populate all AVAILABLE_SIZES with default 0 stock
+        AVAILABLE_SIZES.forEach(sz => {
+          groupsMap[color].sizes[sz] = { stock: 0 };
+        });
+      }
+      
+      groupsMap[color].sizes[v.size] = {
+        stock: v.stock || 0,
+        price: v.price || undefined
+      };
+    });
+    
+    return Object.values(groupsMap);
+  };
+
+  const serializeGroupsToFlatVariants = (groups: ColorVariantGroup[]): any[] => {
+    const flat: any[] = [];
+    groups.forEach((g) => {
+      if (!g.color) return; // Skip groups without a color name
+      Object.entries(g.sizes).forEach(([size, data]) => {
+        flat.push({
+          color: g.color,
+          size: size,
+          stock: data.stock || 0,
+          price: data.price || undefined,
+          imageAssetIds: g.imageAssetIds,
+          externalImageUrls: g.externalImageUrls.filter(Boolean)
+        });
+      });
+    });
+    return flat;
+  };
+
   const handleOpenAdd = () => {
     setEditingProduct(null);
     setFormName('');
@@ -97,8 +164,9 @@ export default function AdminProductsPage() {
     setFormImageAssetId('');
     setFormImageUrl('');
     setFormExternalImageUrl('');
+    setFormUploadedGallery([]);
     setFormExternalGalleryUrls([]);
-    setFormVariants([]);
+    setFormColorGroups([]);
     setIsDrawerOpen(true);
   };
 
@@ -109,11 +177,12 @@ export default function AdminProductsPage() {
     setFormStock(product.stock.toString());
     setFormCategory(product.categoryId || '');
     setFormDescription(product.description || '');
-    setFormImageAssetId('');
+    setFormImageAssetId((product as any).imageAssetId || '');
     setFormImageUrl(product.imageUrl || '');
     setFormExternalImageUrl(product.externalImageUrl || '');
+    setFormUploadedGallery((product as any).gallery || []);
     setFormExternalGalleryUrls(product.externalGalleryUrls || []);
-    setFormVariants(product.variants || []);
+    setFormColorGroups(parseFlatVariantsToGroups(product.variants));
     setIsDrawerOpen(true);
   };
 
@@ -145,7 +214,46 @@ export default function AdminProductsPage() {
     }
   };
 
-  // Gallery URLs Management
+  const handleGalleryImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingGallery(true);
+    const newUploads: Array<{ assetId: string; url: string }> = [];
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch('/api/admin/products/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.success) {
+          newUploads.push({ assetId: data.assetId, url: data.url });
+        } else {
+          console.error('Failed to upload gallery file:', file.name, data.error);
+        }
+      }
+
+      if (newUploads.length > 0) {
+        setFormUploadedGallery([...formUploadedGallery, ...newUploads]);
+      }
+    } catch (error) {
+      console.error('Error uploading gallery files:', error);
+      alert('Error uploading one or more files');
+    } finally {
+      setUploadingGallery(false);
+    }
+  };
+
+  const removeUploadedGalleryItem = (assetId: string) => {
+    setFormUploadedGallery(formUploadedGallery.filter(item => item.assetId !== assetId));
+  };
+
   const addGalleryUrlField = () => {
     setFormExternalGalleryUrls([...formExternalGalleryUrls, '']);
   };
@@ -162,24 +270,154 @@ export default function AdminProductsPage() {
     setFormExternalGalleryUrls(updated);
   };
 
-  // Variants Management
-  const addVariantField = () => {
-    setFormVariants([...formVariants, { color: '', size: 'M', stock: 10 }]);
+  // Color Group Variant Handlers
+  const addColorGroup = () => {
+    const initialSizes: { [size: string]: { stock: number; price?: number } } = {};
+    AVAILABLE_SIZES.forEach(sz => {
+      initialSizes[sz] = { stock: 0 };
+    });
+
+    setFormColorGroups([...formColorGroups, {
+      id: Math.random().toString(36).substring(2, 9),
+      color: '',
+      imageAssetIds: [],
+      uploadedImages: [],
+      externalImageUrls: [],
+      sizes: initialSizes
+    }]);
   };
 
-  const updateVariantField = (index: number, field: keyof Variant, val: any) => {
-    const updated = [...formVariants];
-    updated[index] = {
-      ...updated[index],
-      [field]: val
-    };
-    setFormVariants(updated);
+  const removeColorGroup = (id: string) => {
+    setFormColorGroups(formColorGroups.filter(g => g.id !== id));
   };
 
-  const removeVariantField = (index: number) => {
-    const updated = [...formVariants];
-    updated.splice(index, 1);
-    setFormVariants(updated);
+  const updateColorName = (id: string, color: string) => {
+    setFormColorGroups(formColorGroups.map(g => g.id === id ? { ...g, color } : g));
+  };
+
+  const updateColorSizeStock = (groupId: string, size: string, stock: number) => {
+    setFormColorGroups(formColorGroups.map(g => {
+      if (g.id === groupId) {
+        const currentSize = g.sizes[size] || { stock: 0 };
+        return {
+          ...g,
+          sizes: {
+            ...g.sizes,
+            [size]: { ...currentSize, stock }
+          }
+        };
+      }
+      return g;
+    }));
+  };
+
+  const updateColorSizePrice = (groupId: string, size: string, price: number | undefined) => {
+    setFormColorGroups(formColorGroups.map(g => {
+      if (g.id === groupId) {
+        const currentSize = g.sizes[size] || { stock: 0 };
+        return {
+          ...g,
+          sizes: {
+            ...g.sizes,
+            [size]: { ...currentSize, price }
+          }
+        };
+      }
+      return g;
+    }));
+  };
+
+  const handleColorImagesUpload = async (groupId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingColorId(groupId);
+    const newUploads: Array<{ assetId: string; url: string }> = [];
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch('/api/admin/products/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.success) {
+          newUploads.push({ assetId: data.assetId, url: data.url });
+        } else {
+          console.error('Failed to upload variant file:', file.name, data.error);
+        }
+      }
+
+      if (newUploads.length > 0) {
+        setFormColorGroups(formColorGroups.map(g => {
+          if (g.id === groupId) {
+            const uploaded = [...g.uploadedImages, ...newUploads];
+            const assetIds = uploaded.map(u => u.assetId);
+            return {
+              ...g,
+              uploadedImages: uploaded,
+              imageAssetIds: assetIds
+            };
+          }
+          return g;
+        }));
+      }
+    } catch (error) {
+      console.error('Error uploading variant files:', error);
+      alert('Error uploading one or more files');
+    } finally {
+      setUploadingColorId(null);
+    }
+  };
+
+  const removeColorImage = (groupId: string, assetId: string) => {
+    setFormColorGroups(formColorGroups.map(g => {
+      if (g.id === groupId) {
+        const uploaded = g.uploadedImages.filter(img => img.assetId !== assetId);
+        const assetIds = uploaded.map(u => u.assetId);
+        return {
+          ...g,
+          uploadedImages: uploaded,
+          imageAssetIds: assetIds
+        };
+      }
+      return g;
+    }));
+  };
+
+  const addColorExternalUrl = (groupId: string) => {
+    setFormColorGroups(formColorGroups.map(g => {
+      if (g.id === groupId) {
+        return { ...g, externalImageUrls: [...g.externalImageUrls, ''] };
+      }
+      return g;
+    }));
+  };
+
+  const updateColorExternalUrl = (groupId: string, index: number, val: string) => {
+    setFormColorGroups(formColorGroups.map(g => {
+      if (g.id === groupId) {
+        const updated = [...g.externalImageUrls];
+        updated[index] = val;
+        return { ...g, externalImageUrls: updated };
+      }
+      return g;
+    }));
+  };
+
+  const removeColorExternalUrl = (groupId: string, index: number) => {
+    setFormColorGroups(formColorGroups.map(g => {
+      if (g.id === groupId) {
+        const updated = [...g.externalImageUrls];
+        updated.splice(index, 1);
+        return { ...g, externalImageUrls: updated };
+      }
+      return g;
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -200,8 +438,9 @@ export default function AdminProductsPage() {
       categoryId: formCategory,
       imageAssetId: formImageAssetId || undefined,
       externalImageUrl: formExternalImageUrl,
+      galleryImageIds: formUploadedGallery.map(img => img.assetId).filter(Boolean),
       externalGalleryUrls: formExternalGalleryUrls.filter(Boolean),
-      variants: formVariants.filter(v => v.color && v.size),
+      variants: serializeGroupsToFlatVariants(formColorGroups),
     };
 
     try {
@@ -289,7 +528,7 @@ export default function AdminProductsPage() {
           />
         </div>
 
-        <Card padding={false} className="overflow-hidden">
+        <Card padding="p-0" className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -374,10 +613,10 @@ export default function AdminProductsPage() {
         </Card>
       </div>
 
-      {/* Drawer Overlay & Content */}
+      {/* Modal Overlay & Content */}
       {isDrawerOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex justify-end animate-in fade-in duration-300">
-          <div className="w-full max-w-xl bg-white h-full p-8 shadow-2xl overflow-y-auto flex flex-col justify-between animate-in slide-in-from-right duration-300">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300">
+          <div className="w-full max-w-4xl bg-white rounded-2xl p-8 shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col justify-between animate-in zoom-in-95 duration-300">
             <div className="space-y-8 pb-10">
               {/* Header */}
               <div className="flex items-center justify-between border-b border-zinc-100 pb-6">
@@ -440,54 +679,166 @@ export default function AdminProductsPage() {
                   </div>
                 </div>
 
-                {/* 2. Inventory & Size Breakdown */}
-                <div className="space-y-4">
+                {/* 2. Color-wise Variants breakdown */}
+                <div className="space-y-6">
                   <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-                    <h4 className="text-[10px] uppercase tracking-widest font-black text-black">2. Sizes & Stock Quantities</h4>
+                    <h4 className="text-[10px] uppercase tracking-widest font-black text-black">2. Color Variant Configurations</h4>
                     <button
                       type="button"
-                      onClick={addVariantField}
+                      onClick={addColorGroup}
                       className="text-[9px] font-black uppercase tracking-widest text-zinc-500 hover:text-black transition-colors"
                     >
-                      + Add Size/Color
+                      + Add Color Option
                     </button>
                   </div>
 
-                  {formVariants.length > 0 ? (
-                    <div className="space-y-3">
-                      {formVariants.map((v, idx) => (
-                        <div key={idx} className="flex gap-2 items-center bg-zinc-50 p-3 border border-zinc-100 rounded-lg">
-                          <input
-                            type="text"
-                            required
-                            placeholder="Color (e.g. Red)"
-                            value={v.color}
-                            onChange={(e) => updateVariantField(idx, 'color', e.target.value)}
-                            className="w-1/3 h-10 px-3 bg-white border border-zinc-200 text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-black"
-                          />
-                          <select
-                            value={v.size}
-                            onChange={(e) => updateVariantField(idx, 'size', e.target.value)}
-                            className="w-1/4 h-10 px-2 bg-white border border-zinc-200 text-[10px] font-black uppercase tracking-widest"
-                          >
-                            {AVAILABLE_SIZES.map(sz => <option key={sz} value={sz}>{sz}</option>)}
-                          </select>
-                          <input
-                            type="number"
-                            required
-                            min="0"
-                            placeholder="Stock"
-                            value={v.stock}
-                            onChange={(e) => updateVariantField(idx, 'stock', parseInt(e.target.value) || 0)}
-                            className="w-1/4 h-10 px-3 bg-white border border-zinc-200 text-xs font-bold focus:outline-none focus:border-black"
-                          />
+                  {formColorGroups.length > 0 ? (
+                    <div className="space-y-8">
+                      {formColorGroups.map((group) => (
+                        <div key={group.id} className="border border-zinc-200 rounded-xl p-6 bg-zinc-50/50 space-y-6 relative">
                           <button
                             type="button"
-                            onClick={() => removeVariantField(idx)}
-                            className="text-red-500 hover:text-red-700 font-bold px-2 text-sm"
+                            onClick={() => removeColorGroup(group.id)}
+                            className="absolute top-4 right-4 text-[9px] font-black uppercase tracking-widest text-red-655 hover:text-red-700 transition-colors"
                           >
-                            ×
+                            Remove Color
                           </button>
+
+                          {/* Color input */}
+                          <div className="space-y-2 max-w-xs">
+                            <label className="block text-[9px] uppercase tracking-widest font-black text-zinc-400">Color Name *</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Ruby Red"
+                              value={group.color}
+                              onChange={(e) => updateColorName(group.id, e.target.value)}
+                              className="w-full h-10 px-3 bg-white border border-zinc-200 text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-black"
+                            />
+                          </div>
+
+                          {/* Color wise images */}
+                          <div className="space-y-4 bg-white p-4 border border-zinc-100 rounded-lg">
+                            <span className="block text-[9px] uppercase tracking-widest font-black text-zinc-500">Color-Wise Images</span>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {/* Color uploads */}
+                              <div className="space-y-2">
+                                <label className="block text-[8px] uppercase tracking-widest font-black text-zinc-400">Upload Images for {group.color || 'this color'}</label>
+                                <div className="border border-dashed border-zinc-200 p-4 text-center bg-zinc-50 hover:border-black transition-colors relative rounded">
+                                  <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={(e) => handleColorImagesUpload(group.id, e)}
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                    disabled={uploadingColorId === group.id}
+                                  />
+                                  {uploadingColorId === group.id ? (
+                                    <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest animate-pulse">Uploading variant images...</p>
+                                  ) : (
+                                    <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Click to upload multiple files</p>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Color manual external links */}
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <label className="block text-[8px] uppercase tracking-widest font-black text-zinc-400">Manual Image URLs</label>
+                                  <button
+                                    type="button"
+                                    onClick={() => addColorExternalUrl(group.id)}
+                                    className="text-[8px] font-black uppercase tracking-widest text-zinc-500 hover:text-black transition-colors"
+                                  >
+                                    + Add URL
+                                  </button>
+                                </div>
+                                {group.externalImageUrls.length > 0 ? (
+                                  <div className="space-y-2">
+                                    {group.externalImageUrls.map((url, urlIdx) => (
+                                      <div key={urlIdx} className="flex gap-2 items-center">
+                                        <input
+                                          type="text"
+                                          placeholder="https://example.com/image.jpg"
+                                          value={url}
+                                          onChange={(e) => updateColorExternalUrl(group.id, urlIdx, e.target.value)}
+                                          className="flex-grow h-9 px-3 bg-zinc-50 border border-zinc-200 text-xs font-medium focus:outline-none focus:border-black"
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={() => removeColorExternalUrl(group.id, urlIdx)}
+                                          className="text-red-500 hover:text-red-700 font-bold px-1 text-sm"
+                                        >
+                                          ×
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="text-[8px] text-zinc-400 italic">No manual URLs added.</p>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Color uploaded thumbnails display - NO text inputs showing Sanity URL! */}
+                            {group.uploadedImages.length > 0 && (
+                              <div className="pt-4 border-t border-zinc-100 mt-2">
+                                <span className="block text-[8px] uppercase tracking-widest font-black text-zinc-400 mb-2">Uploaded Images</span>
+                                <div className="flex flex-wrap gap-3">
+                                  {group.uploadedImages.map((img) => (
+                                    <div key={img.assetId} className="relative w-16 h-20 bg-zinc-100 border border-zinc-200 overflow-hidden group rounded">
+                                      <img src={img.url} alt="Variant image" className="w-full h-full object-cover" />
+                                      <button
+                                        type="button"
+                                        onClick={() => removeColorImage(group.id, img.assetId)}
+                                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-bold text-xs transition-opacity"
+                                      >
+                                        Delete
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Size-wise stock and prices */}
+                          <div className="space-y-3 bg-white p-4 border border-zinc-100 rounded-lg">
+                            <span className="block text-[9px] uppercase tracking-widest font-black text-zinc-500 font-bold">Sizes & Stock Breakdown</span>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                              {AVAILABLE_SIZES.map((sz) => {
+                                const sizeData = group.sizes[sz] || { stock: 0 };
+                                return (
+                                  <div key={sz} className="border border-zinc-150 rounded p-3 bg-zinc-50/30 flex flex-col gap-2">
+                                    <span className="text-[10px] font-black text-black uppercase tracking-wider">{sz} Size</span>
+                                    
+                                    <div className="space-y-1">
+                                      <label className="block text-[7px] uppercase font-bold text-zinc-400">Stock</label>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        value={sizeData.stock}
+                                        onChange={(e) => updateColorSizeStock(group.id, sz, parseInt(e.target.value) || 0)}
+                                        className="w-full h-8 px-2 bg-white border border-zinc-200 text-xs font-bold"
+                                      />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <label className="block text-[7px] uppercase font-bold text-zinc-400">Price Override (INR)</label>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        placeholder="Use Base Price"
+                                        value={sizeData.price || ''}
+                                        onChange={(e) => updateColorSizePrice(group.id, sz, e.target.value ? parseFloat(e.target.value) : undefined)}
+                                        className="w-full h-8 px-2 bg-white border border-zinc-200 text-xs font-bold"
+                                      />
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -505,106 +856,15 @@ export default function AdminProductsPage() {
                         />
                       </div>
                       <p className="text-[9px] text-zinc-400 uppercase tracking-wide">
-                        💡 Click "+ Add Size/Color" to configure stock levels for specific colors and sizes.
+                        💡 Click "+ Add Color Option" to configure variants with color-wise images, sizes, stock, and custom prices.
                       </p>
                     </div>
                   )}
                 </div>
 
-                {/* 3. Product Photos & Multiple Option */}
-                <div className="space-y-6">
-                  <h4 className="text-[10px] uppercase tracking-widest font-black text-black border-b border-zinc-100 pb-2">3. Product Photos</h4>
-                  
-                  {/* Main image options */}
-                  <div className="space-y-4 bg-zinc-50 p-4 border border-zinc-100 rounded-xl">
-                    <span className="block text-[9px] uppercase tracking-widest font-black text-zinc-500">Featured Image Option</span>
-                    
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="space-y-2">
-                        <label className="block text-[8px] uppercase tracking-widest font-black text-zinc-400">Image Address Link (URL)</label>
-                        <input
-                          type="text"
-                          value={formExternalImageUrl}
-                          onChange={(e) => setFormExternalImageUrl(e.target.value)}
-                          placeholder="https://example.com/image.jpg"
-                          className="w-full h-10 px-4 bg-white border border-zinc-200 text-xs font-medium focus:outline-none focus:border-black transition-colors"
-                        />
-                      </div>
-
-                      <div className="text-center text-[10px] text-zinc-300 font-bold uppercase tracking-widest">OR</div>
-
-                      <div className="space-y-2">
-                        <label className="block text-[8px] uppercase tracking-widest font-black text-zinc-400">Upload Image File</label>
-                        <div className="border border-dashed border-zinc-200 p-4 text-center bg-white hover:border-black transition-colors relative">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                          />
-                          {uploadingImage ? (
-                            <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest animate-pulse">Uploading...</p>
-                          ) : formImageUrl ? (
-                            <div className="space-y-1">
-                              <img src={formImageUrl} alt="Uploaded File Preview" className="h-16 mx-auto object-cover border border-zinc-100" />
-                              <p className="text-[8px] font-black text-green-600 uppercase tracking-widest">✓ File uploaded</p>
-                            </div>
-                          ) : (
-                            <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Click to select file</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Multiple Gallery Photos */}
-                  <div className="space-y-4 bg-zinc-50 p-4 border border-zinc-100 rounded-xl">
-                    <div className="flex items-center justify-between border-b border-zinc-200 pb-2">
-                      <span className="block text-[9px] uppercase tracking-widest font-black text-zinc-500">Image Gallery Links</span>
-                      <button
-                        type="button"
-                        onClick={addGalleryUrlField}
-                        className="text-[8px] font-black uppercase tracking-widest text-zinc-500 hover:text-black transition-colors"
-                      >
-                        + Add Image Link
-                      </button>
-                    </div>
-
-                    {formExternalGalleryUrls.length > 0 ? (
-                      <div className="space-y-3">
-                        {formExternalGalleryUrls.map((url, idx) => (
-                          <div key={idx} className="flex gap-2 items-center">
-                            <input
-                              type="text"
-                              value={url}
-                              onChange={(e) => updateGalleryUrlField(idx, e.target.value)}
-                              placeholder="https://example.com/gallery-image.jpg"
-                              className="flex-grow h-10 px-4 bg-white border border-zinc-200 text-xs font-medium focus:outline-none focus:border-black"
-                            />
-                            {url && (
-                              <div className="w-10 h-10 overflow-hidden flex-shrink-0 bg-white border border-zinc-150 rounded">
-                                <img src={url} className="w-full h-full object-cover" alt="Preview" onError={(e)=>{(e.target as any).style.display='none'}}/>
-                              </div>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => removeGalleryUrlField(idx)}
-                              className="text-red-500 hover:text-red-700 font-bold px-2 text-sm"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-[9px] text-zinc-400 italic uppercase tracking-wider">No additional gallery photos added.</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* 4. Description */}
+                {/* 3. Description */}
                 <div className="space-y-2">
-                  <h4 className="text-[10px] uppercase tracking-widest font-black text-black border-b border-zinc-100 pb-2">4. Description</h4>
+                  <h4 className="text-[10px] uppercase tracking-widest font-black text-black border-b border-zinc-100 pb-2">3. Description</h4>
                   <textarea
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}

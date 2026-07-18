@@ -14,12 +14,29 @@ export async function GET() {
         comparePrice,
         stock,
         description,
-        "imageUrl": coalesce(mainImage.asset->url, externalImageUrl),
+        "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
+        "imageAssetId": mainImage.asset->_ref,
         externalImageUrl,
+        "gallery": gallery[] {
+          "assetId": asset->_ref,
+          "url": asset->url
+        },
         externalGalleryUrls,
         "category": category->name,
         "categoryId": category->_ref,
-        variants
+        variants[] {
+          _key,
+          sku,
+          color,
+          size,
+          price,
+          stock,
+          images[] {
+            "assetId": asset->_ref,
+            "url": asset->url
+          },
+          externalImageUrls
+        }
       }
     `);
     
@@ -55,6 +72,7 @@ export async function POST(request: Request) {
       categoryId, 
       imageAssetId, 
       externalImageUrl, 
+      galleryImageIds,
       externalGalleryUrls, 
       variants 
     } = body;
@@ -89,25 +107,65 @@ export async function POST(request: Request) {
           _ref: imageAssetId
         }
       };
+    } else {
+      doc.mainImage = null;
     }
 
     if (externalImageUrl) {
       doc.externalImageUrl = externalImageUrl;
+    } else {
+      doc.externalImageUrl = '';
+    }
+
+    if (galleryImageIds && Array.isArray(galleryImageIds)) {
+      doc.gallery = galleryImageIds.map((id: string) => ({
+        _type: 'image',
+        asset: {
+          _type: 'reference',
+          _ref: id
+        }
+      }));
+    } else {
+      doc.gallery = [];
     }
 
     if (externalGalleryUrls && Array.isArray(externalGalleryUrls)) {
       doc.externalGalleryUrls = externalGalleryUrls.filter(Boolean);
+    } else {
+      doc.externalGalleryUrls = [];
     }
 
     if (variants && Array.isArray(variants)) {
-      doc.variants = variants.map((v: any, index: number) => ({
-        _key: `v_${Date.now()}_${index}`,
-        sku: v.sku || `${slug}-${v.color || ''}-${v.size || ''}`.toLowerCase(),
-        color: v.color || '',
-        size: v.size || '',
-        stock: parseInt(v.stock) || 0,
-        price: v.price ? parseFloat(v.price) : undefined,
-      }));
+      doc.variants = variants.map((v: any, index: number) => {
+        const item: any = {
+          _key: v._key || `v_${Date.now()}_${index}`,
+          sku: v.sku || `${slug}-${v.color || ''}-${v.size || ''}`.toLowerCase(),
+          color: v.color || '',
+          size: v.size || '',
+          stock: parseInt(v.stock) || 0,
+          price: v.price ? parseFloat(v.price) : undefined,
+        };
+
+        if (v.imageAssetIds && Array.isArray(v.imageAssetIds)) {
+          item.images = v.imageAssetIds.map((id: string) => ({
+            _type: 'image',
+            asset: {
+              _type: 'reference',
+              _ref: id
+            }
+          }));
+        } else {
+          item.images = [];
+        }
+
+        if (v.externalImageUrls && Array.isArray(v.externalImageUrls)) {
+          item.externalImageUrls = v.externalImageUrls.filter(Boolean);
+        } else {
+          item.externalImageUrls = [];
+        }
+
+        return item;
+      });
       
       // Calculate total stock
       const totalStock = doc.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0);
@@ -137,6 +195,7 @@ export async function PUT(request: Request) {
       categoryId, 
       imageAssetId, 
       externalImageUrl, 
+      galleryImageIds,
       externalGalleryUrls, 
       variants 
     } = body;
@@ -161,15 +220,44 @@ export async function PUT(request: Request) {
         _ref: categoryId,
       },
       externalImageUrl: externalImageUrl || '',
+      gallery: (galleryImageIds && Array.isArray(galleryImageIds)) ? galleryImageIds.map((id: string) => ({
+        _type: 'image',
+        asset: {
+          _type: 'reference',
+          _ref: id
+        }
+      })) : [],
       externalGalleryUrls: (externalGalleryUrls && Array.isArray(externalGalleryUrls)) ? externalGalleryUrls.filter(Boolean) : [],
-      variants: (variants && Array.isArray(variants)) ? variants.map((v: any, index: number) => ({
-        _key: v._key || `v_${Date.now()}_${index}`,
-        sku: v.sku || `${slug}-${v.color || ''}-${v.size || ''}`.toLowerCase(),
-        color: v.color || '',
-        size: v.size || '',
-        stock: parseInt(v.stock) || 0,
-        price: v.price ? parseFloat(v.price) : undefined,
-      })) : []
+      variants: (variants && Array.isArray(variants)) ? variants.map((v: any, index: number) => {
+        const item: any = {
+          _key: v._key || `v_${Date.now()}_${index}`,
+          sku: v.sku || `${slug}-${v.color || ''}-${v.size || ''}`.toLowerCase(),
+          color: v.color || '',
+          size: v.size || '',
+          stock: parseInt(v.stock) || 0,
+          price: v.price ? parseFloat(v.price) : undefined,
+        };
+
+        if (v.imageAssetIds && Array.isArray(v.imageAssetIds)) {
+          item.images = v.imageAssetIds.map((id: string) => ({
+            _type: 'image',
+            asset: {
+              _type: 'reference',
+              _ref: id
+            }
+          }));
+        } else {
+          item.images = [];
+        }
+
+        if (v.externalImageUrls && Array.isArray(v.externalImageUrls)) {
+          item.externalImageUrls = v.externalImageUrls.filter(Boolean);
+        } else {
+          item.externalImageUrls = [];
+        }
+
+        return item;
+      }) : []
     };
 
     if (imageAssetId) {
@@ -180,6 +268,8 @@ export async function PUT(request: Request) {
           _ref: imageAssetId
         }
       };
+    } else {
+      patches.mainImage = null;
     }
 
     if (patches.variants.length > 0) {

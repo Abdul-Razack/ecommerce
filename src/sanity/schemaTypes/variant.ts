@@ -41,5 +41,11 @@ export const variant = defineType({
       type: "array",
       of: [{ type: "image", options: { hotspot: true } }],
     }),
+    defineField({
+      name: "externalImageUrls",
+      title: "External Image URLs",
+      type: "array",
+      of: [{ type: "string" }],
+    }),
   ],
 });

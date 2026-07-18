@@ -5,7 +5,7 @@ import Container from '@/shared/ui/layout/Container';
 import Button from '@/shared/ui/Button';
 import ProductCard from '@/domains/products/components/ProductCard';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function Homepage() {
   // 01. Fetch Latest Deployments (New Arrivals)
@@ -15,11 +15,11 @@ export default async function Homepage() {
     price,
     comparePrice,
     stock,
-    "imageUrl": coalesce(mainImage.asset->url, externalImageUrl),
+    "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
     "category": category->name,
     "slug": slug.current,
     variants
-  }`);
+  }`, {}, { next: { revalidate: 0 } });
 
   return (
     <main className="bg-white pt-24 pb-40">
@@ -84,7 +84,7 @@ export default async function Homepage() {
                 </Link>
               </div>
               <img 
-                src="https://images.unsplash.com/photo-1506152983158-b4a74a01c721?q=80&w=300&auto=format&fit=crop" 
+                src="https://assets0.mirraw.com/images/8288550/RoyalBlue_4fe606c6-8430-41df-812b-c2b0eb46bb6d_zoom.jpg?1600076914" 
                 alt="Leggings Focus" 
                 className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-white/10"
               />
@@ -101,7 +101,7 @@ export default async function Homepage() {
                 </Link>
               </div>
               <img 
-                src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=300&auto=format&fit=crop" 
+                src="https://www.ankitadesigns.in/cdn/shop/files/350nilima.png?v=1777283189" 
                 alt="Nighty Focus" 
                 className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-white/10"
               />
@@ -118,7 +118,7 @@ export default async function Homepage() {
                 </Link>
               </div>
               <img 
-                src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=300&auto=format&fit=crop" 
+                src="https://jisboutique.com/cdn/shop/files/24_166af726-83fd-4c7c-a62f-54444fbbefc3.jpg?v=1718281040" 
                 alt="Inskirt Focus" 
                 className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-white/10"
               />
@@ -135,7 +135,7 @@ export default async function Homepage() {
                 </Link>
               </div>
               <img 
-                src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=300&auto=format&fit=crop" 
+                src="https://pochampallysarees.com/cdn/shop/files/PureSoftSilkBlueYellowSari.jpg?v=1762248060" 
                 alt="Sarees Focus" 
                 className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-white/10"
               />
@@ -176,7 +176,7 @@ export default async function Homepage() {
             {/* Right Banner Image Column */}
             <div className="md:col-span-7 relative min-h-[200px] md:min-h-full">
               <img 
-                src="/promo_flatlay.png" 
+                src="/images/poster-image.png" 
                 className="w-full h-full object-cover" 
                 alt="Spring Sale Flatlay" 
               />

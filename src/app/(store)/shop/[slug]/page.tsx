@@ -3,7 +3,7 @@ import { urlFor } from '@/shared/lib/sanity';
 import { notFound } from 'next/navigation';
 import ProductDetails from '@/domains/products/components/ProductDetails';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -59,6 +59,32 @@ export default async function ProductDetailPage({ params }) {
     product.externalGalleryUrls.forEach((url: string) => {
       if (url && !images.some(img => img.url === url)) {
         images.push({ url, thumbnailUrl: url });
+      }
+    });
+  }
+
+  // Add variant specific images to the details gallery
+  if (product.variants && Array.isArray(product.variants)) {
+    product.variants.forEach((v: any) => {
+      if (v.images && Array.isArray(v.images)) {
+        v.images.forEach((img: any) => {
+          try {
+            const url = urlFor(img).width(800).height(1000).url();
+            const thumbnailUrl = urlFor(img).width(100).height(125).url();
+            if (url && !images.some(img => img.url === url)) {
+              images.push({ url, thumbnailUrl });
+            }
+          } catch (e) {
+            console.error('Error parsing variant image', e);
+          }
+        });
+      }
+      if (v.externalImageUrls && Array.isArray(v.externalImageUrls)) {
+        v.externalImageUrls.forEach((url: string) => {
+          if (url && !images.some(img => img.url === url)) {
+            images.push({ url, thumbnailUrl: url });
+          }
+        });
       }
     });
   }

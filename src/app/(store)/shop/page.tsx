@@ -4,7 +4,7 @@ import Container from '@/shared/ui/layout/Container';
 import Link from 'next/link';
 import Button from '@/shared/ui/Button';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'All Products - Posh Pigeon',

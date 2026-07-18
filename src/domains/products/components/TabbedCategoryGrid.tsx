@@ -148,7 +148,7 @@ export default function TabbedCategoryGrid({ initialProducts }: TabbedCategoryGr
                     <img 
                       src={product.imageUrl || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=2040&auto=format&fit=crop'} 
                       alt={cleanName}
-                      className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105"
+                      className="w-full h-full object-contain p-2 transition-all duration-1000 group-hover:scale-105"
                     />
                   </Link>
 

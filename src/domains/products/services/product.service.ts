@@ -18,7 +18,7 @@ export const productService = {
         comparePrice,
         stock,
         description,
-        "imageUrl": coalesce(mainImage.asset->url, externalImageUrl),
+        "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
         "gallery": gallery[].asset->url,
         "externalGalleryUrls": externalGalleryUrls,
         "category": category->name,
@@ -39,7 +39,7 @@ export const productService = {
         price,
         comparePrice,
         description,
-        "imageUrl": coalesce(mainImage.asset->url, externalImageUrl),
+        "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
         gallery,
         "externalGalleryUrls": externalGalleryUrls,
         "category": category->name,
@@ -58,7 +58,7 @@ export const productService = {
         name, 
         "slug": slug.current, 
         price, 
-        "imageUrl": coalesce(mainImage.asset->url, externalImageUrl), 
+        "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])), 
         "category": category->name
       }
     `, { category, currentId });
@@ -74,7 +74,7 @@ export const productService = {
         name, 
         "slug": slug.current, 
         price, 
-        "imageUrl": coalesce(mainImage.asset->url, externalImageUrl), 
+        "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])), 
         "category": category->name
       }
     `);

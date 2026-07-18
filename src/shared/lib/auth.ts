@@ -12,22 +12,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        console.log('[Auth Debug] Authorize called with email:', credentials?.email);
         if (!credentials?.email || !credentials?.password) {
+          console.log('[Auth Debug] Missing email or password');
           return null;
         }
 
         try {
           // Query Sanity for the admin user
+          console.log('[Auth Debug] Fetching admin user from Sanity...');
           const admin = await writeClient.fetch(`
             *[_type == "adminUser" && email == $email][0]
           `, { email: credentials.email as string });
 
-          if (!admin) return null;
+          if (!admin) {
+            console.log('[Auth Debug] Admin user not found in Sanity database');
+            return null;
+          }
+          console.log('[Auth Debug] Admin user found in Sanity:', admin.email);
 
           const isValid = await bcrypt.compare(credentials.password as string, admin.password);
+          console.log('[Auth Debug] Password comparison result:', isValid);
 
-          if (!isValid) return null;
+          if (!isValid) {
+            console.log('[Auth Debug] Invalid password provided');
+            return null;
+          }
 
+          console.log('[Auth Debug] Authorization successful!');
           return {
             id: admin._id,
             email: admin.email,
@@ -35,7 +47,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             role: 'admin',
           };
         } catch (error) {
-          console.error('Auth error:', error);
+          console.error('[Auth Debug] Auth error occurred:', error);
           return null;
         }
       },
