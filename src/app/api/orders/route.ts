@@ -41,6 +41,8 @@ export async function POST(request) {
         name: item.name,
         price: item.price,
         quantity: item.quantity,
+        color: item.color || null,
+        size: item.size || null,
       })),
       totalAmount,
       status: 'confirmed',

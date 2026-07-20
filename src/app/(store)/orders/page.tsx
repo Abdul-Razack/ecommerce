@@ -55,7 +55,7 @@ function OrdersContent() {
         spacing=""
         title="My Orders" 
         description="Monitor the progress of your premium activewear orders. Enter your registered email to search your history."
-        className="bg-white border-b border-gray-100 pt-32 md:pt-40 pb-20"
+        className="bg-white border-b border-gray-100 pt-10 md:pt-12 pb-20"
         action={
           <form onSubmit={handleSearch} className="flex-shrink-0">
               <div className="flex flex-col md:flex-row items-end gap-3 w-full md:max-w-md mt-6 md:mt-0">
@@ -119,20 +119,65 @@ function OrdersContent() {
                         <Badge variant={order.status === 'delivered' ? 'success' : 'primary'} className="h-7 px-4 font-black uppercase text-[9px] tracking-widest">
                           {order.status?.replace(/_/g, ' ') || 'processing'}
                         </Badge>
-                        <Badge variant="neutral" className="h-7 px-4 font-black uppercase text-[9px] tracking-widest bg-gray-100 border-none">
-                          {order.paymentType === 'cod' ? '🏠 COD' : '💳 Online'}
+                        <Badge variant="neutral" className="h-7 px-4 font-black uppercase text-[9px] tracking-widest bg-gray-100 border-none flex items-center gap-1 text-zinc-700">
+                          {order.paymentType === 'cod' ? (
+                            <>
+                              <svg className="w-3 h-3 text-zinc-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                              <span>COD</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-3 h-3 text-zinc-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>
+                              <span>Online</span>
+                            </>
+                          )}
                         </Badge>
                       </div>
 
                       <OrderTimeline status={order.status} />
 
                       {order.trackingId && (
-                        <div className="bg-gray-50 border border-gray-100 p-6 rounded-xl inline-flex items-center gap-4">
-                          <span className="text-xl">🚚</span>
-                          <div>
-                            <p className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400 mb-1">Carrier Tracking ID</p>
-                            <p className="text-sm font-black text-black tracking-widest uppercase">{order.trackingId}</p>
+                        <div className="bg-gray-50 border border-gray-100 p-6 rounded-xl flex flex-col gap-4">
+                          <div className="flex items-center gap-4">
+                            <svg className="w-5 h-5 text-zinc-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 8h7.88a1 1 0 01.97 1.2l-.96 4.8a1 1 0 01-.97.8H13" />
+                            </svg>
+                            <div>
+                              <p className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400 mb-1">Carrier Tracking ID</p>
+                              <p className="text-sm font-black text-black tracking-widest uppercase">{order.trackingId}</p>
+                            </div>
                           </div>
+
+                          {order.trackingUpdates && order.trackingUpdates.length > 0 && (
+                            <div className="mt-4 border-t border-gray-200 pt-4 space-y-4">
+                              <p className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">Tracking Timeline</p>
+                              <div className="relative pl-6 space-y-6 border-l border-zinc-200 mt-2">
+                                {order.trackingUpdates.map((update: any, idx: number) => (
+                                  <div key={idx} className="relative">
+                                    <div className={`absolute -left-[30px] top-1 w-2 h-2 rounded-full border-2 bg-white ${
+                                      idx === 0 ? 'border-black ring-4 ring-black/10 scale-125' : 'border-zinc-300'
+                                    }`} />
+                                    <div className="space-y-1 text-left">
+                                      <p className={`text-xs font-bold ${idx === 0 ? 'text-black' : 'text-gray-600'}`}>
+                                        {update.status} - {update.location}
+                                      </p>
+                                      <p className="text-[10px] text-gray-400 font-medium">
+                                        {new Date(update.timestamp).toLocaleString('en-IN', {
+                                          day: 'numeric',
+                                          month: 'short',
+                                          hour: '2-digit',
+                                          minute: '2-digit'
+                                        })}
+                                      </p>
+                                      {update.description && (
+                                        <p className="text-[11px] text-gray-500 mt-1 italic">{update.description}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -169,7 +214,9 @@ function OrdersContent() {
           </div>
         ) : searched ? (
           <div className="flex flex-col items-center justify-center py-40 text-center">
-            <div className="text-7xl mb-8">📭</div>
+            <div className="flex justify-center mb-8">
+              <svg className="w-16 h-16 text-zinc-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0l-3.586 3.586a2 2 0 01-2.828 0L9 13" /></svg>
+            </div>
             <h2 className="text-2xl font-black text-gray-900 mb-4 uppercase tracking-tight">No Order History Found</h2>
             <p className="text-gray-500 mb-10 max-w-sm text-sm font-medium leading-relaxed">
               We couldn't find any historical data for <span className="font-bold text-black border-b border-black">{email}</span>. Please verify your email and try again.
@@ -182,7 +229,9 @@ function OrdersContent() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-40 text-center border-2 border-dashed border-gray-200 rounded-[2rem] bg-white mt-16 group hover:border-black transition-colors duration-500">
-            <div className="text-6xl mb-10 opacity-20 group-hover:opacity-100 transition-opacity duration-500">🔍</div>
+            <div className="flex justify-center mb-10 opacity-20 group-hover:opacity-100 transition-opacity duration-500">
+              <svg className="w-12 h-12 text-black" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
             <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.4em] group-hover:text-black transition-colors duration-500">
               Enter your email above to track your orders
             </h3>

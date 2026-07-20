@@ -67,3 +67,23 @@ export async function removeAddress(addressKey: string) {
   revalidatePath('/account');
   return { success: true };
 }
+
+export async function setDefaultAddress(addressKey: string) {
+  const { user } = await withAuth();
+  if (!user) throw new Error('Not authenticated');
+
+  const customer = await syncCustomerToSanity(user);
+  if (!customer) throw new Error('Customer not found');
+
+  const updatedAddresses = (customer.savedAddresses || []).map((addr: any) => ({
+    ...addr,
+    isDefault: addr._key === addressKey,
+  }));
+
+  await writeClient.patch(customer._id)
+    .set({ savedAddresses: updatedAddresses })
+    .commit();
+
+  revalidatePath('/account');
+  return { success: true };
+}

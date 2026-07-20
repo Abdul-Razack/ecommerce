@@ -8,9 +8,11 @@ const nextConfig = {
       },
     ],
   },
-  // Allow Sanity Studio to work
   typescript: {
     ignoreBuildErrors: true,
+  },
+  experimental: {
+    cpus: 1
   },
   async redirects() {
     return [

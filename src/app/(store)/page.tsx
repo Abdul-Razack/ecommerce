@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function Homepage() {
   // Fetch multiple sets of products for different sections
-  const [latestProducts, topSellingProducts, recommendedProducts, allProducts] = await Promise.all([
+  const [latestProducts, topSellingProducts, recommendedProducts] = await Promise.all([
     client.fetch(`*[_type == "product"] | order(_createdAt desc)[0...4] {
       _id, name, price, comparePrice, stock,
       "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
@@ -26,57 +26,150 @@ export default async function Homepage() {
       _id, name, price, comparePrice, stock,
       "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
       "category": category->name, "slug": slug.current, variants
-    }`, {}, { next: { revalidate: 0 } }),
-
-    client.fetch(`*[_type == "product"] | order(name asc)[0...8] {
-      _id, name, price, comparePrice, stock,
-      "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
-      "category": category->name, "slug": slug.current, variants
     }`, {}, { next: { revalidate: 0 } })
   ]);
 
   return (
-    <main className="bg-white pt-24 pb-40">
+    <main className="bg-white pb-40">
       
-      {/* 01. EDITORIAL HERO - Left EXACTLY as it is */}
-      <section className="relative overflow-hidden pt-12 pb-20">
-        <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-            <div className="lg:col-span-6 space-y-10 z-10 relative">
-              <div className="technical flex items-center gap-4 animate-kinetic-reveal">
-                <span className="w-12 h-px bg-onyx/10" />
-                Premium Collection // Vol. 26
-              </div>
-              <h1 className="text-[clamp(3.5rem,8vw,6.5rem)] leading-[0.85] animate-kinetic-reveal [animation-delay:200ms] font-black uppercase">
-                Women's <br />
-                <span className="editorial italic lowercase font-normal text-onyx/30">wear</span> <br />
-                Redefined <span className="text-chrome text-xl align-top">®</span>
+      {/* 01. EDITORIAL HERO */}
+      <section className="relative w-full bg-[#F5F5F5] min-h-[450px] lg:min-h-0 lg:h-auto lg:aspect-[2/1] flex items-center py-12 lg:py-0">
+        {/* Background Image for Large Screens */}
+        <div className="absolute inset-0 z-0 hidden lg:block">
+          <img 
+            src="/images/banner-1.png" 
+            alt="Hero Banner Background" 
+            className="w-full h-full object-cover object-center" 
+          />
+        </div>
+        
+        {/* Mobile Background Image (dimmed overlay for text readability) */}
+        <div className="absolute inset-0 z-0 lg:hidden opacity-50">
+          <img 
+            src="/images/banner.png" 
+            alt="Hero Banner Background" 
+            className="w-full h-full object-cover object-right" 
+          />
+        </div>
+
+        <Container className="relative z-10 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-6 space-y-6 max-w-lg">
+              <span className="technical text-onyx/40 tracking-[0.4em] uppercase animate-kinetic-reveal">Posh Pigeon Premium</span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-black leading-[1.05] animate-kinetic-reveal [animation-delay:200ms]">
+                WEAR YOUR <br/>
+                <span className="editorial italic lowercase font-normal text-onyx/50">confidence</span>
               </h1>
-              <p className="text-lg text-onyx/50 max-w-sm editorial italic animate-kinetic-reveal [animation-delay:400ms]">
-                India's finest collection of premium women's Leggings, Nighties, Inskirts, and Sarees.
+              <p className="text-sm md:text-base text-onyx/60 font-medium leading-relaxed font-sans animate-kinetic-reveal [animation-delay:400ms]">
+                Trendy pieces. Timeless style. Posh Pigeon has everything you need to look and feel your best.
               </p>
-              <div className="pt-8 flex flex-wrap gap-8 animate-kinetic-reveal [animation-delay:600ms]">
+              <div className="flex flex-wrap gap-4 pt-4 animate-kinetic-reveal [animation-delay:600ms]">
                 <Link href="/shop">
-                  <Button className="h-16 px-12 rounded-full bg-onyx text-white hover:bg-chrome hover:text-onyx transition-all text-[10px] font-black tracking-[0.4em] shadow-2xl">
-                    EXPLORE SHOP
-                  </Button>
+                  <span className="inline-flex items-center justify-center h-14 px-8 rounded-full bg-black text-white hover:bg-stone-800 transition-colors text-[10px] font-black uppercase tracking-widest cursor-pointer shadow-md">
+                    SHOP NEW IN
+                  </span>
                 </Link>
-                <Link href="#collections" className="flex items-center gap-6 group cursor-pointer hover:scale-105 transition-transform duration-500">
-                  <div className="w-12 h-12 rounded-full border border-onyx/20 flex items-center justify-center group-hover:bg-onyx group-hover:text-white transition-all">
-                    <span className="text-lg">↓</span>
-                  </div>
-                  <span className="technical opacity-40 group-hover:opacity-100 transition-opacity">Discover</span>
+                <Link href="#collections">
+                  <span className="inline-flex items-center justify-center h-14 px-8 rounded-full border border-black/20 text-black hover:bg-black hover:text-white hover:border-black transition-all text-[10px] font-black uppercase tracking-widest cursor-pointer">
+                    EXPLORE COLLECTIONS
+                  </span>
                 </Link>
-              </div>
-            </div>
-            <div className="lg:col-span-6 relative">
-              <div className="relative aspect-[4/5] w-full max-w-[450px] mx-auto rounded-[3rem] overflow-hidden">
-                <img src="/images/hero.webp" className="w-full h-full object-cover" alt="Posh Pigeon Hero" />
               </div>
             </div>
           </div>
         </Container>
+
+        {/* Floating Features Bar (Desktop Only) */}
+        <div className="absolute bottom-0 translate-y-1/2 left-0 right-0 z-20 hidden lg:flex justify-center">
+          <div className="bg-white border border-gray-150/50 rounded-full shadow-kinetic px-10 py-5 max-w-5xl w-full flex justify-between items-center divide-x divide-gray-100">
+            {/* Feature 1 */}
+            <div className="flex items-center gap-4 px-6 first:pl-0 flex-1">
+              <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-black">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 8h7.88a1 1 0 01.97 1.2l-.96 4.8a1 1 0 01-.97.8H13" /></svg>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-wider text-black">Free Shipping</p>
+                <p className="text-[9px] text-gray-400 font-medium uppercase mt-0.5 tracking-wider">On orders over ₹999</p>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="flex items-center gap-4 px-6 flex-1">
+              <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-black">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-wider text-black">Easy Returns</p>
+                <p className="text-[9px] text-gray-400 font-medium uppercase mt-0.5 tracking-wider">7-Day Return Policy</p>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="flex items-center gap-4 px-6 flex-1">
+              <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-black">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-wider text-black">Secure Payment</p>
+                <p className="text-[9px] text-gray-400 font-medium uppercase mt-0.5 tracking-wider">100% Secure Checkout</p>
+              </div>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="flex items-center gap-4 px-6 last:pr-0 flex-1">
+              <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-black">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-wider text-black">Premium Quality</p>
+                <p className="text-[9px] text-gray-400 font-medium uppercase mt-0.5 tracking-wider">Made in India</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
+
+      {/* Mobile Features Bar */}
+      <div className="lg:hidden bg-white border-y border-gray-150 py-6 px-4">
+        <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-black flex-shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 8h7.88a1 1 0 01.97 1.2l-.96 4.8a1 1 0 01-.97.8H13" /></svg>
+            </div>
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-wider text-black">Free Shipping</p>
+              <p className="text-[8px] text-gray-400 font-medium uppercase mt-0.5">Over ₹999</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-black flex-shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>
+            </div>
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-wider text-black">Easy Returns</p>
+              <p className="text-[8px] text-gray-400 font-medium uppercase mt-0.5">7-Day Returns</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-black flex-shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+            </div>
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-wider text-black">Secure Pay</p>
+              <p className="text-[8px] text-gray-400 font-medium uppercase mt-0.5">100% Encrypted</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-black flex-shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            </div>
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-wider text-black">Premium Quality</p>
+              <p className="text-[8px] text-gray-400 font-medium uppercase mt-0.5">Made in India</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* 02. PREMIUM SHADES / COLLECTIONS FOCUS */}
       <section id="collections" className="py-24 border-t border-zinc-100">
@@ -260,29 +353,7 @@ export default async function Homepage() {
         </Container>
       </section>
 
-      {/* 07. ALL PRODUCTS PREVIEW GRID */}
-      <section className="py-20 border-t border-zinc-100 bg-[#FAF9F5]">
-        <Container>
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl font-black uppercase tracking-tight text-black">All Products Preview</h2>
-            <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">A glimpse into our complete catalog</p>
-          </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
-            {allProducts.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
-          
-          <div className="mt-16 text-center">
-            <Link href="/shop">
-              <Button variant="outline" className="h-16 px-16 rounded-full border-2 border-black hover:bg-black hover:text-white transition-all text-[11px] font-black tracking-[0.3em] uppercase">
-                View Entire Collection
-              </Button>
-            </Link>
-          </div>
-        </Container>
-      </section>
 
       {/* 08. FINAL CTA */}
       <section className="py-24 text-center bg-white border-t border-zinc-100">

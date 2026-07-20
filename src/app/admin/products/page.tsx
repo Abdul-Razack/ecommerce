@@ -5,6 +5,7 @@ import Card from '@/shared/ui/Card';
 import Badge from '@/shared/ui/Badge';
 import Button from '@/shared/ui/Button';
 import Skeleton from '@/shared/ui/Skeleton';
+import { useToast } from '@/shared/ui/Toast';
 
 interface Variant {
   _key?: string;
@@ -48,6 +49,7 @@ interface ColorVariantGroup {
 }
 
 export default function AdminProductsPage() {
+  const { showToast, showConfirm, showAlert } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -203,12 +205,13 @@ export default function AdminProductsPage() {
       if (data.success) {
         setFormImageAssetId(data.assetId);
         setFormImageUrl(data.url);
+        showToast('Image uploaded successfully', 'success');
       } else {
-        alert('Upload failed: ' + data.error);
+        showAlert({ title: 'Upload Failed', message: data.error });
       }
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert('Upload failed');
+      showAlert({ title: 'Upload Failed', message: 'An unexpected error occurred during upload.' });
     } finally {
       setUploadingImage(false);
     }
@@ -244,7 +247,7 @@ export default function AdminProductsPage() {
       }
     } catch (error) {
       console.error('Error uploading gallery files:', error);
-      alert('Error uploading one or more files');
+      showAlert({ title: 'Upload Error', message: 'Error uploading one or more gallery files.' });
     } finally {
       setUploadingGallery(false);
     }
@@ -368,7 +371,7 @@ export default function AdminProductsPage() {
       }
     } catch (error) {
       console.error('Error uploading variant files:', error);
-      alert('Error uploading one or more files');
+      showAlert({ title: 'Upload Error', message: 'Error uploading one or more variant files.' });
     } finally {
       setUploadingColorId(null);
     }
@@ -423,7 +426,7 @@ export default function AdminProductsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName || !formPrice || !formCategory) {
-      alert('Please fill out all required fields.');
+      showAlert({ title: 'Required Fields Missing', message: 'Please fill out all required fields: Name, Price, and Category.' });
       return;
     }
 
@@ -453,19 +456,27 @@ export default function AdminProductsPage() {
       if (data.success) {
         setIsDrawerOpen(false);
         fetchProducts();
+        showToast('Product saved successfully!', 'success');
       } else {
-        alert('Failed to save: ' + data.error);
+        showAlert({ title: 'Save Failed', message: data.error });
       }
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Failed to save product');
+      showAlert({ title: 'Save Error', message: 'An unexpected error occurred while saving the product.' });
     } finally {
       setSubmitLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    const isConfirmed = await showConfirm({
+      title: 'Delete Product',
+      message: 'Are you sure you want to delete this product? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Cancel',
+      isDestructive: true
+    });
+    if (!isConfirmed) return;
 
     try {
       const res = await fetch(`/api/admin/products?id=${id}`, {
@@ -474,12 +485,13 @@ export default function AdminProductsPage() {
       const data = await res.json();
       if (data.success) {
         fetchProducts();
+        showToast('Product deleted successfully!', 'success');
       } else {
-        alert('Delete failed: ' + data.error);
+        showAlert({ title: 'Delete Failed', message: data.error });
       }
     } catch (error) {
       console.error('Error deleting product:', error);
-      alert('Delete failed');
+      showAlert({ title: 'Delete Error', message: 'An unexpected error occurred while deleting the product.' });
     }
   };
 

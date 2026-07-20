@@ -12,15 +12,19 @@ export const metadata = {
 };
 
 export default async function ProductsPage({ searchParams }) {
-  const { category } = await searchParams;
+  const { category, search } = await searchParams;
   let products = [];
 
   try {
+    const filters = [];
     if (category) {
-      products = await productService.getProducts(`category->slug.current == "${category}"`);
-    } else {
-      products = await productService.getProducts();
+      filters.push(`category->slug.current == "${category}"`);
     }
+    if (search) {
+      filters.push(`(name match "*${search}*" || description match "*${search}*")`);
+    }
+    const filterString = filters.length > 0 ? filters.join(' && ') : undefined;
+    products = await productService.getProducts(filterString);
   } catch (error) {
     console.error('Error fetching products:', error);
   }
@@ -28,19 +32,23 @@ export default async function ProductsPage({ searchParams }) {
   return (
     <div className="bg-white min-h-screen">
       {/* Hero Section */}
-      <div className="bg-[#F8F6F4] py-12 md:py-16 border-b border-zinc-150">
-        <Container>
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-            <div className="md:col-span-5 space-y-4">
-              <h1 className="text-4xl md:text-6xl font-black tracking-tight text-black uppercase">Shop</h1>
-              <div className="flex items-center gap-2 text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em]">
-                <Link href="/" className="hover:text-black transition-colors">Home</Link>
-                <span>&gt;</span>
-                <span className="text-black">Shop</span>
-              </div>
-            </div>
-            <div className="md:col-span-7 rounded-2xl overflow-hidden shadow-tactile border border-zinc-100 aspect-[21/9]">
-              <img src="/shop_banner_rack.png" className="w-full h-full object-cover" alt="Shop Apparel Banner" />
+      <div className="relative bg-black py-32 md:py-44 border-b border-zinc-900 text-white overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/images/shop-banner.png" 
+            alt="Shop Banner" 
+            className="w-full h-full object-cover object-center opacity-40" 
+          />
+        </div>
+        
+        <Container className="relative z-10">
+          <div className="space-y-4">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white animate-kinetic-reveal">Shop</h1>
+            <div className="flex items-center gap-2 text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em]">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <span>&gt;</span>
+              <span className="text-white">Shop</span>
             </div>
           </div>
         </Container>
