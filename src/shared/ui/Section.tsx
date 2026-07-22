@@ -1,7 +1,16 @@
 import React from 'react';
 import Container from './layout/Container';
 
-const Section = ({ 
+interface SectionProps {
+  children: React.ReactNode;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: React.ReactNode;
+  className?: string;
+  spacing?: string;
+}
+
+const Section: React.FC<SectionProps> = ({ 
   children, 
   title, 
   description, 

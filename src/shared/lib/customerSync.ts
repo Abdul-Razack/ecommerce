@@ -1,5 +1,5 @@
 import { writeClient } from '@/shared/lib/sanity';
-import { User } from '@workos-inc/authkit-nextjs/interfaces';
+import type { User } from '@workos-inc/node';
 
 export async function syncCustomerToSanity(user: User | null) {
   if (!user) return null;

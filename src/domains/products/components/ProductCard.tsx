@@ -10,7 +10,12 @@ import { useRouter } from 'next/navigation';
  * Tactile Product Card (2026 DTC Overhaul)
  * Features: Rating stars, Compare strike price, Wishlist toggle, and responsive Cart actions.
  */
-export default function ProductCard({ product, onQuickView }) {
+interface ProductCardProps {
+  product: any;
+  onQuickView?: any;
+}
+
+export default function ProductCard({ product, onQuickView }: ProductCardProps) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const router = useRouter();

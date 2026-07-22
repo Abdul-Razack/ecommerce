@@ -1,6 +1,11 @@
 import React from 'react';
 
-const Input = ({ label, error, className = '', ...props }) => {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+}
+
+const Input: React.FC<InputProps> = ({ label, error, className = '', ...props }) => {
   return (
     <div className={`flex flex-col gap-3 w-full ${className}`}>
       {label && (
