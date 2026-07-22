@@ -143,7 +143,7 @@ export default function ProductDetails({ product, relatedProducts }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
           {/* Gallery Layer with High-Class FX */}
-          <div className="lg:col-span-5 lg:sticky lg:top-32 space-y-6 animate-kinetic-reveal h-fit">
+          <div className="lg:col-span-5 lg:sticky lg:top-32 space-y-6 h-fit">
             <div className="aspect-[4/5] rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-tactile tactile-card border border-onyx/5 relative flex items-center justify-center p-6 md:p-8">
               <img 
                 src={activeImage} 
@@ -169,7 +169,7 @@ export default function ProductDetails({ product, relatedProducts }) {
           </div>
 
           {/* Configuration Layer */}
-          <div className="lg:col-span-7 flex flex-col justify-start space-y-8 animate-kinetic-reveal [animation-delay:200ms]">
+          <div className="lg:col-span-7 flex flex-col justify-start space-y-8">
             
             {/* Category and Title */}
             <div className="space-y-4">
@@ -181,10 +181,10 @@ export default function ProductDetails({ product, relatedProducts }) {
                 
                 {/* Rating indicator */}
                 <div className="flex items-center gap-1 ml-auto">
-                  <div className="flex text-amber-500 text-xs">
+                  <div className="flex text-chrome text-xs">
                     <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
                   </div>
-                  <span className="text-[9px] text-zinc-400 font-bold">(4.9/5 from 48 reviews)</span>
+                  <span className="text-[9px] text-onyx/50 font-bold">(4.9/5 from 48 reviews)</span>
                 </div>
               </div>
               
@@ -194,15 +194,15 @@ export default function ProductDetails({ product, relatedProducts }) {
               <div className="flex items-baseline gap-4 pt-2">
                 <p className="text-3xl font-black text-onyx">₹{activePrice}</p>
                 {originalPrice > activePrice && (
-                  <span className="text-lg text-zinc-400 line-through">₹{originalPrice}</span>
+                  <span className="text-lg text-onyx/40 line-through">₹{originalPrice}</span>
                 )}
                 {originalPrice > activePrice && (
-                  <span className="text-[10px] font-black text-green-700 bg-green-50 border border-green-100 px-3 py-1 rounded-full uppercase tracking-wider">
+                  <span className="text-[10px] font-black text-green-700 bg-green-50/50 border border-green-100/50 px-3 py-1 rounded-full uppercase tracking-wider">
                     {Math.round(((originalPrice - activePrice) / originalPrice) * 100)}% OFF
                   </span>
                 )}
               </div>
-              <p className="technical text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Inclusive of all taxes</p>
+              <p className="technical text-[9px] text-onyx/40 font-bold uppercase tracking-wider">Inclusive of all taxes</p>
             </div>
 
             {/* Colors, Sizes & Swatches Section */}
@@ -231,7 +231,7 @@ export default function ProductDetails({ product, relatedProducts }) {
                         <button
                           key={color}
                           onClick={() => handleColorChange(color)}
-                          className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${isSelected ? 'border-black scale-110 shadow-md ring-2 ring-zinc-200' : 'border-zinc-300 hover:scale-105'}`}
+                          className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${isSelected ? 'border-onyx scale-110 shadow-md ring-2 ring-onyx/20' : 'border-onyx/10 hover:scale-105'}`}
                           style={{ backgroundColor: bgVal }}
                           title={color}
                         />
@@ -257,10 +257,10 @@ export default function ProductDetails({ product, relatedProducts }) {
                           onClick={() => setSelectedSize(sz)}
                           className={`min-w-[3.5rem] h-10 px-3 rounded-lg border text-xs font-black uppercase transition-all tracking-wider ${
                             !isAvailable 
-                              ? 'border-zinc-100 text-zinc-300 line-through cursor-not-allowed bg-zinc-50/50' 
+                              ? 'border-onyx/5 text-onyx/20 line-through cursor-not-allowed bg-neutral-soft/50' 
                               : isSelected
-                                ? 'border-black bg-black text-white shadow'
-                                : 'border-zinc-200 hover:border-black text-zinc-800 bg-white'
+                                ? 'border-onyx bg-onyx text-bone shadow'
+                                : 'border-onyx/10 hover:border-onyx text-onyx bg-white/80'
                           }`}
                         >
                           {sz}
@@ -275,17 +275,17 @@ export default function ProductDetails({ product, relatedProducts }) {
               <div className="flex flex-wrap gap-8 items-center pt-2">
                 <div className="space-y-2">
                   <span className="technical text-onyx/40 text-[8px] uppercase tracking-widest block">Quantity</span>
-                  <div className="flex items-center border border-zinc-200 rounded-lg bg-white overflow-hidden">
+                  <div className="flex items-center border border-onyx/10 rounded-lg bg-white/80 overflow-hidden">
                     <button
                       onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                      className="px-3 h-10 font-black hover:bg-zinc-50 text-zinc-600 transition-colors"
+                      className="px-3 h-10 font-black hover:bg-neutral-soft text-onyx/70 transition-colors"
                     >
                       -
                     </button>
                     <span className="px-4 font-bold text-xs min-w-[2rem] text-center select-none">{quantity}</span>
                     <button
                       onClick={() => setQuantity(q => q + 1)}
-                      className="px-3 h-10 font-black hover:bg-zinc-50 text-zinc-600 transition-colors"
+                      className="px-3 h-10 font-black hover:bg-neutral-soft text-onyx/70 transition-colors"
                     >
                       +
                     </button>
@@ -302,29 +302,29 @@ export default function ProductDetails({ product, relatedProducts }) {
             </div>
 
             {/* Coupons / Promo Codes */}
-            <div className="bg-[#FAF9F6] border border-dashed border-zinc-200 rounded-2xl p-6 space-y-4">
+            <div className="bg-neutral-soft border border-dashed border-onyx/10 rounded-2xl p-6 space-y-4">
               <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-zinc-800" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-onyx/70" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01"/>
                 </svg>
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-950">Active Promo Coupons</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-onyx">Active Promo Coupons</h4>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {coupons.map((c) => (
-                  <div key={c.code} className="bg-white border border-zinc-150 p-4 rounded-xl flex items-center justify-between gap-4">
+                  <div key={c.code} className="bg-white/80 border border-onyx/5 p-4 rounded-xl flex items-center justify-between gap-4">
                     <div className="space-y-1">
-                      <span className="font-mono text-xs font-black bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded border border-zinc-200 uppercase">
+                      <span className="font-mono text-xs font-black bg-bone text-onyx px-2 py-0.5 rounded border border-onyx/10 uppercase">
                         {c.code}
                       </span>
-                      <p className="text-[9px] text-zinc-400 font-bold leading-tight">{c.desc}</p>
+                      <p className="text-[9px] text-onyx/50 font-bold leading-tight">{c.desc}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleCopyCoupon(c.code)}
                       className={`text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded transition-all flex-shrink-0 ${
                         copiedCoupon === c.code 
-                          ? 'bg-green-700 text-white' 
-                          : 'bg-zinc-900 text-white hover:bg-black'
+                          ? 'bg-green-700 text-bone' 
+                          : 'bg-onyx text-bone hover:bg-black'
                       }`}
                     >
                       {copiedCoupon === c.code ? 'Copied' : 'Copy'}
@@ -358,7 +358,7 @@ export default function ProductDetails({ product, relatedProducts }) {
                   type="button"
                   onClick={() => toggleWishlist(product)}
                   className={`w-16 h-16 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 bg-white ${
-                    favorited ? 'border-red-200 text-red-600 shadow-md' : 'border-zinc-200 text-zinc-400 hover:border-zinc-400'
+                    favorited ? 'border-red-200 text-red-600 shadow-md' : 'border-onyx/10 text-onyx/40 hover:border-onyx/40'
                   }`}
                   title="Add to Wishlist"
                 >
@@ -376,40 +376,40 @@ export default function ProductDetails({ product, relatedProducts }) {
               </div>
 
               {/* Trust badges block */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 bg-white border border-zinc-150 rounded-2xl p-4 text-center">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 bg-white/50 border border-onyx/5 rounded-2xl p-4 text-center">
                 <div className="flex flex-col items-center gap-2">
-                  <svg className="w-6 h-6 text-zinc-800" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-onyx/70" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <rect x="1" y="3" width="15" height="13" rx="2" ry="2"/>
                     <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
                     <circle cx="5.5" cy="18.5" r="2.5"/>
                     <circle cx="18.5" cy="18.5" r="2.5"/>
                   </svg>
-                  <span className="text-[8px] font-black uppercase tracking-wider text-zinc-950">Free Shipping</span>
-                  <p className="text-[7px] text-zinc-400">On orders above ₹999</p>
+                  <span className="text-[8px] font-black uppercase tracking-wider text-onyx">Free Shipping</span>
+                  <p className="text-[7px] text-onyx/50">On orders above ₹999</p>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <svg className="w-6 h-6 text-zinc-800" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-onyx/70" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <rect x="2" y="6" width="20" height="12" rx="2"/>
                     <circle cx="12" cy="12" r="3"/>
                     <path d="M6 12h.01M18 12h.01"/>
                   </svg>
-                  <span className="text-[8px] font-black uppercase tracking-wider text-zinc-950">COD Available</span>
-                  <p className="text-[7px] text-zinc-400">Pay on Delivery</p>
+                  <span className="text-[8px] font-black uppercase tracking-wider text-onyx">COD Available</span>
+                  <p className="text-[7px] text-onyx/50">Pay on Delivery</p>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <svg className="w-6 h-6 text-zinc-800" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-onyx/70" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                     <polyline points="3 3 3 8 8 8"/>
                   </svg>
-                  <span className="text-[8px] font-black uppercase tracking-wider text-zinc-950">7-Day Returns</span>
-                  <p className="text-[7px] text-zinc-400">Easy Returns & Exchange</p>
+                  <span className="text-[8px] font-black uppercase tracking-wider text-onyx">7-Day Returns</span>
+                  <p className="text-[7px] text-onyx/50">Easy Returns & Exchange</p>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <svg className="w-6 h-6 text-zinc-800" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-onyx/70" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                   </svg>
-                  <span className="text-[8px] font-black uppercase tracking-wider text-zinc-950">100% Original</span>
-                  <p className="text-[7px] text-zinc-400">Direct from Brand</p>
+                  <span className="text-[8px] font-black uppercase tracking-wider text-onyx">100% Original</span>
+                  <p className="text-[7px] text-onyx/50">Direct from Brand</p>
                 </div>
               </div>
             </div>
@@ -417,7 +417,7 @@ export default function ProductDetails({ product, relatedProducts }) {
         </div>
 
         {/* Product Detail & Spec Breakdown Section */}
-        <div className="mt-16 border-t border-onyx/10 pt-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 animate-kinetic-reveal [animation-delay:400ms]">
+        <div className="mt-16 border-t border-onyx/10 pt-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           <div className="lg:col-span-4">
             <div className="sticky top-32 space-y-4">
               <div className="flex items-center gap-4">

@@ -11,11 +11,11 @@ const Button = ({
   ...props 
 }) => {
   const variants = {
-    primary: 'bg-black text-white hover:bg-zinc-800 hover:scale-105 hover:shadow-lg',
-    secondary: 'bg-zinc-100 text-black hover:bg-zinc-200 hover:scale-105 hover:shadow-lg',
-    outline: 'border border-black text-black hover:bg-black hover:text-white hover:scale-105 hover:shadow-lg',
-    white: 'bg-white text-black hover:bg-zinc-50 hover:scale-105 hover:shadow-lg',
-    ghost: 'hover:bg-zinc-100 text-zinc-600 hover:text-black',
+    primary: 'bg-onyx text-bone hover:bg-black hover:scale-105 hover:shadow-lg',
+    secondary: 'bg-neutral-soft text-onyx hover:bg-onyx hover:text-bone hover:scale-105 hover:shadow-lg',
+    outline: 'border border-onyx/20 text-onyx hover:bg-onyx hover:text-bone hover:border-onyx hover:scale-105 hover:shadow-lg',
+    white: 'bg-bone text-onyx hover:bg-white hover:scale-105 hover:shadow-lg',
+    ghost: 'hover:bg-neutral-soft text-onyx/70 hover:text-onyx',
   };
 
   const sizes = {

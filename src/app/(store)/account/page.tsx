@@ -47,11 +47,11 @@ export default async function AccountPage() {
   `, { email: user.email, customerId: customer._id });
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-8 pb-20 md:pt-12 md:pb-28">
+    <div className="bg-bone min-h-screen pt-8 pb-20 md:pt-12 md:pb-28">
       <Container className="max-w-6xl space-y-8">
-        <div className="border-b border-gray-200 pb-6 mb-8">
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-black">My Account</h1>
-          <p className="text-gray-500 font-medium mt-2">
+        <div className="border-b border-onyx/10 pb-6 mb-8">
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-onyx">My Account</h1>
+          <p className="text-onyx/60 font-medium mt-2">
             Manage your personal profile, delivery addresses, and track shipments.
           </p>
         </div>

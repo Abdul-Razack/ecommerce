@@ -35,7 +35,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
   const originalPrice = product.comparePrice || Math.round(product.price * 1.4);
 
   return (
-    <div className="group flex flex-col h-full bg-white border border-zinc-150 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 relative">
+    <div className="group flex flex-col h-full bg-bone/50 border border-onyx/5 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 relative">
       
       {/* Wishlist Toggle Button (Heart) */}
       <button
@@ -61,7 +61,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
       </button>
 
       {/* Image Container */}
-      <div className="relative aspect-[4/5] overflow-hidden bg-[#FAF9F6] border-b border-zinc-100">
+      <div className="relative aspect-[4/5] overflow-hidden bg-neutral-soft border-b border-onyx/5">
         <Link href={`/shop/${product.slug?.current || product.slug}`} className="block w-full h-full">
           <img 
             src={product.imageUrl || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=2040&auto=format&fit=crop'} 
@@ -72,7 +72,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
         {/* Badge */}
         {product.flags?.isFeatured && (
-          <div className="absolute top-4 left-4 bg-black text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded">
+          <div className="absolute top-4 left-4 bg-onyx text-bone text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
             Bestseller
           </div>
         )}
@@ -83,34 +83,34 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         <div className="space-y-1">
           {/* Category & Ratings row */}
           <div className="flex items-center justify-between">
-            <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">
+            <span className="text-[9px] font-bold text-onyx/50 uppercase tracking-wider">
               {product.category || 'General'}
             </span>
             
             {/* Stars rating row */}
             <div className="flex items-center gap-0.5">
-              <div className="flex text-amber-500 text-[10px]">
+              <div className="flex text-chrome text-[10px]">
                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
               </div>
-              <span className="text-[8px] text-zinc-400 font-bold ml-1">(5.0)</span>
+              <span className="text-[8px] text-onyx/50 font-bold ml-1">(5.0)</span>
             </div>
           </div>
 
           {/* Product Name */}
           <Link href={`/shop/${product.slug?.current || product.slug}`} className="block">
-            <h3 className="text-xs font-black uppercase text-zinc-950 tracking-tight leading-tight line-clamp-1 hover:text-zinc-650 transition-colors">
+            <h3 className="text-xs font-black uppercase text-onyx tracking-tight leading-tight line-clamp-1 hover:text-onyx/70 transition-colors">
               {cleanName}
             </h3>
           </Link>
 
           {/* Price details with compare/strike price */}
           <div className="flex items-baseline gap-2 pt-1">
-            <span className="text-xs font-black text-black">₹{product.price}</span>
+            <span className="text-xs font-black text-onyx">₹{product.price}</span>
             {originalPrice > product.price && (
-              <span className="text-[10px] text-zinc-400 line-through">₹{originalPrice}</span>
+              <span className="text-[10px] text-onyx/40 line-through">₹{originalPrice}</span>
             )}
             {originalPrice > product.price && (
-              <span className="text-[9px] text-green-700 font-black uppercase">
+              <span className="text-[9px] text-green-700/80 font-black uppercase">
                 {Math.round(((originalPrice - product.price) / originalPrice) * 100)}% OFF
               </span>
             )}
@@ -150,7 +150,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         </div>
 
         {/* Action Buttons: Add to Cart and Buy Now */}
-        <div className="flex gap-2 pt-2 border-t border-zinc-100">
+        <div className="flex gap-2 pt-2 border-t border-onyx/5">
           <button
             type="button"
             onClick={(e) => {
@@ -158,7 +158,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
               e.stopPropagation();
               addToCart(product);
             }}
-            className="w-1/2 h-9 text-[8px] tracking-widest font-black bg-white hover:bg-zinc-50 border border-zinc-200 text-black uppercase transition-all rounded-lg active:scale-95"
+            className="w-1/2 h-9 text-[8px] tracking-widest font-black bg-transparent hover:bg-onyx/5 border border-onyx/10 text-onyx uppercase transition-all rounded-full active:scale-95"
           >
             Add to Cart
           </button>
@@ -170,7 +170,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
               addToCart(product);
               router.push('/cart');
             }}
-            className="w-1/2 h-9 text-[8px] tracking-widest font-black bg-black hover:bg-zinc-800 text-white uppercase transition-all rounded-lg active:scale-95"
+            className="w-1/2 h-9 text-[8px] tracking-widest font-black bg-onyx hover:bg-black text-bone uppercase transition-all rounded-full active:scale-95 shadow-sm"
           >
             Buy Now
           </button>

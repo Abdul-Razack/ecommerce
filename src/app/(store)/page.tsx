@@ -30,16 +30,16 @@ export default async function Homepage() {
   ]);
 
   return (
-    <main className="bg-white pb-40">
+    <main className="bg-bone pb-40">
       
       {/* 01. EDITORIAL HERO */}
-      <section className="relative w-full bg-[#F5F5F5] min-h-[450px] lg:min-h-0 lg:h-auto lg:aspect-[2/1] flex items-center py-12 lg:py-0">
+      <section className="relative w-full bg-bone min-h-[450px] lg:min-h-[600px] flex items-center py-12 lg:py-0">
         {/* Background Image for Large Screens */}
         <div className="absolute inset-0 z-0 hidden lg:block">
           <img 
             src="/images/banner-1.png" 
             alt="Hero Banner Background" 
-            className="w-full h-full object-cover object-center" 
+            className="w-full h-full object-cover object-top" 
           />
         </div>
         
@@ -48,29 +48,29 @@ export default async function Homepage() {
           <img 
             src="/images/banner.png" 
             alt="Hero Banner Background" 
-            className="w-full h-full object-cover object-right" 
+            className="w-full h-full object-cover object-[right_top]" 
           />
         </div>
 
-        <Container className="relative z-10 w-full">
+        <Container className="relative z-10 w-full pt-10 pb-32 lg:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-6 space-y-6 max-w-lg">
-              <span className="technical text-onyx/40 tracking-[0.4em] uppercase animate-kinetic-reveal">Posh Pigeon Premium</span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-black leading-[1.05] animate-kinetic-reveal [animation-delay:200ms]">
+            <div className="lg:col-span-6 space-y-6 max-w-lg bg-white/40 lg:bg-transparent p-6 lg:p-0 rounded-3xl backdrop-blur-sm lg:backdrop-blur-none">
+              <span className="technical text-onyx tracking-[0.4em] uppercase">Posh Pigeon Premium</span>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-onyx leading-[1.05]">
                 WEAR YOUR <br/>
-                <span className="editorial italic lowercase font-normal text-onyx/50">confidence</span>
+                <span className="editorial italic lowercase font-normal text-onyx">confidence</span>
               </h1>
-              <p className="text-sm md:text-base text-onyx/60 font-medium leading-relaxed font-sans animate-kinetic-reveal [animation-delay:400ms]">
+              <p className="text-sm md:text-base text-onyx font-medium leading-relaxed font-sans">
                 Trendy pieces. Timeless style. Posh Pigeon has everything you need to look and feel your best.
               </p>
-              <div className="flex flex-wrap gap-4 pt-4 animate-kinetic-reveal [animation-delay:600ms]">
+              <div className="flex flex-wrap gap-4 pt-4">
                 <Link href="/shop">
-                  <span className="inline-flex items-center justify-center h-14 px-8 rounded-full bg-black text-white hover:bg-stone-800 transition-colors text-[10px] font-black uppercase tracking-widest cursor-pointer shadow-md">
+                  <span className="inline-flex items-center justify-center h-14 px-8 rounded-full bg-onyx text-bone hover:bg-black transition-colors text-[10px] font-black uppercase tracking-widest cursor-pointer shadow-md">
                     SHOP NEW IN
                   </span>
                 </Link>
                 <Link href="#collections">
-                  <span className="inline-flex items-center justify-center h-14 px-8 rounded-full border border-black/20 text-black hover:bg-black hover:text-white hover:border-black transition-all text-[10px] font-black uppercase tracking-widest cursor-pointer">
+                  <span className="inline-flex items-center justify-center h-14 px-8 rounded-full border border-onyx/20 text-onyx hover:bg-onyx hover:text-bone hover:border-onyx transition-all text-[10px] font-black uppercase tracking-widest cursor-pointer">
                     EXPLORE COLLECTIONS
                   </span>
                 </Link>
@@ -172,20 +172,20 @@ export default async function Homepage() {
       </div>
 
       {/* 02. PREMIUM SHADES / COLLECTIONS FOCUS */}
-      <section id="collections" className="py-24 border-t border-zinc-100">
+      <section id="collections" className="py-24 border-t border-onyx/5">
         <Container>
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl font-black uppercase tracking-tight text-black">Premium Shades</h2>
-            <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">Explore curated categories designed for everyday elegance</p>
+            <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Premium Shades</h2>
+            <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Explore curated categories designed for everyday elegance</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Pill 1: Leggings */}
-            <div className="bg-[#FFA8A8] h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow">
+            <div className="bg-neutral-soft h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow border border-onyx/5">
               <div className="space-y-2 z-10">
-                <h4 className="text-xs font-black uppercase text-zinc-900 tracking-wider">Leggings Gallery</h4>
+                <h4 className="text-xs font-black uppercase text-onyx tracking-wider">Leggings Gallery</h4>
                 <Link href="/shop?category=leggings">
-                  <span className="inline-block text-[9px] bg-white text-zinc-950 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-black hover:text-white transition-colors cursor-pointer">
+                  <span className="inline-block text-[9px] bg-bone text-onyx border border-onyx/10 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-onyx hover:text-bone transition-colors cursor-pointer">
                     Click Now
                   </span>
                 </Link>
@@ -193,16 +193,16 @@ export default async function Homepage() {
               <img 
                 src="https://assets0.mirraw.com/images/8288550/RoyalBlue_4fe606c6-8430-41df-812b-c2b0eb46bb6d_zoom.jpg?1600076914" 
                 alt="Leggings Focus" 
-                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-white/10"
+                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
               />
             </div>
 
             {/* Pill 2: Nighty */}
-            <div className="bg-[#C1E1C1] h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow">
+            <div className="bg-[#E6DFD3] h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow border border-onyx/5">
               <div className="space-y-2 z-10">
-                <h4 className="text-xs font-black uppercase text-zinc-900 tracking-wider">Nighty Fashion</h4>
+                <h4 className="text-xs font-black uppercase text-onyx tracking-wider">Nighty Fashion</h4>
                 <Link href="/shop?category=nighty">
-                  <span className="inline-block text-[9px] bg-white text-zinc-950 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-black hover:text-white transition-colors cursor-pointer">
+                  <span className="inline-block text-[9px] bg-bone text-onyx border border-onyx/10 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-onyx hover:text-bone transition-colors cursor-pointer">
                     Shop Now
                   </span>
                 </Link>
@@ -210,16 +210,16 @@ export default async function Homepage() {
               <img 
                 src="https://www.ankitadesigns.in/cdn/shop/files/350nilima.png?v=1777283189" 
                 alt="Nighty Focus" 
-                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-white/10"
+                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
               />
             </div>
 
             {/* Pill 3: Inskirt */}
-            <div className="bg-[#FFF9C4] h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow">
+            <div className="bg-[#DFD8CD] h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow border border-onyx/5">
               <div className="space-y-2 z-10">
-                <h4 className="text-xs font-black uppercase text-zinc-900 tracking-wider">Inskirt Core</h4>
+                <h4 className="text-xs font-black uppercase text-onyx tracking-wider">Inskirt Core</h4>
                 <Link href="/shop?category=inskirt">
-                  <span className="inline-block text-[9px] bg-white text-zinc-950 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-black hover:text-white transition-colors cursor-pointer">
+                  <span className="inline-block text-[9px] bg-bone text-onyx border border-onyx/10 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-onyx hover:text-bone transition-colors cursor-pointer">
                     Explore
                   </span>
                 </Link>
@@ -227,16 +227,16 @@ export default async function Homepage() {
               <img 
                 src="https://jisboutique.com/cdn/shop/files/24_166af726-83fd-4c7c-a62f-54444fbbefc3.jpg?v=1718281040" 
                 alt="Inskirt Focus" 
-                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-white/10"
+                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
               />
             </div>
 
             {/* Pill 4: Sarees */}
-            <div className="bg-[#D7CCC8] h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow">
+            <div className="bg-[#E2DCD3] h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow border border-onyx/5">
               <div className="space-y-2 z-10">
-                <h4 className="text-xs font-black uppercase text-zinc-900 tracking-wider">Sarees Style</h4>
+                <h4 className="text-xs font-black uppercase text-onyx tracking-wider">Sarees Style</h4>
                 <Link href="/shop?category=sarees">
-                  <span className="inline-block text-[9px] bg-white text-zinc-950 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-black hover:text-white transition-colors cursor-pointer">
+                  <span className="inline-block text-[9px] bg-bone text-onyx border border-onyx/10 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-onyx hover:text-bone transition-colors cursor-pointer">
                     View Saree
                   </span>
                 </Link>
@@ -244,7 +244,7 @@ export default async function Homepage() {
               <img 
                 src="https://pochampallysarees.com/cdn/shop/files/PureSoftSilkBlueYellowSari.jpg?v=1762248060" 
                 alt="Sarees Focus" 
-                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-white/10"
+                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
               />
             </div>
           </div>
@@ -252,14 +252,14 @@ export default async function Homepage() {
       </section>
 
       {/* 03. TOP SELLING SECTION */}
-      <section className="py-20 border-t border-zinc-100">
+      <section className="py-20 border-t border-onyx/5">
         <Container>
           <div className="flex justify-between items-end mb-16">
             <div className="space-y-4">
-              <h2 className="text-3xl font-black uppercase tracking-tight text-black">Top Selling</h2>
-              <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">Discover what others are loving right now.</p>
+              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Top Selling</h2>
+              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Discover what others are loving right now.</p>
             </div>
-            <Link href="/shop" className="text-[10px] font-black uppercase tracking-widest hover:text-zinc-500 underline decoration-2 underline-offset-4 hidden md:block">
+            <Link href="/shop" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4 hidden md:block">
               Shop Bestsellers
             </Link>
           </div>
@@ -273,11 +273,11 @@ export default async function Homepage() {
       </section>
 
       {/* 04. SPRING SALE PROMOTIONAL BANNER SECTION */}
-      <section className="py-12 border-t border-zinc-100">
+      <section className="py-12 border-t border-onyx/5">
         <Container>
-          <div className="bg-[#1A3A2B] rounded-3xl overflow-hidden shadow-kinetic grid grid-cols-1 md:grid-cols-12 relative items-stretch min-h-[280px]">
+          <div className="bg-onyx rounded-3xl overflow-hidden shadow-kinetic grid grid-cols-1 md:grid-cols-12 relative items-stretch min-h-[280px]">
             {/* Left Content Column */}
-            <div className="md:col-span-5 p-8 md:p-12 flex flex-col justify-center space-y-4 text-white z-10">
+            <div className="md:col-span-5 p-8 md:p-12 flex flex-col justify-center space-y-4 text-bone z-10">
               <div className="flex items-center gap-2">
                 <span className="text-chrome font-black text-[9px] tracking-[0.2em] uppercase">✦ Limited Time Offer</span>
               </div>
@@ -314,11 +314,11 @@ export default async function Homepage() {
       </section>
 
       {/* 05. NEW ARRIVALS CARD SECTION */}
-      <section className="py-20 border-t border-zinc-100 bg-[#FAF9F5]">
+      <section className="py-20 border-t border-onyx/5 bg-neutral-soft">
         <Container>
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl font-black uppercase tracking-tight text-black">New Arrivals</h2>
-            <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">Fresh off the loom: browse our newly arrived collections</p>
+            <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">New Arrivals</h2>
+            <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Fresh off the loom: browse our newly arrived collections</p>
           </div>
 
           {latestProducts.length > 0 ? (
@@ -336,12 +336,12 @@ export default async function Homepage() {
       </section>
 
       {/* 06. RECOMMENDED PICKS */}
-      <section className="py-20 border-t border-zinc-100">
+      <section className="py-20 border-t border-onyx/5">
         <Container>
           <div className="flex justify-between items-end mb-16">
             <div className="space-y-4">
-              <h2 className="text-3xl font-black uppercase tracking-tight text-black">Recommended For You</h2>
-              <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">Curated picks based on current trends.</p>
+              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Recommended For You</h2>
+              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Curated picks based on current trends.</p>
             </div>
           </div>
 
@@ -356,15 +356,18 @@ export default async function Homepage() {
 
 
       {/* 08. FINAL CTA */}
-      <section className="py-24 text-center bg-white border-t border-zinc-100">
+      <section className="py-16 md:py-20 text-center bg-bone border-t border-onyx/5">
         <Container>
-          <div className="max-w-5xl mx-auto bg-[#F1F1EF] border border-zinc-200 rounded-[3rem] md:rounded-[5rem] py-20 md:py-24 px-8 md:px-12 shadow-sm">
-            <div className="max-w-3xl mx-auto space-y-8">
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-[1.1] uppercase">
+          <div className="max-w-4xl mx-auto bg-neutral-soft border border-onyx/10 rounded-[2.5rem] md:rounded-[4rem] py-14 md:py-16 px-6 md:px-10 shadow-sm relative overflow-hidden">
+            {/* Decorative subtle gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
+            
+            <div className="relative max-w-2xl mx-auto space-y-6">
+              <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-tight uppercase text-onyx">
                 JOIN THE <span className="text-chrome">COLLECTION</span>
               </h2>
-              <Link href="/shop" className="inline-block pt-8">
-                <Button className="h-16 md:h-20 px-12 md:px-16 bg-onyx text-white text-[10px] md:text-[12px] font-black tracking-[0.5em] shadow-kinetic hover:scale-105 transition-transform uppercase">
+              <Link href="/shop" className="inline-block pt-4">
+                <Button className="h-14 md:h-16 px-10 md:px-14 bg-onyx text-bone text-[9px] md:text-[11px] font-black tracking-[0.4em] shadow-kinetic hover:scale-105 transition-transform uppercase rounded-full">
                   EXPLORE SHOP
                 </Button>
               </Link>

@@ -15,7 +15,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-b border-white/5 pb-16">
           {/* Brand & Manifesto */}
           <div className="md:col-span-4 space-y-6">
-            <img src="/images/logo.png" alt="Posh Pigeon Logo" className="h-10 w-auto object-contain opacity-80" />
+            <img src="/images/logo.png" alt="Posh Pigeon Logo" className="h-12 w-auto object-contain opacity-80" />
             <p className="text-sm text-zinc-400 max-w-xs leading-relaxed">
               Premium Quality apparel for every woman. Unmatched Comfort and Style.
             </p>

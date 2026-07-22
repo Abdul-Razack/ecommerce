@@ -69,9 +69,9 @@ export default function CartDrawer() {
             </div>
           ) : (
             cartItems.map((item) => (
-              <div key={item._id} className="flex gap-8 group animate-kinetic-reveal">
+              <div key={item._id} className="flex gap-8 group transition-all duration-300">
                 <div className="w-24 h-32 rounded-inner bg-bone overflow-hidden flex-shrink-0 border border-onyx/5">
-                  <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
+                  <img src={item.imageUrl || (typeof item.image === 'string' ? item.image : null) || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=2040&auto=format&fit=crop'} className="w-full h-full object-cover" alt={item.name || 'Product'} />
                 </div>
                 <div className="flex flex-col justify-between flex-grow py-2">
                   <div className="flex justify-between items-start">

@@ -78,7 +78,8 @@ export default function CheckoutPage() {
         console.error('Failed to parse saved address');
       }
     }
-  }, [closeCart]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const subtotal = getCartTotal();
   const codCharge = paymentMethod === 'cod' ? 50 : 0;
@@ -94,10 +95,10 @@ export default function CheckoutPage() {
     });
   };
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const validateStep = (currentStep) => {
-    const newErrors = {};
+  const validateStep = (currentStep: number) => {
+    const newErrors: Record<string, string> = {};
     if (currentStep === 1) return true;
 
     if (currentStep === 2) {
@@ -247,7 +248,7 @@ export default function CheckoutPage() {
         },
       };
 
-      const rzp = new window.Razorpay(options);
+      const rzp = new (window as any).Razorpay(options);
       rzp.on('payment.failed', function () {
         showToast('Payment failed. Please try again.', 'error');
       });
@@ -295,20 +296,20 @@ export default function CheckoutPage() {
   if (cartItems.length === 0) return null;
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-bone min-h-screen">
       <script src="https://checkout.razorpay.com/v1/checkout.js" async />
       
       {/* Premium Header */}
-      <div className="bg-white border-b border-border-light py-12 mb-12">
+      <div className="bg-neutral-soft border-b border-onyx/5 py-12 mb-12">
         <Container>
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-black uppercase leading-none">CHECKOUT</h1>
-            <nav className="flex items-center gap-6 text-[11px] font-black uppercase tracking-[0.3em] text-gray-300">
-              <span className={`transition-all duration-500 ${step >= 1 ? 'text-black' : ''}`}>01 Review</span>
-              <span className="w-8 h-[1px] bg-gray-100" />
-              <span className={`transition-all duration-500 ${step >= 2 ? 'text-black' : ''}`}>02 Delivery Address</span>
-              <span className="w-8 h-[1px] bg-gray-100" />
-              <span className={`transition-all duration-500 ${step >= 3 ? 'text-black' : ''}`}>03 Payment</span>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-onyx uppercase leading-none">CHECKOUT</h1>
+            <nav className="flex items-center gap-6 text-[11px] font-black uppercase tracking-[0.3em] text-onyx/40">
+              <span className={`transition-all duration-500 ${step >= 1 ? 'text-onyx' : ''}`}>01 Review</span>
+              <span className="w-8 h-[1px] bg-onyx/10" />
+              <span className={`transition-all duration-500 ${step >= 2 ? 'text-onyx' : ''}`}>02 Delivery Address</span>
+              <span className="w-8 h-[1px] bg-onyx/10" />
+              <span className={`transition-all duration-500 ${step >= 3 ? 'text-onyx' : ''}`}>03 Payment</span>
             </nav>
           </div>
         </Container>
@@ -320,33 +321,33 @@ export default function CheckoutPage() {
           {/* LEFT - FORM (8/12 Width) */}
           <div className="lg:col-span-8 space-y-12">
             {step === 1 && (
-              <Card variant="outline" padding="p-8 md:p-12" className="animate-fade-in">
-                <div className="flex items-center justify-between border-b border-border-light pb-8 mb-10">
-                  <h2 className="text-2xl font-black uppercase tracking-tight text-black">1. Order Review</h2>
+              <Card variant="outline" padding="p-8 md:p-12" className="animate-fade-in bg-neutral-soft border-onyx/5">
+                <div className="flex items-center justify-between border-b border-onyx/5 pb-8 mb-10">
+                  <h2 className="text-2xl font-black uppercase tracking-tight text-onyx">1. Order Review</h2>
                   <Badge variant="neutral">{cartItems.length} ITEMS</Badge>
                 </div>
                 
-                <div className="divide-y divide-border-light">
+                <div className="divide-y divide-onyx/5">
                   {cartItems.map((item) => (
                     <div key={item._id} className="py-10 flex gap-10 first:pt-0 last:pb-0">
-                      <div className="w-24 h-32 md:w-32 md:h-40 bg-zinc-50 rounded-2xl overflow-hidden flex-shrink-0 border border-border-light shadow-depth-1">
+                      <div className="w-24 h-32 md:w-32 md:h-40 bg-bone rounded-2xl overflow-hidden flex-shrink-0 border border-onyx/5 shadow-sm">
                         <img 
-                          src={item.image || 'https://placehold.co/400x500?text=Product'} 
+                          src={item.imageUrl || (typeof item.image === 'string' ? item.image : null) || 'https://placehold.co/400x500?text=Product'} 
                           alt={item.name} 
                           className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" 
-                          onError={(e) => { e.target.src = 'https://placehold.co/400x500?text=Product'; }}
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://placehold.co/400x500?text=Product'; }}
                         />
                       </div>
                       <div className="flex-grow flex flex-col justify-between py-2">
                         <div className="flex justify-between items-start gap-4">
                           <div>
-                            <h4 className="text-lg font-bold text-black uppercase tracking-tight">{item.name}</h4>
-                            <p className="text-xs font-black text-zinc-400 mt-2 uppercase tracking-[0.2em]">{item.category}</p>
+                            <h4 className="text-lg font-bold text-onyx uppercase tracking-tight">{item.name}</h4>
+                            <p className="text-xs font-black text-onyx/40 mt-2 uppercase tracking-[0.2em]">{item.category}</p>
                           </div>
-                          <p className="text-lg font-black text-black">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
+                          <p className="text-lg font-black text-onyx">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
                         </div>
-                        <div className="flex items-center gap-6 text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em]">
-                          <span className="bg-zinc-100 px-4 py-2 rounded-lg text-black">QTY: {item.quantity}</span>
+                        <div className="flex items-center gap-6 text-[11px] font-black text-onyx/60 uppercase tracking-[0.2em]">
+                          <span className="bg-bone px-4 py-2 rounded-lg text-onyx">QTY: {item.quantity}</span>
                           <span>₹{item.price?.toLocaleString('en-IN')} / UNIT</span>
                         </div>
                       </div>
@@ -363,10 +364,10 @@ export default function CheckoutPage() {
             )}
 
             {step === 2 && (
-              <Card variant="outline" padding="p-8 md:p-12" className="animate-fade-in">
+              <Card variant="outline" padding="p-8 md:p-12" className="animate-fade-in bg-neutral-soft border-onyx/5">
                 <div className="space-y-16">
                   <div className="space-y-10">
-                    <h2 className="text-2xl font-black uppercase tracking-tight text-black">2. Delivery Address</h2>
+                    <h2 className="text-2xl font-black uppercase tracking-tight text-onyx">2. Delivery Address</h2>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <Input 
@@ -402,10 +403,10 @@ export default function CheckoutPage() {
 
                   <div className="space-y-10">
                     <div className="flex justify-between items-center">
-                      <h3 className="text-xl font-bold text-black uppercase tracking-tight">Address Details</h3>
+                      <h3 className="text-xl font-bold text-onyx uppercase tracking-tight">Address Details</h3>
                       {savedAddresses.length > 0 && (
                         <select 
-                          className="text-xs uppercase tracking-widest font-black border border-gray-200 rounded p-2 outline-none cursor-pointer hover:border-black"
+                          className="text-xs uppercase tracking-widest font-black border border-onyx/10 rounded p-2 outline-none cursor-pointer hover:border-onyx bg-white/80"
                           onChange={(e) => {
                             if (!e.target.value) return;
                             const addr = savedAddresses.find(a => a._key === e.target.value);
@@ -430,13 +431,13 @@ export default function CheckoutPage() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="md:col-span-2 space-y-3">
-                        <label className="text-xs font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Physical Address</label>
+                        <label className="text-xs font-black text-onyx/50 uppercase tracking-[0.2em] ml-1">Physical Address</label>
                         <textarea
                           name="address"
                           value={formData.address}
                           onChange={handleChange}
-                          className={`w-full border px-5 py-5 rounded-2xl text-base font-medium focus:border-black focus:ring-0 outline-none transition-all duration-300 min-h-[140px] resize-none shadow-depth-1 focus:shadow-depth-2 ${
-                            errors.address ? 'border-red-500' : 'border-border-light'
+                          className={`w-full border px-6 py-4 bg-white/80 rounded-[2rem] text-sm font-medium focus:border-onyx focus:ring-0 outline-none transition-all duration-300 min-h-[140px] resize-none shadow-sm focus:shadow-md ${
+                            errors.address ? 'border-red-500' : 'border-onyx/10'
                           }`}
                           placeholder="Flat/House No, Building, Street, Landmark..."
                         />
@@ -452,17 +453,17 @@ export default function CheckoutPage() {
                     {customerId && (
                       <div className="pt-2">
                         <label className="flex items-center gap-3 cursor-pointer group">
-                          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${saveAddress ? 'bg-black border-black text-white' : 'border-gray-300 group-hover:border-black'}`}>
+                          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${saveAddress ? 'bg-onyx border-onyx text-bone' : 'border-onyx/20 group-hover:border-onyx'}`}>
                             {saveAddress && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                           </div>
                           <input type="checkbox" className="hidden" checked={saveAddress} onChange={() => setSaveAddress(!saveAddress)} />
-                          <span className="text-sm font-bold text-gray-900 select-none">Save this address to my profile for future purchases</span>
+                          <span className="text-sm font-bold text-onyx select-none">Save this address to my profile for future purchases</span>
                         </label>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex flex-col md:flex-row gap-6 pt-10 border-t border-border-light">
+                  <div className="flex flex-col md:flex-row gap-6 pt-10 border-t border-onyx/5">
                     <Button onClick={prevStep} variant="outline" className="flex-1">
                       Back to Review
                     </Button>
@@ -475,10 +476,10 @@ export default function CheckoutPage() {
             )}
 
             {step === 3 && (
-              <Card variant="outline" padding="p-8 md:p-12" className="animate-fade-in">
+              <Card variant="outline" padding="p-8 md:p-12" className="animate-fade-in bg-neutral-soft border-onyx/5">
                 <div className="space-y-16">
                   <div className="space-y-10">
-                    <h2 className="text-2xl font-black uppercase tracking-tight text-black">3. Payment Method</h2>
+                    <h2 className="text-2xl font-black uppercase tracking-tight text-onyx">3. Payment Method</h2>
                     <div className="grid grid-cols-1 gap-6">
                       <PaymentOption 
                         active={paymentMethod === 'online'} 
@@ -499,20 +500,20 @@ export default function CheckoutPage() {
 
                   <div className="space-y-10">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-bold text-black uppercase tracking-tight">Delivery Address</h3>
-                      <button onClick={() => setStep(2)} className="text-[11px] font-black text-black underline uppercase tracking-[0.2em] hover:text-zinc-500 transition-colors">Modify</button>
+                      <h3 className="text-xl font-bold text-onyx uppercase tracking-tight">Delivery Address</h3>
+                      <button onClick={() => setStep(2)} className="text-[11px] font-black text-onyx underline uppercase tracking-[0.2em] hover:text-onyx/60 transition-colors">Modify</button>
                     </div>
-                    <Card variant="flat" padding="p-10" className="space-y-4 rounded-3xl border border-border-light shadow-depth-1">
-                      <p className="text-lg font-black text-black uppercase tracking-tight">{formData.name}</p>
-                      <p className="text-base text-zinc-500 font-medium leading-relaxed max-w-md">
+                    <Card variant="flat" padding="p-10" className="space-y-4 rounded-[2rem] border border-onyx/5 shadow-sm bg-white/50">
+                      <p className="text-lg font-black text-onyx uppercase tracking-tight">{formData.name}</p>
+                      <p className="text-base text-onyx/60 font-medium leading-relaxed max-w-md">
                         {formData.address}, {formData.city}, {formData.state} - {formData.pincode}
                       </p>
-                      <div className="pt-4 flex items-center gap-6 text-sm font-black text-black">
+                      <div className="pt-4 flex items-center gap-6 text-sm font-black text-onyx">
                         <span className="flex items-center gap-2">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
                           {formData.phone}
                         </span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-200" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-onyx/20" />
                         <span className="flex items-center gap-2">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
                           {formData.email}
@@ -521,7 +522,7 @@ export default function CheckoutPage() {
                     </Card>
                   </div>
 
-                  <div className="flex flex-col md:flex-row gap-6 pt-10 border-t border-border-light">
+                  <div className="flex flex-col md:flex-row gap-6 pt-10 border-t border-onyx/5">
                     <Button onClick={prevStep} variant="outline" className="flex-1" disabled={loading}>
                       Back
                     </Button>
@@ -541,55 +542,55 @@ export default function CheckoutPage() {
           {/* RIGHT - SUMMARY (4/12 Width) */}
           <div className="lg:col-span-4">
             <div className="lg:sticky top-12 space-y-10">
-              <Card variant="shadow" padding="p-10" className="space-y-10 rounded-3xl">
-                <h3 className="text-xl font-black text-black uppercase tracking-[0.2em] text-center border-b border-border-light pb-8">Order Summary</h3>
+              <Card variant="shadow" padding="p-10" className="space-y-10 rounded-[2rem] bg-neutral-soft border-onyx/5">
+                <h3 className="text-xl font-black text-onyx uppercase tracking-[0.2em] text-center border-b border-onyx/5 pb-8">Order Summary</h3>
                 
                 <div className="max-h-[400px] overflow-y-auto pr-4 space-y-8 custom-scrollbar">
                   {cartItems.map((item) => (
                     <div key={item._id} className="flex gap-6 items-center group">
-                      <div className="w-20 h-24 bg-zinc-50 rounded-xl border border-border-light overflow-hidden flex-shrink-0 relative shadow-depth-1">
+                      <div className="w-20 h-24 bg-bone rounded-xl border border-onyx/5 overflow-hidden flex-shrink-0 relative shadow-sm">
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-black border-2 border-white">
+                        <span className="absolute -top-2 -right-2 bg-onyx text-bone text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-black border-2 border-bone">
                           {item.quantity}
                         </span>
                       </div>
                       <div className="flex-grow">
-                        <p className="text-sm font-bold text-black uppercase leading-tight line-clamp-1">{item.name}</p>
-                        <p className="text-[10px] font-black text-zinc-400 mt-2 uppercase tracking-[0.2em]">₹{item.price?.toLocaleString('en-IN')} / ea</p>
+                        <p className="text-sm font-bold text-onyx uppercase leading-tight line-clamp-1">{item.name}</p>
+                        <p className="text-[10px] font-black text-onyx/40 mt-2 uppercase tracking-[0.2em]">₹{item.price?.toLocaleString('en-IN')} / ea</p>
                       </div>
-                      <p className="text-base font-black text-black whitespace-nowrap">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
+                      <p className="text-base font-black text-onyx whitespace-nowrap">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
                     </div>
                   ))}
                 </div>
 
-                <div className="pt-10 border-t border-dashed border-zinc-200 space-y-5">
+                <div className="pt-10 border-t border-dashed border-onyx/10 space-y-5">
                   <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
-                    <span className="text-zinc-400">Items Subtotal</span>
-                    <span className="text-black">₹{subtotal.toLocaleString('en-IN')}</span>
+                    <span className="text-onyx/50">Items Subtotal</span>
+                    <span className="text-onyx">₹{subtotal.toLocaleString('en-IN')}</span>
                   </div>
                   <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
-                    <span className="text-zinc-400">Delivery Charges</span>
-                    <span className={deliveryCharge === 0 ? 'text-green-600' : 'text-black'}>
+                    <span className="text-onyx/50">Delivery Charges</span>
+                    <span className={deliveryCharge === 0 ? 'text-green-600' : 'text-onyx'}>
                       {deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}
                     </span>
                   </div>
                   {paymentMethod === 'cod' && (
                     <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
-                      <span className="text-zinc-400">Cash on Delivery Fee</span>
-                      <span className="text-black">₹50</span>
+                      <span className="text-onyx/50">Cash on Delivery Fee</span>
+                      <span className="text-onyx">₹50</span>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-10 border-t-2 border-black flex justify-between items-baseline">
-                  <span className="text-sm font-black text-black uppercase tracking-[0.3em]">Total Amount</span>
+                <div className="pt-10 border-t-2 border-onyx flex justify-between items-baseline">
+                  <span className="text-sm font-black text-onyx uppercase tracking-[0.3em]">Total Amount</span>
                   <div className="text-right">
-                    <span className="text-4xl font-black text-black">₹{total.toLocaleString('en-IN')}</span>
+                    <span className="text-4xl font-black text-onyx">₹{total.toLocaleString('en-IN')}</span>
                   </div>
                 </div>
               </Card>
 
-              <div className="bg-white border border-border-light rounded-3xl p-10 space-y-10 shadow-depth-1">
+              <div className="bg-neutral-soft border border-onyx/5 rounded-[2rem] p-10 space-y-10 shadow-sm">
                 <SummaryFeature icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>} title="Secure Payment" desc="SSL Authorized Encryption" />
                 <SummaryFeature icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="3" width="15" height="13" /><polyline points="16 8 20 8 23 11 23 16 16 16" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>} title="Fast Delivery" desc="3-5 Business Days Delivery" />
               </div>
@@ -603,12 +604,12 @@ export default function CheckoutPage() {
 
 const SummaryFeature = ({ icon, title, desc }) => (
   <div className="flex gap-5">
-    <div className="w-10 h-10 rounded-xl bg-zinc-50 flex items-center justify-center text-black border border-border-light flex-shrink-0">
+    <div className="w-10 h-10 rounded-xl bg-bone flex items-center justify-center text-onyx border border-onyx/5 flex-shrink-0">
       {icon}
     </div>
     <div>
-      <h4 className="text-xs font-black text-black uppercase tracking-[0.1em]">{title}</h4>
-      <p className="text-[11px] text-zinc-400 font-medium mt-1 leading-tight">{desc}</p>
+      <h4 className="text-xs font-black text-onyx uppercase tracking-[0.1em]">{title}</h4>
+      <p className="text-[11px] text-onyx/40 font-medium mt-1 leading-tight">{desc}</p>
     </div>
   </div>
 );
@@ -616,23 +617,23 @@ const SummaryFeature = ({ icon, title, desc }) => (
 const PaymentOption = ({ active, onClick, title, desc, icon }) => (
   <div 
     onClick={onClick}
-    className={`p-8 border rounded-2xl cursor-pointer transition-all duration-500 flex items-center justify-between group ${
-      active ? 'border-black bg-white shadow-depth-2' : 'border-border-light hover:border-zinc-300 bg-white shadow-depth-1'
+    className={`p-8 border rounded-[2rem] cursor-pointer transition-all duration-500 flex items-center justify-between group ${
+      active ? 'border-onyx bg-white shadow-md' : 'border-onyx/10 hover:border-onyx/40 bg-white/50 shadow-sm'
     }`}
   >
     <div className="flex items-center gap-6">
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-500 ${active ? 'bg-black text-white' : 'bg-zinc-50 text-zinc-400'}`}>
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-500 ${active ? 'bg-onyx text-bone' : 'bg-bone text-onyx/40'}`}>
         {icon}
       </div>
       <div>
-        <h4 className="text-base font-black text-black uppercase tracking-tight">{title}</h4>
-        <p className="text-[11px] text-zinc-400 font-medium mt-1 uppercase tracking-[0.05em]">{desc}</p>
+        <h4 className="text-base font-black text-onyx uppercase tracking-tight">{title}</h4>
+        <p className="text-[11px] text-onyx/50 font-medium mt-1 uppercase tracking-[0.05em]">{desc}</p>
       </div>
     </div>
     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
-      active ? 'border-black' : 'border-zinc-200 group-hover:border-zinc-300'
+      active ? 'border-onyx' : 'border-onyx/20 group-hover:border-onyx/40'
     }`}>
-      {active && <div className="w-3 h-3 rounded-full bg-black animate-fade-in" />}
+      {active && <div className="w-3 h-3 rounded-full bg-onyx animate-fade-in" />}
     </div>
   </div>
 );

@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  /* Premium Onyx & Bone Palette */
-  --onyx: #121212;
-  --bone: #F9F9F7;
-  --neutral-soft: #F1F1EF;
-  --chrome: #C5A059; /* DTC Gold Highlight */
-  --glass-white: rgba(255, 255, 255, 0.03);
-  --glass-dark: rgba(18, 18, 18, 0.85);
+  /* Warm Vanilla Aesthetic Palette */
+  --onyx: #1C1917; /* Soft Charcoal */
+  --bone: #F2ECE4; /* Warm Beige / Sand */
+  --neutral-soft: #E8E2D9; /* Slightly darker beige for cards/sections */
+  --chrome: #C5A059; /* Gold Highlight */
+  --glass-white: rgba(255, 255, 255, 0.2);
+  --glass-dark: rgba(28, 25, 23, 0.85);
 }
 
 @layer base {

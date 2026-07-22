@@ -30,25 +30,25 @@ export default async function ProductsPage({ searchParams }) {
   }
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-bone min-h-screen">
       {/* Hero Section */}
-      <div className="relative bg-black py-32 md:py-44 border-b border-zinc-900 text-white overflow-hidden">
+      <div className="relative bg-neutral-soft py-32 md:py-44 border-b border-onyx/5 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
             src="/images/shop-banner.png" 
             alt="Shop Banner" 
-            className="w-full h-full object-cover object-center opacity-40" 
+            className="w-full h-full object-cover object-center opacity-20" 
           />
         </div>
         
         <Container className="relative z-10">
           <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white animate-kinetic-reveal">Shop</h1>
-            <div className="flex items-center gap-2 text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em]">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-onyx animate-kinetic-reveal">Shop</h1>
+            <div className="flex items-center gap-2 text-[10px] text-onyx/50 font-bold uppercase tracking-[0.2em]">
+              <Link href="/" className="hover:text-onyx transition-colors">Home</Link>
               <span>&gt;</span>
-              <span className="text-white">Shop</span>
+              <span className="text-onyx">Shop</span>
             </div>
           </div>
         </Container>
@@ -62,8 +62,8 @@ export default async function ProductsPage({ searchParams }) {
           ) : (
             <div className="flex flex-col items-center justify-center py-32 text-center">
               <div className="text-5xl mb-6">📦</div>
-              <h2 className="text-xl font-bold text-black mb-2">No Products Yet</h2>
-              <p className="text-sm text-zinc-500 mb-8 max-w-xs">
+              <h2 className="text-xl font-bold text-onyx mb-2">No Products Yet</h2>
+              <p className="text-sm text-onyx/60 mb-8 max-w-xs">
                 Our inventory is currently being updated. Please check back later.
               </p>
               <Link href="/">
