@@ -8,21 +8,21 @@ import ProductCard from '@/domains/products/components/ProductCard';
 export const dynamic = 'force-dynamic';
 
 export default async function Homepage() {
-  // Fetch multiple sets of products for different sections
-  const [latestProducts, topSellingProducts, recommendedProducts] = await Promise.all([
-    client.fetch(`*[_type == "product"] | order(_createdAt desc)[0...4] {
+  // Fetch multiple sets of products for different category sections
+  const [leggingsProducts, sareesProducts, nightyProducts] = await Promise.all([
+    client.fetch(`*[_type == "product" && category->slug.current == "leggings"] | order(_createdAt desc)[0...4] {
       _id, name, price, comparePrice, stock,
       "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
       "category": category->name, "slug": slug.current, variants
     }`, {}, { next: { revalidate: 0 } }),
     
-    client.fetch(`*[_type == "product"] | order(price desc)[0...4] {
+    client.fetch(`*[_type == "product" && category->slug.current == "sarees"] | order(_createdAt desc)[0...4] {
       _id, name, price, comparePrice, stock,
       "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
       "category": category->name, "slug": slug.current, variants
     }`, {}, { next: { revalidate: 0 } }),
     
-    client.fetch(`*[_type == "product"] | order(_createdAt asc)[0...4] {
+    client.fetch(`*[_type == "product" && category->slug.current == "nighty"] | order(_createdAt desc)[0...4] {
       _id, name, price, comparePrice, stock,
       "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
       "category": category->name, "slug": slug.current, variants
@@ -251,21 +251,21 @@ export default async function Homepage() {
         </Container>
       </section>
 
-      {/* 03. TOP SELLING SECTION */}
+      {/* 03. LEGGINGS COLLECTION */}
       <section className="py-20 border-t border-onyx/5">
         <Container>
           <div className="flex justify-between items-end mb-16">
             <div className="space-y-4">
-              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Top Selling</h2>
-              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Discover what others are loving right now.</p>
+              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Leggings Collection</h2>
+              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Premium stretch and comfort for your everyday.</p>
             </div>
-            <Link href="/shop" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4 hidden md:block">
-              Shop Bestsellers
+            <Link href="/shop?category=leggings" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4 hidden md:block">
+              Shop Leggings
             </Link>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            {topSellingProducts.map((product) => (
+            {leggingsProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>
@@ -313,40 +313,48 @@ export default async function Homepage() {
         </Container>
       </section>
 
-      {/* 05. NEW ARRIVALS CARD SECTION */}
+      {/* 05. SAREES COLLECTION */}
       <section className="py-20 border-t border-onyx/5 bg-neutral-soft">
         <Container>
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">New Arrivals</h2>
-            <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Fresh off the loom: browse our newly arrived collections</p>
+          <div className="flex justify-between items-end mb-16">
+            <div className="space-y-4">
+              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Exclusive Sarees</h2>
+              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Timeless elegance woven into every thread.</p>
+            </div>
+            <Link href="/shop?category=sarees" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4 hidden md:block">
+              Shop Sarees
+            </Link>
           </div>
 
-          {latestProducts.length > 0 ? (
+          {sareesProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-              {latestProducts.map((product) => (
+              {sareesProducts.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}
             </div>
           ) : (
             <div className="py-16 text-center text-zinc-400 italic text-xs uppercase tracking-wider font-bold">
-              New arrivals are currently being loaded. Check back soon!
+              Sarees collection is currently being loaded. Check back soon!
             </div>
           )}
         </Container>
       </section>
 
-      {/* 06. RECOMMENDED PICKS */}
+      {/* 06. NIGHTWEAR COLLECTION */}
       <section className="py-20 border-t border-onyx/5">
         <Container>
           <div className="flex justify-between items-end mb-16">
             <div className="space-y-4">
-              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Recommended For You</h2>
-              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Curated picks based on current trends.</p>
+              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Nightwear & Sleepwear</h2>
+              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Luxurious comfort for your evenings.</p>
             </div>
+            <Link href="/shop?category=nighty" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4 hidden md:block">
+              Shop Nightwear
+            </Link>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            {recommendedProducts.map((product) => (
+            {nightyProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>

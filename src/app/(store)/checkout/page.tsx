@@ -548,9 +548,16 @@ export default function CheckoutPage() {
                 <div className="max-h-[400px] overflow-y-auto pr-4 space-y-8 custom-scrollbar">
                   {cartItems.map((item) => (
                     <div key={item._id} className="flex gap-6 items-center group">
-                      <div className="w-20 h-24 bg-bone rounded-xl border border-onyx/5 overflow-hidden flex-shrink-0 relative shadow-sm">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        <span className="absolute -top-2 -right-2 bg-onyx text-bone text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-black border-2 border-bone">
+                      <div className="w-20 h-24 flex-shrink-0 relative">
+                        <div className="w-full h-full bg-bone rounded-xl border border-onyx/5 overflow-hidden shadow-sm">
+                          <img 
+                            src={item.imageUrl || (typeof item.image === 'string' ? item.image : null) || 'https://placehold.co/400x500?text=Product'} 
+                            alt={item.name} 
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://placehold.co/400x500?text=Product'; }}
+                          />
+                        </div>
+                        <span className="absolute -top-2 -right-2 bg-onyx text-bone text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-black border-2 border-bone z-10">
                           {item.quantity}
                         </span>
                       </div>

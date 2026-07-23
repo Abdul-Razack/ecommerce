@@ -2,7 +2,7 @@ import React from 'react';
 import Container from './layout/Container';
 
 interface SectionProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: React.ReactNode;

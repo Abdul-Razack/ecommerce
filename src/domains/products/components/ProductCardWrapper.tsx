@@ -113,9 +113,9 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
 
     // Sort Logic
     if (selectedSort === 'price-low') {
-      result.sort((a, b) => a.price - b.price);
+      result.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
     } else if (selectedSort === 'price-high') {
-      result.sort((a, b) => b.price - a.price);
+      result.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
     }
 
     return result;
@@ -155,7 +155,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
           <div className="relative">
             <button 
               onClick={() => toggleDropdown('categories')}
-              className={`hover:text-black flex items-center gap-1 transition-colors ${selectedCategory !== 'All' ? 'text-black' : ''}`}
+              className={`hover:text-black flex items-center gap-1 transition-colors select-none ${selectedCategory !== 'All' ? 'text-black' : ''}`}
             >
               Categories ({selectedCategory}) <span className="text-[8px] font-bold">▼</span>
             </button>
@@ -178,7 +178,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
           <div className="relative">
             <button 
               onClick={() => toggleDropdown('colors')}
-              className={`hover:text-black flex items-center gap-1 transition-colors ${selectedColor !== 'All Colors' ? 'text-black' : ''}`}
+              className={`hover:text-black flex items-center gap-1 transition-colors select-none ${selectedColor !== 'All Colors' ? 'text-black' : ''}`}
             >
               Color ({selectedColor}) <span className="text-[8px] font-bold">▼</span>
             </button>
@@ -204,7 +204,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
           <div className="relative">
             <button 
               onClick={() => toggleDropdown('sizes')}
-              className={`hover:text-black flex items-center gap-1 transition-colors ${selectedSize !== 'All Sizes' ? 'text-black' : ''}`}
+              className={`hover:text-black flex items-center gap-1 transition-colors select-none ${selectedSize !== 'All Sizes' ? 'text-black' : ''}`}
             >
               Size ({selectedSize}) <span className="text-[8px] font-bold">▼</span>
             </button>
@@ -227,7 +227,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
           <div className="relative">
             <button 
               onClick={() => toggleDropdown('prices')}
-              className={`hover:text-black flex items-center gap-1 transition-colors ${selectedPrice !== 0 ? 'text-black' : ''}`}
+              className={`hover:text-black flex items-center gap-1 transition-colors select-none ${selectedPrice !== 0 ? 'text-black' : ''}`}
             >
               Price ({PRICE_OPTIONS[selectedPrice]?.label}) <span className="text-[8px] font-bold">▼</span>
             </button>
@@ -253,7 +253,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
           <div className="relative">
             <button 
               onClick={() => toggleDropdown('sort')}
-              className="hover:text-black text-zinc-500 flex items-center gap-1"
+              className="hover:text-black text-zinc-500 flex items-center gap-1 select-none"
             >
               {SORT_OPTIONS.find(opt => opt.value === selectedSort)?.label} <span className="text-[8px]">▼</span>
             </button>

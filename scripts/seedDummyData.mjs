@@ -24,6 +24,7 @@ const CATEGORIES = [
 ];
 
 const DUMMY_PRODUCTS = [
+  // LEGGINGS
   {
     name: 'Onyx Core Legging',
     price: 1299,
@@ -43,6 +44,26 @@ const DUMMY_PRODUCTS = [
     isFeatured: false,
   },
   {
+    name: 'Graphite Everyday Legging',
+    price: 1099,
+    comparePrice: 1599,
+    description: 'The perfect everyday legging, designed for maximum comfort and flexibility.',
+    image: 'https://images.unsplash.com/photo-1560931124-74c6ee6f2a63?q=80&w=800&auto=format&fit=crop',
+    catSlug: 'leggings',
+    isFeatured: false,
+  },
+  {
+    name: 'Carbon Ribbed Legging',
+    price: 1699,
+    comparePrice: 2499,
+    description: 'Premium ribbed legging offering superior hold and a textured look.',
+    image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=800&auto=format&fit=crop',
+    catSlug: 'leggings',
+    isFeatured: true,
+  },
+
+  // ACTIVEWEAR
+  {
     name: 'Midnight Active Top',
     price: 899,
     comparePrice: 1299,
@@ -60,6 +81,26 @@ const DUMMY_PRODUCTS = [
     catSlug: 'activewear',
     isFeatured: false,
   },
+  {
+    name: 'Platinum Training Jacket',
+    price: 1999,
+    comparePrice: 2999,
+    description: 'Lightweight zip-up jacket perfect for outdoor training and warmups.',
+    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop',
+    catSlug: 'activewear',
+    isFeatured: true,
+  },
+  {
+    name: 'Obsidian Performance Shorts',
+    price: 899,
+    comparePrice: 1299,
+    description: 'High-performance running shorts with inner liner and hidden pockets.',
+    image: 'https://images.unsplash.com/photo-1538330627166-33d1908c210d?q=80&w=800&auto=format&fit=crop',
+    catSlug: 'activewear',
+    isFeatured: false,
+  },
+
+  // NIGHTY
   {
     name: 'Silk Lounge Nighty',
     price: 1899,
@@ -79,6 +120,26 @@ const DUMMY_PRODUCTS = [
     isFeatured: false,
   },
   {
+    name: 'Satin Dream Nightdress',
+    price: 2199,
+    comparePrice: 3299,
+    description: 'Luxurious satin nightdress falling elegantly at the knees.',
+    image: 'https://images.unsplash.com/photo-1562157502-0e9e4f506846?q=80&w=800&auto=format&fit=crop',
+    catSlug: 'nighty',
+    isFeatured: true,
+  },
+  {
+    name: 'Rose Gold Sleep Shirt',
+    price: 1299,
+    comparePrice: 1899,
+    description: 'Comfortable oversized sleep shirt in a beautiful rose gold shade.',
+    image: 'https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop',
+    catSlug: 'nighty',
+    isFeatured: false,
+  },
+
+  // SAREES
+  {
     name: 'Royal Georgette Saree',
     price: 3499,
     comparePrice: 5999,
@@ -93,6 +154,24 @@ const DUMMY_PRODUCTS = [
     comparePrice: 4599,
     description: 'Minimalist chiffon saree in beautiful ivory with subtle embellishments.',
     image: 'https://images.unsplash.com/photo-1583391733958-d25e07fac662?q=80&w=800&auto=format&fit=crop',
+    catSlug: 'sarees',
+    isFeatured: false,
+  },
+  {
+    name: 'Emerald Silk Saree',
+    price: 4599,
+    comparePrice: 7999,
+    description: 'Traditional pure silk saree in a stunning emerald green color with gold zari.',
+    image: 'https://images.unsplash.com/photo-1583391733958-d25e07fac662?q=80&w=800&auto=format&fit=crop',
+    catSlug: 'sarees',
+    isFeatured: true,
+  },
+  {
+    name: 'Crimson Banarasi Saree',
+    price: 5299,
+    comparePrice: 8999,
+    description: 'Exquisite Banarasi saree woven with intricate crimson and gold patterns.',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=800&auto=format&fit=crop',
     catSlug: 'sarees',
     isFeatured: false,
   }

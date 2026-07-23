@@ -64,9 +64,10 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
       <div className="relative aspect-[4/5] overflow-hidden bg-neutral-soft border-b border-onyx/5">
         <Link href={`/shop/${product.slug?.current || product.slug}`} className="block w-full h-full">
           <img 
-            src={product.imageUrl || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=2040&auto=format&fit=crop'} 
+            src={product.imageUrl || (typeof product.image === 'string' ? product.image : null) || 'https://placehold.co/400x500?text=Product'} 
             alt={cleanName}
             className="w-full h-full object-contain p-2 transition-all duration-700 group-hover:scale-105"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://placehold.co/400x500?text=Product'; }}
           />
         </Link>
 
