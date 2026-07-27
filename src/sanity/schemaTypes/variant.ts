@@ -20,7 +20,7 @@ export const variant = defineType({
       title: "Size",
       type: "string",
       options: {
-        list: ["XS", "S", "M", "L", "XL", "XXL"],
+        list: ["XS", "S", "M", "L", "XL", "XXL", "3XL"],
       },
     }),
     defineField({

@@ -33,7 +33,7 @@ export default async function Homepage() {
     <main className="bg-bone pb-40">
       
       {/* 01. EDITORIAL HERO */}
-      <section className="relative w-full bg-bone min-h-[450px] lg:min-h-[600px] flex items-center py-12 lg:py-0">
+      <section className="relative w-full bg-bone min-h-[500px] lg:min-h-[700px] flex items-center py-12 lg:py-0">
         {/* Background Image for Large Screens */}
         <div className="absolute inset-0 z-0 hidden lg:block">
           <img 

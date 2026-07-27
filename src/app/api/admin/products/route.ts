@@ -300,6 +300,31 @@ export async function DELETE(request: Request) {
       );
     }
 
+    // Auto-clean references to prevent Sanity reference blocking errors
+    try {
+      const referencingDocs = await writeClient.fetch<any[]>(
+        `*[references($id)]`,
+        { id }
+      );
+
+      for (const doc of referencingDocs) {
+        if (doc._type === 'homePage') {
+          const originalProducts = doc.trendingProducts?.products || [];
+          const updatedProducts = originalProducts.filter((p: any) => p._ref !== id);
+          if (originalProducts.length !== updatedProducts.length) {
+            console.log(`Auto-cleaning product reference ${id} from homepage document`);
+            await writeClient
+              .patch(doc._id)
+              .set({ 'trendingProducts.products': updatedProducts })
+              .commit();
+          }
+        }
+        // If there are other documents referencing products strongly, clean them up here
+      }
+    } catch (cleanError: any) {
+      console.error('Failed to auto-clean referencing documents during deletion:', cleanError);
+    }
+
     await writeClient.delete(id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
