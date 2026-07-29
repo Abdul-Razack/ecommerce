@@ -51,23 +51,9 @@ export default async function Homepage() {
 
       {/* 01. EDITORIAL HERO */}
       <section className="relative w-full bg-bone min-h-[450px] lg:min-h-[600px] flex items-center py-12 lg:py-0">
-        {/* Background Image for Large Screens */}
-        <div className="absolute inset-0 z-0 hidden lg:block">
-          <img
-            src="/images/banner-1.png"
-            alt="Hero Banner Background"
-            className="w-full h-full object-cover object-top"
-          />
-        </div>
-
-        {/* Mobile Background Image (dimmed overlay for text readability) */}
-        <div className="absolute inset-0 z-0 lg:hidden opacity-50">
-          <img
-            src="/images/banner.png"
-            alt="Hero Banner Background"
-            className="w-full h-full object-cover object-[right_top]"
-          />
-        </div>
+        
+        {/* Multi-Image Hero Slider Component */}
+        <HeroSlider images={homePage?.hero?.images || []} />
 
         <Container className="relative z-10 w-full pt-10 pb-32 lg:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
