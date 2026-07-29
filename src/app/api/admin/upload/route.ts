@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/shared/lib/auth';
-import { writeClient } from '@/sanity/lib/client';
+import { writeClient } from '@/shared/lib/sanity';
 
 export async function POST(req: NextRequest) {
   try {
