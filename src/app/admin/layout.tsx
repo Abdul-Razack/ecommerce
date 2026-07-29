@@ -42,10 +42,11 @@ function AdminLayoutInner({ children }) {
   const navItems = [
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/products', label: 'Products' },
+    { href: '/admin/categories', label: 'Categories' },
     { href: '/admin/orders', label: 'Orders' },
     { href: '/admin/stock', label: 'Inventory' },
     { href: '/admin/reports', label: 'Performance' },
-    { href: '/studio', label: 'Sanity Studio' },
+    { href: '/admin/storefront', label: 'Storefront' },
     { href: '/', label: 'View Store' },
   ];
 

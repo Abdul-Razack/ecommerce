@@ -4,24 +4,41 @@ import { client } from '@/shared/lib/sanity';
 import Container from '@/shared/ui/layout/Container';
 import Button from '@/shared/ui/Button';
 import ProductCard from '@/domains/products/components/ProductCard';
+import HeroSlider from './components/HeroSlider';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Homepage() {
   // Fetch multiple sets of products for different category sections
-  const [leggingsProducts, sareesProducts, nightyProducts] = await Promise.all([
+  const [homePage, leggingsProducts, sareesProducts, nightyProducts] = await Promise.all([
+    client.fetch(`*[_type == "homePage"][0]{
+      ...,
+      hero {
+        ...,
+        "images": images[].asset->url
+      },
+      dynamicProductRows[] {
+        title,
+        "categorySlug": category->slug.current,
+        "products": *[_type == "product" && category->slug.current == ^.category->slug.current] | order(_createdAt desc)[0...4] {
+          _id, name, price, comparePrice, stock,
+          "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
+          "category": category->name, "slug": slug.current, variants
+        }
+      }
+    }`, {}, { next: { revalidate: 0 } }),
     client.fetch(`*[_type == "product" && category->slug.current == "leggings"] | order(_createdAt desc)[0...4] {
       _id, name, price, comparePrice, stock,
       "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
       "category": category->name, "slug": slug.current, variants
     }`, {}, { next: { revalidate: 0 } }),
-    
+
     client.fetch(`*[_type == "product" && category->slug.current == "sarees"] | order(_createdAt desc)[0...4] {
       _id, name, price, comparePrice, stock,
       "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
       "category": category->name, "slug": slug.current, variants
     }`, {}, { next: { revalidate: 0 } }),
-    
+
     client.fetch(`*[_type == "product" && category->slug.current == "nighty"] | order(_createdAt desc)[0...4] {
       _id, name, price, comparePrice, stock,
       "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
@@ -31,24 +48,24 @@ export default async function Homepage() {
 
   return (
     <main className="bg-bone pb-40">
-      
+
       {/* 01. EDITORIAL HERO */}
-      <section className="relative w-full bg-bone min-h-[500px] lg:min-h-[700px] flex items-center py-12 lg:py-0">
+      <section className="relative w-full bg-bone min-h-[450px] lg:min-h-[600px] flex items-center py-12 lg:py-0">
         {/* Background Image for Large Screens */}
         <div className="absolute inset-0 z-0 hidden lg:block">
-          <img 
-            src="/images/banner-1.png" 
-            alt="Hero Banner Background" 
-            className="w-full h-full object-cover object-top" 
+          <img
+            src="/images/banner-1.png"
+            alt="Hero Banner Background"
+            className="w-full h-full object-cover object-top"
           />
         </div>
-        
+
         {/* Mobile Background Image (dimmed overlay for text readability) */}
         <div className="absolute inset-0 z-0 lg:hidden opacity-50">
-          <img 
-            src="/images/banner.png" 
-            alt="Hero Banner Background" 
-            className="w-full h-full object-cover object-[right_top]" 
+          <img
+            src="/images/banner.png"
+            alt="Hero Banner Background"
+            className="w-full h-full object-cover object-[right_top]"
           />
         </div>
 
@@ -56,17 +73,14 @@ export default async function Homepage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-6 space-y-6 max-w-lg bg-white/40 lg:bg-transparent p-6 lg:p-0 rounded-3xl backdrop-blur-sm lg:backdrop-blur-none">
               <span className="technical text-onyx tracking-[0.4em] uppercase">Posh Pigeon Premium</span>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-onyx leading-[1.05]">
-                WEAR YOUR <br/>
-                <span className="editorial italic lowercase font-normal text-onyx">confidence</span>
-              </h1>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-onyx leading-[1.05]" dangerouslySetInnerHTML={{ __html: homePage?.hero?.heading || "WEAR YOUR <br/><span class='editorial italic lowercase font-normal text-onyx'>confidence</span>" }} />
               <p className="text-sm md:text-base text-onyx font-medium leading-relaxed font-sans">
-                Trendy pieces. Timeless style. Posh Pigeon has everything you need to look and feel your best.
+                {homePage?.hero?.subtext || "Trendy pieces. Timeless style. Posh Pigeon has everything you need to look and feel your best."}
               </p>
               <div className="flex flex-wrap gap-4 pt-4">
                 <Link href="/shop">
                   <span className="inline-flex items-center justify-center h-14 px-8 rounded-full bg-onyx text-bone hover:bg-black transition-colors text-[10px] font-black uppercase tracking-widest cursor-pointer shadow-md">
-                    SHOP NEW IN
+                    {homePage?.hero?.buttonText || "SHOP NEW IN"}
                   </span>
                 </Link>
                 <Link href="#collections">
@@ -190,9 +204,9 @@ export default async function Homepage() {
                   </span>
                 </Link>
               </div>
-              <img 
-                src="https://assets0.mirraw.com/images/8288550/RoyalBlue_4fe606c6-8430-41df-812b-c2b0eb46bb6d_zoom.jpg?1600076914" 
-                alt="Leggings Focus" 
+              <img
+                src="https://assets0.mirraw.com/images/8288550/RoyalBlue_4fe606c6-8430-41df-812b-c2b0eb46bb6d_zoom.jpg?1600076914"
+                alt="Leggings Focus"
                 className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
               />
             </div>
@@ -207,9 +221,9 @@ export default async function Homepage() {
                   </span>
                 </Link>
               </div>
-              <img 
-                src="https://www.ankitadesigns.in/cdn/shop/files/350nilima.png?v=1777283189" 
-                alt="Nighty Focus" 
+              <img
+                src="https://www.ankitadesigns.in/cdn/shop/files/350nilima.png?v=1777283189"
+                alt="Nighty Focus"
                 className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
               />
             </div>
@@ -224,9 +238,9 @@ export default async function Homepage() {
                   </span>
                 </Link>
               </div>
-              <img 
-                src="https://jisboutique.com/cdn/shop/files/24_166af726-83fd-4c7c-a62f-54444fbbefc3.jpg?v=1718281040" 
-                alt="Inskirt Focus" 
+              <img
+                src="https://jisboutique.com/cdn/shop/files/24_166af726-83fd-4c7c-a62f-54444fbbefc3.jpg?v=1718281040"
+                alt="Inskirt Focus"
                 className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
               />
             </div>
@@ -241,9 +255,9 @@ export default async function Homepage() {
                   </span>
                 </Link>
               </div>
-              <img 
-                src="https://pochampallysarees.com/cdn/shop/files/PureSoftSilkBlueYellowSari.jpg?v=1762248060" 
-                alt="Sarees Focus" 
+              <img
+                src="https://pochampallysarees.com/cdn/shop/files/PureSoftSilkBlueYellowSari.jpg?v=1762248060"
+                alt="Sarees Focus"
                 className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
               />
             </div>
@@ -273,45 +287,47 @@ export default async function Homepage() {
       </section>
 
       {/* 04. SPRING SALE PROMOTIONAL BANNER SECTION */}
-      <section className="py-12 border-t border-onyx/5">
-        <Container>
-          <div className="bg-onyx rounded-3xl overflow-hidden shadow-kinetic grid grid-cols-1 md:grid-cols-12 relative items-stretch min-h-[280px]">
-            {/* Left Content Column */}
-            <div className="md:col-span-5 p-8 md:p-12 flex flex-col justify-center space-y-4 text-bone z-10">
-              <div className="flex items-center gap-2">
-                <span className="text-chrome font-black text-[9px] tracking-[0.2em] uppercase">✦ Limited Time Offer</span>
+      {homePage?.promotionalBanner?.isActive !== false && (
+        <section className="py-12 border-t border-onyx/5">
+          <Container>
+            <div className="bg-onyx rounded-3xl overflow-hidden shadow-kinetic grid grid-cols-1 md:grid-cols-12 relative items-stretch min-h-[280px]">
+              {/* Left Content Column */}
+              <div className="md:col-span-5 p-8 md:p-12 flex flex-col justify-center space-y-4 text-bone z-10">
+                <div className="flex items-center gap-2">
+                  <span className="text-chrome font-black text-[9px] tracking-[0.2em] uppercase">✦ Limited Time Offer</span>
+                </div>
+                <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tight leading-none text-white">
+                  {homePage?.promotionalBanner?.heading || "Spring Sale is Live!"}
+                </h3>
+                <p className="text-xs text-white/70 font-medium tracking-wide">
+                  {homePage?.promotionalBanner?.subtext || "Enjoy up to 40% off on selected clothing collections."}
+                </p>
+                <Link href="/shop" className="pt-2 block">
+                  <span className="inline-block text-[9px] bg-[#DCA095] hover:bg-white text-zinc-950 font-black px-6 py-3 rounded-full uppercase tracking-widest transition-colors cursor-pointer">
+                    Explore Deals →
+                  </span>
+                </Link>
               </div>
-              <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tight leading-none text-white">
-                Spring Sale is Live!
-              </h3>
-              <p className="text-xs text-white/70 font-medium tracking-wide">
-                Enjoy up to 40% off on selected clothing collections.
-              </p>
-              <Link href="/shop" className="pt-2 block">
-                <span className="inline-block text-[9px] bg-[#DCA095] hover:bg-white text-zinc-950 font-black px-6 py-3 rounded-full uppercase tracking-widest transition-colors cursor-pointer">
-                  Explore Deals →
-                </span>
-              </Link>
-            </div>
 
-            {/* Overlapping Badge Circle */}
-            <div className="hidden md:flex absolute left-[38%] top-1/2 -translate-y-1/2 z-20 w-28 h-28 bg-[#DCA095] text-white rounded-full border-[6px] border-[#F8F6F4] flex flex-col items-center justify-center shadow-lg pointer-events-none">
-              <span className="text-[9px] uppercase tracking-widest font-black opacity-80">Up To</span>
-              <span className="text-xl font-black leading-none my-0.5">40%</span>
-              <span className="text-[9px] uppercase tracking-widest font-black opacity-80">Off</span>
-            </div>
+              {/* Overlapping Badge Circle */}
+              <div className="hidden md:flex absolute left-[38%] top-1/2 -translate-y-1/2 z-20 w-28 h-28 bg-[#DCA095] text-white rounded-full border-[6px] border-[#F8F6F4] flex flex-col items-center justify-center shadow-lg pointer-events-none">
+                <span className="text-[9px] uppercase tracking-widest font-black opacity-80">Up To</span>
+                <span className="text-xl font-black leading-none my-0.5">{homePage?.promotionalBanner?.discount || "40%"}</span>
+                <span className="text-[9px] uppercase tracking-widest font-black opacity-80">Off</span>
+              </div>
 
-            {/* Right Banner Image Column */}
-            <div className="md:col-span-7 relative min-h-[200px] md:min-h-full">
-              <img 
-                src="/images/poster-image.png" 
-                className="w-full h-full object-cover" 
-                alt="Spring Sale Flatlay" 
-              />
+              {/* Right Banner Image Column */}
+              <div className="md:col-span-7 relative min-h-[200px] md:min-h-full">
+                <img
+                  src="/images/poster-image.png"
+                  className="w-full h-full object-cover"
+                  alt="Spring Sale Flatlay"
+                />
+              </div>
             </div>
-          </div>
-        </Container>
-      </section>
+          </Container>
+        </section>
+      )}
 
       {/* 05. SAREES COLLECTION */}
       <section className="py-20 border-t border-onyx/5 bg-neutral-soft">
@@ -369,14 +385,12 @@ export default async function Homepage() {
           <div className="max-w-4xl mx-auto bg-neutral-soft border border-onyx/10 rounded-[2.5rem] md:rounded-[4rem] py-14 md:py-16 px-6 md:px-10 shadow-sm relative overflow-hidden">
             {/* Decorative subtle gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
-            
+
             <div className="relative max-w-2xl mx-auto space-y-6">
-              <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-tight uppercase text-onyx">
-                JOIN THE <span className="text-chrome">COLLECTION</span>
-              </h2>
-              <Link href="/shop" className="inline-block pt-4">
+              <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-tight uppercase text-onyx" dangerouslySetInnerHTML={{ __html: homePage?.globalCta?.heading || "JOIN THE <span class='text-chrome'>COLLECTION</span>" }} />
+              <Link href={homePage?.globalCta?.buttonLink || "/shop"} className="inline-block pt-4">
                 <Button className="h-14 md:h-16 px-10 md:px-14 bg-onyx text-bone text-[9px] md:text-[11px] font-black tracking-[0.4em] shadow-kinetic hover:scale-105 transition-transform uppercase rounded-full">
-                  EXPLORE SHOP
+                  {homePage?.globalCta?.buttonText || "EXPLORE SHOP"}
                 </Button>
               </Link>
             </div>
