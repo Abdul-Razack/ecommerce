@@ -3,9 +3,11 @@
 import { useEffect } from 'react';
 import { useCart } from '@/hooks/useCart';
 import Button from '@/shared/ui/Button';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 export default function QuickViewModal({ product, isOpen, onClose }) {
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     if (isOpen) {
@@ -65,7 +67,7 @@ export default function QuickViewModal({ product, isOpen, onClose }) {
             </p>
           )}
           <h2 className="text-3xl md:text-4xl font-serif text-black mb-6 leading-tight">{product.name}</h2>
-          <p className="text-xl font-bold text-black mb-10">₹{product.price?.toLocaleString('en-IN')}</p>
+          <p className="text-xl font-bold text-black mb-10">{formatPrice(product.price)}</p>
           
           <div className="space-y-6 mb-10">
             <p className="text-xs text-zinc-500 leading-relaxed font-light italic">

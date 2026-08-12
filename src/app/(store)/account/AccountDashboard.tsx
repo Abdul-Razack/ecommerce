@@ -15,6 +15,18 @@ interface AccountDashboardProps {
   orders: any[];
 }
 
+function formatOrderPrice(amount: number, orderCurrency?: string) {
+  const currencyCode = orderCurrency || 'INR';
+  if (currencyCode === 'INR') {
+    return `₹${Math.round(amount).toLocaleString('en-IN')}`;
+  } else {
+    return `RM ${amount.toLocaleString('en-MY', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+}
+
 export default function AccountDashboard({ customer, orders }: AccountDashboardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -237,7 +249,7 @@ export default function AccountDashboard({ customer, orders }: AccountDashboardP
                         <div className="flex items-center justify-between md:justify-end gap-8">
                           <div>
                             <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40 mb-0.5">Total</p>
-                            <p className="text-sm font-black">₹{parseFloat(order.totalAmount || 0).toLocaleString('en-IN')}</p>
+                            <p className="text-sm font-black">{formatOrderPrice(parseFloat(order.totalAmount || 0), order.currency)}</p>
                           </div>
                           <button 
                             onClick={() => {
@@ -318,7 +330,7 @@ export default function AccountDashboard({ customer, orders }: AccountDashboardP
                           <div>
                             <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40">Total Amount</p>
                             <p className="text-xs font-black text-onyx">
-                              ₹{parseFloat(order.totalAmount || 0).toLocaleString('en-IN')}
+                              {formatOrderPrice(parseFloat(order.totalAmount || 0), order.currency)}
                             </p>
                           </div>
                         </div>
@@ -440,7 +452,7 @@ export default function AccountDashboard({ customer, orders }: AccountDashboardP
                                         {item.productName || item.name}
                                       </p>
                                       <p className="text-[9px] font-bold text-onyx/40 mt-1 uppercase tracking-widest">
-                                        ₹{item.price?.toLocaleString('en-IN')}
+                                        {formatOrderPrice(item.price || 0, order.currency)}
                                       </p>
                                       {(item.color || item.size) && (
                                         <div className="flex gap-2 mt-1.5">

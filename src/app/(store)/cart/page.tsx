@@ -6,9 +6,11 @@ import Container from '@/shared/ui/layout/Container';
 import Button from '@/shared/ui/Button';
 import Card from '@/shared/ui/Card';
 import Skeleton from '@/shared/ui/Skeleton';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, getCartCount, isLoaded } = useCart();
+  const { formatPrice } = useCurrency();
 
   if (!isLoaded) {
     return (
@@ -89,7 +91,7 @@ export default function CartPage() {
                         {item.name || 'Premium Item'}
                       </h3>
                       <p className="text-xs sm:text-sm md:text-base font-black text-onyx pt-0.5 sm:pt-1">
-                        ₹{(item.price || 0).toLocaleString('en-IN')}
+                        {formatPrice(item.price || 0)}
                       </p>
                     </div>
                     
@@ -139,17 +141,17 @@ export default function CartPage() {
               <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
                 <div className="flex justify-between items-center border-b border-onyx/5 pb-3 sm:pb-4">
                   <span className="technical text-[9px] sm:text-[10px] text-onyx/60 uppercase tracking-[0.2em] font-bold">Subtotal</span>
-                  <span className="font-black text-onyx text-sm sm:text-base">₹{subtotal.toLocaleString('en-IN')}</span>
+                  <span className="font-black text-onyx text-sm sm:text-base">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-onyx/5 pb-3 sm:pb-4">
                   <span className="technical text-[9px] sm:text-[10px] text-onyx/60 uppercase tracking-[0.2em] font-bold">Delivery</span>
                   <span className={`font-black text-[9px] sm:text-[10px] tracking-wider uppercase px-2 py-1 rounded ${deliveryCharge === 0 ? 'bg-green-100/50 text-green-700 border border-green-200/50' : 'text-onyx'}`}>
-                    {deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}
+                    {deliveryCharge === 0 ? 'FREE' : formatPrice(deliveryCharge)}
                   </span>
                 </div>
                 {deliveryCharge > 0 && (
                   <p className="text-[9px] sm:text-[10px] text-chrome font-bold uppercase tracking-wider text-center pt-2">
-                    Add ₹{(999 - subtotal).toLocaleString('en-IN')} more for free delivery
+                    Add {formatPrice(999 - subtotal)} more for free delivery
                   </p>
                 )}
               </div>
@@ -157,7 +159,7 @@ export default function CartPage() {
               <div className="bg-white/50 border border-onyx/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 flex justify-between items-end">
                 <div>
                   <p className="technical text-[8px] sm:text-[9px] uppercase tracking-widest font-black text-onyx/40 mb-1">Total Price</p>
-                  <p className="text-2xl sm:text-3xl font-black text-onyx leading-none">₹{total.toLocaleString('en-IN')}</p>
+                  <p className="text-2xl sm:text-3xl font-black text-onyx leading-none">{formatPrice(total)}</p>
                 </div>
                 <p className="technical text-[7px] sm:text-[8px] text-onyx/40 uppercase tracking-widest font-bold">Incl. taxes</p>
               </div>

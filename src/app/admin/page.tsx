@@ -4,10 +4,24 @@ import { useState, useEffect } from 'react';
 import Card from '@/shared/ui/Card';
 import Badge from '@/shared/ui/Badge';
 import Skeleton from '@/shared/ui/Skeleton';
+import { useCurrency } from '@/providers/CurrencyProvider';
+
+function formatOrderPrice(amount: number, orderCurrency?: string) {
+  const currencyCode = orderCurrency || 'INR';
+  if (currencyCode === 'INR') {
+    return `₹${Math.round(amount).toLocaleString('en-IN')}`;
+  } else {
+    return `RM ${amount.toLocaleString('en-MY', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+}
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     fetchStats();
@@ -52,12 +66,12 @@ export default function AdminDashboard() {
         <StatCard title="Total Orders" value={stats?.totalOrders || 0} icon="📦" />
         <StatCard 
           title="Total Revenue" 
-          value={`₹${(stats?.totalRevenue || 0).toLocaleString('en-IN')}`} 
+          value={formatPrice(stats?.totalRevenue || 0)} 
           icon="💰" 
         />
         <StatCard 
           title="Total Profit" 
-          value={`₹${(stats?.totalProfit || 0).toLocaleString('en-IN')}`} 
+          value={formatPrice(stats?.totalProfit || 0)} 
           icon="📈" 
         />
         <StatCard title="Pending Orders" value={stats?.pendingOrders || 0} icon="⏳" />
@@ -94,7 +108,7 @@ export default function AdminDashboard() {
                           <div className="text-[10px] text-zinc-400 mt-0.5">{order.customer?.email}</div>
                         </td>
                         <td className="px-6 py-4 text-xs font-bold text-black">
-                          ₹{order.totalAmount?.toLocaleString('en-IN')}
+                          {formatOrderPrice(order.totalAmount || 0, order.currency)}
                         </td>
                         <td className="px-6 py-4">
                           <Badge variant={order.status === 'delivered' ? 'success' : order.status === 'pending' ? 'default' : 'primary'}>
@@ -132,7 +146,7 @@ export default function AdminDashboard() {
                     <p className="text-[10px] text-zinc-400 mt-0.5">{product.total_sold} units sold</p>
                   </div>
                   <p className="text-xs font-bold text-black">
-                    ₹{product.total_revenue?.toLocaleString('en-IN')}
+                    {formatPrice(product.total_revenue || 0)}
                   </p>
                 </div>
               ))}

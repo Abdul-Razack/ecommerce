@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import Card from '@/shared/ui/Card';
 import Badge from '@/shared/ui/Badge';
 import Skeleton from '@/shared/ui/Skeleton';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 export default function AdminStockPage() {
   const [stock, setStock] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     fetchStock();
@@ -75,7 +77,7 @@ export default function AdminStockPage() {
                     <td className="px-6 py-4 text-[10px] font-mono text-zinc-400">{item._id}</td>
                     <td className="px-6 py-4 text-xs font-bold text-black">{item.stock}</td>
                     <td className="px-6 py-4 text-xs font-medium text-zinc-600">
-                      ₹{parseFloat(item.costPrice || 0).toLocaleString('en-IN')}
+                      {formatPrice(parseFloat(item.costPrice || 0))}
                     </td>
                     <td className="px-6 py-4">
                       {item.stock === 0 ? (

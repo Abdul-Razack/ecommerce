@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/shared/ui/Toast';
+import { useCurrency } from '@/providers/CurrencyProvider';
 import Container from '@/shared/ui/layout/Container';
 import Button from '@/shared/ui/Button';
 import Input from '@/shared/ui/Input';
@@ -13,6 +14,7 @@ import Badge from '@/shared/ui/Badge';
 
 export default function CheckoutPage() {
   const { cartItems, getCartTotal, getCartCount, clearCart, isLoaded, closeCart } = useCart();
+  const { currency, rate, formatPrice, convertPrice } = useCurrency();
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -148,11 +150,16 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          items: cartItems,
-          totalAmount: total,
+          items: cartItems.map(item => ({
+            ...item,
+            price: convertPrice(item.price)
+          })),
+          totalAmount: convertPrice(total),
+          currency,
+          exchangeRate: rate,
           paymentType: 'cod',
           paymentStatus: 'pending',
-          deliveryCharge: deliveryCharge + codCharge,
+          deliveryCharge: convertPrice(deliveryCharge + codCharge),
           customerId,
           saveAddress,
         }),
@@ -179,11 +186,11 @@ export default function CheckoutPage() {
       const orderRes = await fetch('/api/razorpay/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: total }),
+        body: JSON.stringify({ amount: convertPrice(total), currency }),
       });
 
-      const orderData = await orderRes.json();
-      if (!orderData.success) {
+      const orderJson = await orderRes.json();
+      if (!orderJson.success) {
         showToast('Failed to create payment order', 'error');
         setLoading(false);
         return;
@@ -191,11 +198,11 @@ export default function CheckoutPage() {
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: orderData.order.amount,
-        currency: 'INR',
+        amount: orderJson.order.amount,
+        currency: currency,
         name: 'Posh Pigeon',
         description: `Order of ${getCartCount()} items`,
-        order_id: orderData.order.id,
+        order_id: orderJson.order.id,
         handler: async function (response) {
           const verifyRes = await fetch('/api/razorpay/verify', {
             method: 'POST',
@@ -214,13 +221,18 @@ export default function CheckoutPage() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 ...formData,
-                items: cartItems,
-                totalAmount: total,
+                items: cartItems.map(item => ({
+                  ...item,
+                  price: convertPrice(item.price)
+                })),
+                totalAmount: convertPrice(total),
+                currency,
+                exchangeRate: rate,
                 paymentType: 'online',
                 paymentStatus: 'paid',
                 razorpayOrderId: response.razorpay_order_id,
                 razorpayPaymentId: response.razorpay_payment_id,
-                deliveryCharge,
+                deliveryCharge: convertPrice(deliveryCharge),
                 customerId,
                 saveAddress,
               }),
@@ -344,11 +356,11 @@ export default function CheckoutPage() {
                             <h4 className="text-lg font-bold text-onyx uppercase tracking-tight">{item.name}</h4>
                             <p className="text-xs font-black text-onyx/40 mt-2 uppercase tracking-[0.2em]">{item.category}</p>
                           </div>
-                          <p className="text-lg font-black text-onyx">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
+                          <p className="text-lg font-black text-onyx">{formatPrice(item.price * item.quantity)}</p>
                         </div>
                         <div className="flex items-center gap-6 text-[11px] font-black text-onyx/60 uppercase tracking-[0.2em]">
                           <span className="bg-bone px-4 py-2 rounded-lg text-onyx">QTY: {item.quantity}</span>
-                          <span>₹{item.price?.toLocaleString('en-IN')} / UNIT</span>
+                          <span>{formatPrice(item.price)} / UNIT</span>
                         </div>
                       </div>
                     </div>
@@ -492,7 +504,7 @@ export default function CheckoutPage() {
                         active={paymentMethod === 'cod'} 
                         onClick={() => setPaymentMethod('cod')}
                         title="Cash on Delivery"
-                        desc="Pay on Delivery (₹50 extra)"
+                        desc={`Pay on Delivery (${formatPrice(50)} extra)`}
                         icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>}
                       />
                     </div>
@@ -531,7 +543,7 @@ export default function CheckoutPage() {
                       className="flex-[2]"
                       disabled={loading}
                     >
-                      {loading ? 'Processing...' : paymentMethod === 'cod' ? 'Place Order' : `Pay ₹${total.toLocaleString('en-IN')}`}
+                      {loading ? 'Processing...' : paymentMethod === 'cod' ? 'Place Order' : `Pay ${formatPrice(total)}`}
                     </Button>
                   </div>
                 </div>
@@ -563,9 +575,9 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-grow">
                         <p className="text-sm font-bold text-onyx uppercase leading-tight line-clamp-1">{item.name}</p>
-                        <p className="text-[10px] font-black text-onyx/40 mt-2 uppercase tracking-[0.2em]">₹{item.price?.toLocaleString('en-IN')} / ea</p>
+                        <p className="text-[10px] font-black text-onyx/40 mt-2 uppercase tracking-[0.2em]">{formatPrice(item.price)} / ea</p>
                       </div>
-                      <p className="text-base font-black text-onyx whitespace-nowrap">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
+                      <p className="text-base font-black text-onyx whitespace-nowrap">{formatPrice(item.price * item.quantity)}</p>
                     </div>
                   ))}
                 </div>
@@ -573,18 +585,18 @@ export default function CheckoutPage() {
                 <div className="pt-10 border-t border-dashed border-onyx/10 space-y-5">
                   <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
                     <span className="text-onyx/50">Items Subtotal</span>
-                    <span className="text-onyx">₹{subtotal.toLocaleString('en-IN')}</span>
+                    <span className="text-onyx">{formatPrice(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
                     <span className="text-onyx/50">Delivery Charges</span>
                     <span className={deliveryCharge === 0 ? 'text-green-600' : 'text-onyx'}>
-                      {deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}
+                      {deliveryCharge === 0 ? 'FREE' : formatPrice(deliveryCharge)}
                     </span>
                   </div>
                   {paymentMethod === 'cod' && (
                     <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
                       <span className="text-onyx/50">Cash on Delivery Fee</span>
-                      <span className="text-onyx">₹50</span>
+                      <span className="text-onyx">{formatPrice(50)}</span>
                     </div>
                   )}
                 </div>
@@ -592,7 +604,7 @@ export default function CheckoutPage() {
                 <div className="pt-10 border-t-2 border-onyx flex justify-between items-baseline">
                   <span className="text-sm font-black text-onyx uppercase tracking-[0.3em]">Total Amount</span>
                   <div className="text-right">
-                    <span className="text-4xl font-black text-onyx">₹{total.toLocaleString('en-IN')}</span>
+                    <span className="text-4xl font-black text-onyx">{formatPrice(total)}</span>
                   </div>
                 </div>
               </Card>

@@ -8,6 +8,30 @@ import HeroSlider from './components/HeroSlider';
 
 export const dynamic = 'force-dynamic';
 
+function formatServerPrice(priceInINR: number) {
+  const envCurrency = process.env.NEXT_PUBLIC_DEFAULT_CURRENCY;
+  const envRegion = process.env.NEXT_PUBLIC_SERVER_REGION;
+  
+  let currency = 'INR';
+  if (envCurrency === 'INR' || envCurrency === 'MYR') {
+    currency = envCurrency;
+  } else if (envRegion === 'MY' || envRegion === 'malaysia' || envRegion === 'Malaysia') {
+    currency = 'MYR';
+  }
+  
+  const rate = parseFloat(process.env.NEXT_PUBLIC_INR_TO_MYR_EXCHANGE_RATE || '0.053');
+  
+  if (currency === 'INR') {
+    return `₹${Math.round(priceInINR).toLocaleString('en-IN')}`;
+  } else {
+    const converted = priceInINR * rate;
+    return `RM ${converted.toLocaleString('en-MY', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+}
+
 export default async function Homepage() {
   // Fetch multiple sets of products for different category sections
   const [homePage, leggingsProducts, sareesProducts, nightyProducts] = await Promise.all([
@@ -89,7 +113,7 @@ export default async function Homepage() {
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-wider text-black">Free Shipping</p>
-                <p className="text-[9px] text-gray-400 font-medium uppercase mt-0.5 tracking-wider">On orders over ₹999</p>
+                <p className="text-[9px] text-gray-400 font-medium uppercase mt-0.5 tracking-wider">On orders over {formatServerPrice(999)}</p>
               </div>
             </div>
 
@@ -138,7 +162,7 @@ export default async function Homepage() {
             </div>
             <div>
               <p className="text-[9px] font-black uppercase tracking-wider text-black">Free Shipping</p>
-              <p className="text-[8px] text-gray-400 font-medium uppercase mt-0.5">Over ₹999</p>
+              <p className="text-[8px] text-gray-400 font-medium uppercase mt-0.5">Over {formatServerPrice(999)}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

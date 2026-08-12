@@ -6,6 +6,18 @@ import Badge from '@/shared/ui/Badge';
 import Button from '@/shared/ui/Button';
 import Skeleton from '@/shared/ui/Skeleton';
 
+function formatOrderPrice(amount: number, orderCurrency?: string) {
+  const currencyCode = orderCurrency || 'INR';
+  if (currencyCode === 'INR') {
+    return `₹${Math.round(amount).toLocaleString('en-IN')}`;
+  } else {
+    return `RM ${amount.toLocaleString('en-MY', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+}
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -143,7 +155,7 @@ export default function AdminOrdersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-xs font-bold text-black">
-                      ₹{order.totalAmount?.toLocaleString('en-IN')}
+                      {formatOrderPrice(order.totalAmount || 0, order.currency)}
                     </td>
                     <td className="px-6 py-4">
                       <Badge variant={order.paymentStatus === 'paid' ? 'success' : 'primary'}>

@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
+import { useCurrency } from '@/providers/CurrencyProvider';
 import Container from './Container';
 
 export default function Navbar({ user, signInUrl, onSignOut }) {
   const { getCartCount, isLoaded, openCart } = useCart();
+  const { currency, setCurrency, formatPrice } = useCurrency();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
@@ -33,14 +35,25 @@ export default function Navbar({ user, signInUrl, onSignOut }) {
     <header className="sticky top-0 left-0 right-0 z-[100] w-full bg-white shadow-sm font-sans">
       {/* 1. Top Announcement Bar */}
       <div className="bg-black text-white border-b border-white/5 relative">
-        <Container className="max-w-[1400px] h-9 flex items-center justify-center px-4 md:px-8 text-[9px] md:text-[10px] uppercase font-bold tracking-widest relative">
-          <div className="text-center">
-            FREE SHIPPING ON ALL ORDERS OVER ₹999 | EASY 7-DAY RETURNS
+        <Container className="max-w-[1400px] h-9 flex items-center justify-between gap-4 px-4 md:px-8 text-[8px] md:text-[10px] uppercase font-bold tracking-widest relative">
+          <div className="truncate">
+            FREE SHIPPING ON ALL ORDERS OVER {formatPrice(999)} | EASY 7-DAY RETURNS
           </div>
-          <div className="hidden md:flex items-center gap-6 text-[9px] font-bold text-zinc-400 absolute right-4 md:right-8">
-            <Link href="/about" className="hover:text-white transition-colors">Store Locator</Link>
-            <span>•</span>
-            <Link href="/about" className="hover:text-white transition-colors">Help</Link>
+          <div className="flex items-center gap-3 text-[9px] font-bold text-zinc-400 flex-shrink-0">
+            <div className="hidden md:flex items-center gap-3">
+              <Link href="/about" className="hover:text-white transition-colors">Store Locator</Link>
+              <span>•</span>
+              <Link href="/about" className="hover:text-white transition-colors">Help</Link>
+              <span>•</span>
+            </div>
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value as any)}
+              className="bg-transparent border-none text-zinc-400 hover:text-white font-bold cursor-pointer outline-none uppercase p-0 text-[9px]"
+            >
+              <option value="INR" className="bg-black text-white">INR (₹)</option>
+              <option value="MYR" className="bg-black text-white">MYR (RM)</option>
+            </select>
           </div>
         </Container>
       </div>

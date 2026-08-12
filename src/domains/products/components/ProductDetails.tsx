@@ -8,6 +8,7 @@ import ProductCard from './ProductCard';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { urlFor } from '@/shared/lib/sanity';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 /**
  * Onyx & Bone Product Details
@@ -16,6 +17,7 @@ import { urlFor } from '@/shared/lib/sanity';
 export default function ProductDetails({ product, relatedProducts }) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
 
   // Extract colors and sizes
@@ -126,14 +128,14 @@ export default function ProductDetails({ product, relatedProducts }) {
     {
       id: 'shipping',
       title: 'Shipping & Returns',
-      content: 'Complimentary domestic shipping on orders exceeding ₹999. Flat-rate shipping applied otherwise. Hassle-free returns available within 7 days of delivery receipt.',
+      content: `Complimentary domestic shipping on orders exceeding ${formatPrice(999)}. Flat-rate shipping applied otherwise. Hassle-free returns available within 7 days of delivery receipt.`,
     },
   ];
 
   const coupons = [
     { code: 'SAVE10', desc: 'Flat 10% OFF on your first purchase' },
-    { code: 'POSH500', desc: 'Flat ₹500 OFF on orders above ₹4,999' },
-    { code: 'FESTIVE15', desc: 'Get 15% OFF on minimum purchase of ₹2,499' }
+    { code: 'POSH500', desc: `Flat ${formatPrice(500)} OFF on orders above ${formatPrice(4999)}` },
+    { code: 'FESTIVE15', desc: `Get 15% OFF on minimum purchase of ${formatPrice(2499)}` }
   ];
 
   return (
@@ -192,9 +194,9 @@ export default function ProductDetails({ product, relatedProducts }) {
               
               {/* Pricing section */}
               <div className="flex items-baseline gap-4 pt-2">
-                <p className="text-3xl font-black text-onyx">₹{activePrice}</p>
+                <p className="text-3xl font-black text-onyx">{formatPrice(activePrice)}</p>
                 {originalPrice > activePrice && (
-                  <span className="text-lg text-onyx/40 line-through">₹{originalPrice}</span>
+                  <span className="text-lg text-onyx/40 line-through">{formatPrice(originalPrice)}</span>
                 )}
                 {originalPrice > activePrice && (
                   <span className="text-[10px] font-black text-green-700 bg-green-50/50 border border-green-100/50 px-3 py-1 rounded-full uppercase tracking-wider">
@@ -385,7 +387,7 @@ export default function ProductDetails({ product, relatedProducts }) {
                     <circle cx="18.5" cy="18.5" r="2.5"/>
                   </svg>
                   <span className="text-[8px] font-black uppercase tracking-wider text-onyx">Free Shipping</span>
-                  <p className="text-[7px] text-onyx/50">On orders above ₹999</p>
+                  <p className="text-[7px] text-onyx/50">On orders above {formatPrice(999)}</p>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <svg className="w-6 h-6 text-onyx/70" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">

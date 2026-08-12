@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
 import { client, urlFor } from '@/shared/lib/sanity';
 import Button from '@/shared/ui/Button';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 /**
  * Onyx & Bone Cart Drawer
@@ -12,6 +13,7 @@ import Button from '@/shared/ui/Button';
  */
 export default function CartDrawer() {
   const { isCartOpen, closeCart, cartItems, removeFromCart, updateQuantity, getCartTotal, isLoaded } = useCart();
+  const { formatPrice } = useCurrency();
   const [crossSells, setCrossSells] = useState([]);
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export default function CartDrawer() {
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
                       <h3 className="text-[10px] font-black uppercase tracking-widest text-onyx">{item.name?.split('-')[0]}</h3>
-                      <p className="technical text-onyx/30">₹{item.price}</p>
+                      <p className="technical text-onyx/30">{formatPrice(item.price)}</p>
                     </div>
                   </div>
                   
@@ -101,15 +103,15 @@ export default function CartDrawer() {
             <div className="space-y-4">
               <div className="flex justify-between technical text-[9px] text-onyx/40">
                 <span>Subtotal</span>
-                <span>₹{subtotal}</span>
+                <span>{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between technical text-[9px] text-onyx/40">
                 <span>Delivery Charges</span>
-                <span className={delivery === 0 ? 'text-onyx font-black' : ''}>{delivery === 0 ? 'FREE' : `₹${delivery}`}</span>
+                <span className={delivery === 0 ? 'text-onyx font-black' : ''}>{delivery === 0 ? 'FREE' : formatPrice(delivery)}</span>
               </div>
               <div className="flex justify-between text-lg font-black pt-4 border-t border-onyx/10">
                 <span className="technical">Total Amount</span>
-                <span>₹{total}</span>
+                <span>{formatPrice(total)}</span>
               </div>
             </div>
             

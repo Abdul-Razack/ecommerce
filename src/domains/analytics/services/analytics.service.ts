@@ -27,7 +27,8 @@ export const analyticsService = {
     const productSalesMap: Record<string, { total_sold: number; total_revenue: number }> = {};
 
     orders.forEach(order => {
-      totalRevenue += order.totalAmount || 0;
+      const orderRevenue = order.totalAmountINR || order.totalAmount || 0;
+      totalRevenue += orderRevenue;
       
       if (order.status === 'delivered') deliveredOrders++;
       else pendingOrders++;
@@ -43,7 +44,12 @@ export const analyticsService = {
         const price = item.price || item.product_price || 0;
         const quantity = item.quantity || 0;
         
-        const profit = (price - costPrice) * quantity;
+        // Convert item price to INR for profit calculation
+        const orderCurrency = order.currency || 'INR';
+        const orderRate = order.exchangeRate || 1;
+        const priceINR = orderCurrency === 'INR' ? price : (orderRate > 0 ? price / orderRate : price);
+        
+        const profit = (priceINR - costPrice) * quantity;
         totalProfit += profit;
 
         const name = item.productName || item.name || productMap[prodId]?.name || 'Unknown Item';
@@ -51,7 +57,7 @@ export const analyticsService = {
           productSalesMap[name] = { total_sold: 0, total_revenue: 0 };
         }
         productSalesMap[name].total_sold += quantity;
-        productSalesMap[name].total_revenue += price * quantity;
+        productSalesMap[name].total_revenue += priceINR * quantity;
       });
     });
 
@@ -75,7 +81,7 @@ export const analyticsService = {
       if (!monthlySalesMap[monthYear]) {
         monthlySalesMap[monthYear] = { month: monthYear, revenue: 0 };
       }
-      monthlySalesMap[monthYear].revenue += order.totalAmount || 0;
+      monthlySalesMap[monthYear].revenue += order.totalAmountINR || order.totalAmount || 0;
     });
 
     const monthlySales = Object.values(monthlySalesMap).slice(-6); // Last 6 months

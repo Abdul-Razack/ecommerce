@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import ProductCard from './ProductCard';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 interface Variant {
   color: string;
@@ -56,6 +57,16 @@ const SORT_OPTIONS = [
 const ITEMS_PER_PAGE = 8;
 
 export default function ProductCardWrapper({ products }: ProductCardWrapperProps) {
+  const { formatPrice } = useCurrency();
+
+  const priceOptions = useMemo(() => [
+    { label: 'All Prices', min: 0, max: Infinity },
+    { label: `Under ${formatPrice(500)}`, min: 0, max: 500 },
+    { label: `${formatPrice(500)} - ${formatPrice(1000)}`, min: 500, max: 1000 },
+    { label: `${formatPrice(1000)} - ${formatPrice(2000)}`, min: 1000, max: 2000 },
+    { label: `Over ${formatPrice(2000)}`, min: 2000, max: Infinity }
+  ], [formatPrice]);
+
   // Filters & State
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedColor, setSelectedColor] = useState<string>('All Colors');
@@ -106,7 +117,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
     }
 
     // Price Filter
-    const priceRange = PRICE_OPTIONS[selectedPrice];
+    const priceRange = priceOptions[selectedPrice];
     if (priceRange) {
       result = result.filter(p => p.price >= priceRange.min && p.price <= priceRange.max);
     }
@@ -119,7 +130,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
     }
 
     return result;
-  }, [products, selectedCategory, selectedColor, selectedSize, selectedPrice, selectedSort]);
+  }, [products, selectedCategory, selectedColor, selectedSize, selectedPrice, selectedSort, priceOptions]);
 
   // Reset pagination if filter changes
   React.useEffect(() => {
@@ -229,11 +240,11 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
               onClick={() => toggleDropdown('prices')}
               className={`hover:text-black flex items-center gap-1 transition-colors select-none ${selectedPrice !== 0 ? 'text-black' : ''}`}
             >
-              Price ({PRICE_OPTIONS[selectedPrice]?.label}) <span className="text-[8px] font-bold">▼</span>
+              Price ({priceOptions[selectedPrice]?.label}) <span className="text-[8px] font-bold">▼</span>
             </button>
             {openDropdown === 'prices' && (
               <div className="absolute left-0 mt-3 w-48 bg-white border border-zinc-150 shadow-xl py-2 rounded-lg z-50 animate-in fade-in slide-in-from-top-1 duration-200">
-                {PRICE_OPTIONS.map((opt, idx) => (
+                {priceOptions.map((opt, idx) => (
                   <button
                     key={idx}
                     onClick={() => { setSelectedPrice(idx); setOpenDropdown(null); }}

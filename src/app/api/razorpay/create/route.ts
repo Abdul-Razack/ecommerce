@@ -4,11 +4,11 @@ import { razorpay } from '@/shared/lib/razorpay';
 // Create Razorpay order
 export async function POST(request) {
   try {
-    const { amount } = await request.json();
+    const { amount, currency = 'INR' } = await request.json();
 
     const options = {
-      amount: Math.round(amount * 100), // Razorpay expects amount in paise
-      currency: 'INR',
+      amount: Math.round(amount * 100), // Razorpay expects amount in paise/cents
+      currency,
       receipt: `receipt_${Date.now()}`,
     };
 

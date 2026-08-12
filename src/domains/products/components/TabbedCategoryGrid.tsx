@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 interface Variant {
   color: string;
@@ -78,6 +79,7 @@ const CategoryIcon = ({ name }: { name: string }) => {
 export default function TabbedCategoryGrid({ initialProducts }: TabbedCategoryGridProps) {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   const filteredProducts = useMemo(() => {
     if (activeCategory === "All") return initialProducts;
@@ -159,7 +161,7 @@ export default function TabbedCategoryGrid({ initialProducts }: TabbedCategoryGr
                     </h4>
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-black text-zinc-900">₹{product.price.toLocaleString('en-IN')}</span>
+                      <span className="text-xs font-black text-zinc-900">{formatPrice(product.price)}</span>
                       
                       <button 
                         onClick={(e) => {

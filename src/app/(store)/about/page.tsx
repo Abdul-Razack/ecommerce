@@ -8,6 +8,30 @@ export const metadata = {
   description: 'Discover Posh Pigeon, India\'s premium women\'s clothing brand offering high-grade stretchable leggings, elegant sarees, cozy nighties, and comfortable inskirts.',
 };
 
+function formatServerPrice(priceInINR: number) {
+  const envCurrency = process.env.NEXT_PUBLIC_DEFAULT_CURRENCY;
+  const envRegion = process.env.NEXT_PUBLIC_SERVER_REGION;
+  
+  let currency = 'INR';
+  if (envCurrency === 'INR' || envCurrency === 'MYR') {
+    currency = envCurrency;
+  } else if (envRegion === 'MY' || envRegion === 'malaysia' || envRegion === 'Malaysia') {
+    currency = 'MYR';
+  }
+  
+  const rate = parseFloat(process.env.NEXT_PUBLIC_INR_TO_MYR_EXCHANGE_RATE || '0.053');
+  
+  if (currency === 'INR') {
+    return `₹${Math.round(priceInINR).toLocaleString('en-IN')}`;
+  } else {
+    const converted = priceInINR * rate;
+    return `RM ${converted.toLocaleString('en-MY', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+}
+
 export default function AboutPage() {
   return (
     <main className="bg-bone min-h-screen pt-12 pb-0 space-y-16 md:space-y-24 overflow-x-hidden">
@@ -245,7 +269,7 @@ export default function AboutPage() {
               <span className="technical text-rose-600 font-bold tracking-widest">03 / THE PROTOCOL</span>
               <h2 className="text-4xl md:text-5xl uppercase font-black text-onyx mt-2">Our customer promise</h2>
             </div>
-            <p className="text-sm text-onyx/50 max-w-sm md:text-right font-sans">Premium service standards that shape our e-commerce experience throughout India.</p>
+            <p className="text-sm text-onyx/50 max-w-sm md:text-right font-sans">Premium service standards that shape our e-commerce experience throughout our serving regions.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -258,7 +282,7 @@ export default function AboutPage() {
             <ValueCard 
               number="02"
               title="DELIVERY ASSURANCE"
-              description="Enjoy free delivery across India on all orders above ₹999. Every package is sealed in high-grade sanitary packing, guaranteeing your items arrive in pristine condition."
+              description={`Enjoy free delivery on all orders above ${formatServerPrice(999)}. Every package is sealed in high-grade sanitary packing, guaranteeing your items arrive in pristine condition.`}
               colorClass="group-hover:text-amber-500"
             />
             <ValueCard 

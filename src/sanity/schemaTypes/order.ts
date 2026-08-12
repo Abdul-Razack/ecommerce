@@ -55,6 +55,23 @@ export const order = defineType({
       type: "number",
     }),
     defineField({
+      name: "currency",
+      title: "Currency",
+      type: "string",
+      initialValue: "INR",
+    }),
+    defineField({
+      name: "exchangeRate",
+      title: "Exchange Rate (1 INR = X Local)",
+      type: "number",
+      initialValue: 1,
+    }),
+    defineField({
+      name: "totalAmountINR",
+      title: "Total Amount (INR Base)",
+      type: "number",
+    }),
+    defineField({
       name: "status",
       title: "Order Status",
       type: "string",

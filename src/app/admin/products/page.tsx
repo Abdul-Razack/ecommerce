@@ -6,6 +6,7 @@ import Badge from '@/shared/ui/Badge';
 import Button from '@/shared/ui/Button';
 import Skeleton from '@/shared/ui/Skeleton';
 import { useToast } from '@/shared/ui/Toast';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 interface Variant {
   _key?: string;
@@ -50,6 +51,7 @@ interface ColorVariantGroup {
 
 export default function AdminProductsPage() {
   const { showToast, showConfirm, showAlert } = useToast();
+  const { formatPrice } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -576,7 +578,7 @@ export default function AdminProductsPage() {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 text-xs font-black text-black">
-                      ₹{product.price.toLocaleString('en-IN')}
+                      {formatPrice(product.price)}
                     </td>
                     <td className="px-6 py-4">
                       <div className="space-y-1">

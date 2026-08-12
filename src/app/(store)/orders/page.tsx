@@ -12,6 +12,18 @@ import Skeleton from '@/shared/ui/Skeleton';
 import Section from '@/shared/ui/Section';
 import Link from 'next/link';
 
+function formatOrderPrice(amount: number, orderCurrency?: string) {
+  const currencyCode = orderCurrency || 'INR';
+  if (currencyCode === 'INR') {
+    return `₹${Math.round(amount).toLocaleString('en-IN')}`;
+  } else {
+    return `RM ${amount.toLocaleString('en-MY', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+}
+
 function OrdersContent() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState(searchParams.get('email') || '');
@@ -99,7 +111,7 @@ function OrdersContent() {
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-widest font-black text-onyx/40 mb-2">Total Amount</p>
-                      <p className="text-sm font-black text-onyx">₹{parseFloat(order.totalAmount).toLocaleString('en-IN')}</p>
+                      <p className="text-sm font-black text-onyx">{formatOrderPrice(parseFloat(order.totalAmount || 0), order.currency)}</p>
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-widest font-black text-onyx/40 mb-2">Delivery To</p>
@@ -201,7 +213,7 @@ function OrdersContent() {
                             </div>
                             <div className="flex flex-col">
                               <p className="text-xs font-black text-onyx uppercase leading-tight line-clamp-1">{item.productName}</p>
-                              <p className="text-[10px] font-bold text-onyx/40 mt-2 uppercase tracking-widest">₹{item.price?.toLocaleString('en-IN')}</p>
+                              <p className="text-[10px] font-bold text-onyx/40 mt-2 uppercase tracking-widest">{formatOrderPrice(item.price || 0, order.currency)}</p>
                             </div>
                           </div>
                         ))}

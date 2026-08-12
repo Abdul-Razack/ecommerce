@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/components/ui/Toast';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 export default function ProductDetailClient({ product }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const { showToast } = useToast();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
 
   const images = product.processedImages || [];
@@ -66,7 +68,7 @@ export default function ProductDetailClient({ product }) {
             <h1 className="product-info-name">{product.name}</h1>
             
             <div className="product-info-price">
-              ₹{product.price?.toLocaleString('en-IN')}
+              {formatPrice(product.price || 0)}
             </div>
 
             {product.description && (
@@ -97,10 +99,10 @@ export default function ProductDetailClient({ product }) {
             <div className="mt-4">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '24px', borderTop: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-                  <span style={{ width: '20px', textAlign: 'center' }}>🚚</span> Free delivery on orders above ₹999
+                  <span style={{ width: '20px', textAlign: 'center' }}>🚚</span> Free delivery on orders above {formatPrice(999)}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-                  <span style={{ width: '20px', textAlign: 'center' }}>💵</span> Cash on Delivery available (+₹50)
+                  <span style={{ width: '20px', textAlign: 'center' }}>💵</span> Cash on Delivery available (+{formatPrice(50)})
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
                   <span style={{ width: '20px', textAlign: 'center' }}>↩️</span> 7-day easy returns

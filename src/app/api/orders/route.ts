@@ -21,9 +21,12 @@ export async function POST(request) {
       paymentStatus,
       razorpayOrderId,
       razorpayPaymentId,
+      currency = 'INR',
+      exchangeRate = 1,
     } = body;
 
     const orderId = generateOrderId();
+    const totalAmountINR = currency === 'INR' ? totalAmount : (exchangeRate > 0 ? totalAmount / exchangeRate : totalAmount);
 
     // Prepare Sanity Order Document
     const orderDoc = {
@@ -45,6 +48,9 @@ export async function POST(request) {
         size: item.size || null,
       })),
       totalAmount,
+      currency,
+      exchangeRate,
+      totalAmountINR,
       status: 'confirmed',
       paymentStatus: paymentStatus || 'pending',
       paymentType: paymentType || 'cod',

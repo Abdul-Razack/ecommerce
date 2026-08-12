@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useRouter } from 'next/navigation';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 /**
  * Tactile Product Card (2026 DTC Overhaul)
@@ -18,6 +19,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, onQuickView }: ProductCardProps) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
   
   const favorited = isInWishlist(product._id);
@@ -106,9 +108,9 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
           {/* Price details with compare/strike price */}
           <div className="flex items-baseline gap-2 pt-1">
-            <span className="text-xs font-black text-onyx">₹{product.price}</span>
+            <span className="text-xs font-black text-onyx">{formatPrice(product.price)}</span>
             {originalPrice > product.price && (
-              <span className="text-[10px] text-onyx/40 line-through">₹{originalPrice}</span>
+              <span className="text-[10px] text-onyx/40 line-through">{formatPrice(originalPrice)}</span>
             )}
             {originalPrice > product.price && (
               <span className="text-[9px] text-green-700/80 font-black uppercase">

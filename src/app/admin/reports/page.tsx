@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import Card from '@/shared/ui/Card';
 import Skeleton from '@/shared/ui/Skeleton';
+import { useCurrency } from '@/providers/CurrencyProvider';
 
 export default function AdminReportsPage() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     fetchStats();
@@ -52,17 +54,17 @@ export default function AdminReportsPage() {
           <div className="flex flex-col gap-2 relative z-10">
             <span className="text-[10px] uppercase tracking-widest font-bold text-zinc-400">Total Revenue</span>
             <p className="text-2xl font-bold text-black tracking-tight">
-              ₹{(stats?.totalRevenue || 0).toLocaleString('en-IN')}
+              {formatPrice(stats?.totalRevenue || 0)}
             </p>
           </div>
           <span className="absolute -bottom-4 -right-4 text-6xl opacity-5 select-none">💰</span>
         </Card>
-
+ 
         <Card className="relative overflow-hidden">
           <div className="flex flex-col gap-2 relative z-10">
             <span className="text-[10px] uppercase tracking-widest font-bold text-zinc-400">Total Profit</span>
             <p className="text-2xl font-bold text-black tracking-tight">
-              ₹{(stats?.totalProfit || 0).toLocaleString('en-IN')}
+              {formatPrice(stats?.totalProfit || 0)}
             </p>
           </div>
           <span className="absolute -bottom-4 -right-4 text-6xl opacity-5 select-none">📈</span>
@@ -117,10 +119,10 @@ export default function AdminReportsPage() {
                       </td>
                       <td className="px-6 py-4 text-center text-zinc-600 font-medium">{month.order_count}</td>
                       <td className="px-6 py-4 text-right font-semibold text-black">
-                        ₹{parseFloat(month.revenue).toLocaleString('en-IN')}
+                        {formatPrice(parseFloat(month.revenue || 0))}
                       </td>
                       <td className="px-6 py-4 text-right text-zinc-600 font-semibold">
-                        ₹{Math.round(parseFloat(month.revenue) / parseInt(month.order_count)).toLocaleString('en-IN')}
+                        {formatPrice(Math.round(parseFloat(month.revenue || 0) / parseInt(month.order_count)))}
                       </td>
                     </tr>
                   ))
@@ -168,7 +170,7 @@ export default function AdminReportsPage() {
                       <td className="px-6 py-4 font-semibold text-black">{product.product_name}</td>
                       <td className="px-6 py-4 text-center text-zinc-600 font-medium">{product.total_sold}</td>
                       <td className="px-6 py-4 text-right font-semibold text-black">
-                        ₹{parseFloat(product.total_revenue).toLocaleString('en-IN')}
+                        {formatPrice(parseFloat(product.total_revenue || 0))}
                       </td>
                     </tr>
                   ))
@@ -198,18 +200,18 @@ export default function AdminReportsPage() {
             <div className="grid grid-cols-3 gap-8 md:gap-16">
               <div>
                 <span className="text-[10px] uppercase tracking-widest font-bold text-zinc-400">Revenue</span>
-                <p className="text-lg font-bold text-black mt-1">₹{stats.totalRevenue.toLocaleString('en-IN')}</p>
+                <p className="text-lg font-bold text-black mt-1">{formatPrice(stats.totalRevenue)}</p>
               </div>
               <div>
                 <span className="text-[10px] uppercase tracking-widest font-bold text-zinc-400">Cost</span>
                 <p className="text-lg font-bold text-rose-600 mt-1">
-                  ₹{(stats.totalRevenue - stats.totalProfit).toLocaleString('en-IN')}
+                  {formatPrice(stats.totalRevenue - stats.totalProfit)}
                 </p>
               </div>
               <div>
                 <span className="text-[10px] uppercase tracking-widest font-bold text-zinc-400">Net Profit</span>
                 <p className="text-lg font-bold text-emerald-600 mt-1">
-                  ₹{stats.totalProfit.toLocaleString('en-IN')}
+                  {formatPrice(stats.totalProfit)}
                 </p>
               </div>
             </div>
