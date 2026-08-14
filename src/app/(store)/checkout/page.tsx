@@ -167,6 +167,7 @@ export default function CheckoutPage() {
 
       const data = await response.json();
       if (data.success) {
+        setOrderPlaced(true);
         clearCart();
         showToast('Order placed successfully!', 'success');
         router.push(`/orders?email=${formData.email}`);
@@ -183,69 +184,58 @@ export default function CheckoutPage() {
   const handleOnlinePayment = async () => {
     setLoading(true);
     try {
-      const orderRes = await fetch('/api/razorpay/create', {
+      const createRes = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: convertPrice(total), currency }),
+        body: JSON.stringify({
+          ...formData,
+          items: cartItems.map(item => ({
+            ...item,
+            price: convertPrice(item.price)
+          })),
+          totalAmount: convertPrice(total),
+          currency,
+          exchangeRate: rate,
+          paymentType: 'razorpay',
+          paymentStatus: 'pending',
+          deliveryCharge: convertPrice(deliveryCharge),
+          customerId,
+          saveAddress,
+        }),
       });
 
-      const orderJson = await orderRes.json();
-      if (!orderJson.success) {
-        showToast('Failed to create payment order', 'error');
+      const createData = await createRes.json();
+      if (!createData.success) {
+        showToast(createData.error || 'Failed to initialize order', 'error');
         setLoading(false);
         return;
       }
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: orderJson.order.amount,
-        currency: currency,
+        amount: Math.round(createData.amount * 100),
+        currency: 'INR',
         name: 'Posh Pigeon',
         description: `Order of ${getCartCount()} items`,
-        order_id: orderJson.order.id,
+        order_id: createData.razorpayOrderId,
         handler: async function (response) {
-          const verifyRes = await fetch('/api/razorpay/verify', {
+          const verifyRes = await fetch('/api/razorpay/verify-and-confirm', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
+              sanityOrderId: createData.orderId,
             }),
           });
 
           const verifyData = await verifyRes.json();
           if (verifyData.success) {
-            const createRes = await fetch('/api/orders', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                ...formData,
-                items: cartItems.map(item => ({
-                  ...item,
-                  price: convertPrice(item.price)
-                })),
-                totalAmount: convertPrice(total),
-                currency,
-                exchangeRate: rate,
-                paymentType: 'online',
-                paymentStatus: 'paid',
-                razorpayOrderId: response.razorpay_order_id,
-                razorpayPaymentId: response.razorpay_payment_id,
-                deliveryCharge: convertPrice(deliveryCharge),
-                customerId,
-                saveAddress,
-              }),
-            });
-
-            const createData = await createRes.json();
-            if (createData.success) {
-              clearCart();
-              showToast('Payment successful! Order placed.', 'success');
-              router.push(`/orders?email=${formData.email}`);
-            } else {
-              showToast('Order creation failed after payment', 'error');
-            }
+            setOrderPlaced(true);
+            clearCart();
+            showToast('Payment successful! Order placed.', 'success');
+            router.push(`/orders?email=${formData.email}`);
           } else {
             showToast('Payment verification failed', 'error');
           }
@@ -287,11 +277,13 @@ export default function CheckoutPage() {
     }
   };
 
+  const [orderPlaced, setOrderPlaced] = useState(false);
+
   useEffect(() => {
-    if (isLoaded && cartItems.length === 0) {
+    if (isLoaded && cartItems.length === 0 && !orderPlaced) {
       router.push('/cart');
     }
-  }, [isLoaded, cartItems, router]);
+  }, [isLoaded, cartItems, router, orderPlaced]);
 
   if (!isLoaded) {
     return (

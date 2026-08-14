@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import { writeClient } from '@/shared/lib/sanity';
+import { auth } from '@/shared/lib/auth';
 
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
 

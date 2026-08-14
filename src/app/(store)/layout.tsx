@@ -8,20 +8,15 @@ import { withAuth, signOut } from '@workos-inc/authkit-nextjs';
 export default async function StoreLayout({ children }) {
   const { user } = await withAuth();
 
-  async function handleSignOut() {
-    'use server';
-    await signOut();
-  }
-
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar user={user} signInUrl="/api/auth/login" onSignOut={handleSignOut} />
+      <Navbar user={user} signInUrl="/api/auth/login" />
       <CartDrawer />
       <StoreMain>
         {children}
       </StoreMain>
       <Footer />
-      <MobileNav user={user} signInUrl="/api/auth/login" onSignOut={handleSignOut} />
+      <MobileNav user={user} signInUrl="/api/auth/login" />
     </div>
   );
 }

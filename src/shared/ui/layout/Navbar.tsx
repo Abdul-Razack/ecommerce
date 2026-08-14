@@ -6,8 +6,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
 import { useCurrency } from '@/providers/CurrencyProvider';
 import Container from './Container';
+import { handleSignOut } from '@/app/actions';
 
-export default function Navbar({ user, signInUrl, onSignOut }) {
+export default function Navbar({ user, signInUrl }) {
   const { getCartCount, isLoaded, openCart } = useCart();
   const { currency, setCurrency, formatPrice } = useCurrency();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -153,7 +154,7 @@ export default function Navbar({ user, signInUrl, onSignOut }) {
                       <button 
                         onClick={() => {
                           setIsUserDropdownOpen(false);
-                          onSignOut();
+                          handleSignOut();
                         }}
                         className="w-full text-left text-[9px] font-black uppercase tracking-[0.2em] text-rose-600 hover:text-rose-800 transition-colors cursor-pointer bg-transparent border-none p-0 pt-1"
                       >

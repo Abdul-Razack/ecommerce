@@ -116,7 +116,7 @@ export default function CartPage() {
                       >
                         −
                       </button>
-                      <span className="w-6 sm:w-8 text-center text-[10px] sm:text-xs font-black">{item.quantity || 1}</span>
+                      <span data-testid="cart-item-qty" className="w-6 sm:w-8 text-center text-[10px] sm:text-xs font-black">{item.quantity || 1}</span>
                       <button 
                         onClick={() => updateQuantity(item._id, (item.quantity || 1) + 1)}
                         className="w-8 sm:w-10 h-full flex items-center justify-center hover:bg-neutral-soft transition-colors font-black text-onyx/70 text-xs sm:text-base"

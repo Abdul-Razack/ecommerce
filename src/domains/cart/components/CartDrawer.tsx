@@ -49,7 +49,12 @@ export default function CartDrawer() {
       />
 
       {/* Kinetic Drawer */}
-      <div className={`
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-hidden={!isCartOpen}
+        data-testid="cart-drawer"
+        className={`
         fixed top-0 right-0 h-full w-full md:w-[500px] bg-white z-[210] shadow-kinetic flex flex-col transition-transform duration-[0.8s] cubic-bezier(0.16, 1, 0.3, 1)
         ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}
       `}>
@@ -59,7 +64,7 @@ export default function CartDrawer() {
             <h2 className="text-2xl font-black text-onyx">YOUR CART</h2>
             <p className="technical text-onyx/30 text-[8px] mt-1">Shopping Cart // {cartItems.length} Items</p>
           </div>
-          <button onClick={closeCart} className="w-12 h-12 rounded-full border border-onyx/10 flex items-center justify-center hover:bg-onyx hover:text-white transition-all">✕</button>
+          <button onClick={closeCart} aria-label="Close Cart" className="w-12 h-12 rounded-full border border-onyx/10 flex items-center justify-center hover:bg-onyx hover:text-white transition-all">✕</button>
         </div>
 
         {/* Manifest (Items) */}

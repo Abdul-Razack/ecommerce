@@ -4,8 +4,9 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
+import { handleSignOut } from '@/app/actions';
 
-const MobileNav = ({ user, signInUrl, onSignOut }) => {
+const MobileNav = ({ user, signInUrl }) => {
   const pathname = usePathname();
   const { getCartCount } = useCart();
   const [mounted, setMounted] = React.useState(false);
@@ -21,7 +22,7 @@ const MobileNav = ({ user, signInUrl, onSignOut }) => {
     { href: '/cart', label: 'CART', icon: <CartIcon count={cartCount} />, isExternal: false },
     { href: user ? '/account' : '/orders', label: user ? 'ACCOUNT' : 'ORDERS', icon: <OrdersIcon />, isExternal: false },
     user 
-      ? { onClick: onSignOut, label: 'LOGOUT', icon: <UserIcon /> }
+      ? { onClick: handleSignOut, label: 'LOGOUT', icon: <UserIcon /> }
       : { href: signInUrl, label: 'LOGIN', icon: <UserIcon />, isExternal: true }
   ];
 
