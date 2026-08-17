@@ -27,19 +27,19 @@ export class StorePage {
   }
 
   async goto() {
-    await this.page.goto('/');
+    await this.page.goto('/', { waitUntil: 'domcontentloaded' });
     // Wait for the hero heading to appear (confirms SSR render)
     await this.page.waitForSelector('h1');
   }
 
   async gotoShop(category?: string) {
     const url = category ? `/shop?category=${category}` : '/shop';
-    await this.page.goto(url);
+    await this.page.goto(url, { waitUntil: 'domcontentloaded' });
     await this.page.waitForSelector('h1');
   }
 
   async gotoCart() {
-    await this.page.goto('/cart');
+    await this.page.goto('/cart', { waitUntil: 'domcontentloaded' });
     // Cart is client-rendered; wait for hydration
     await this.page.waitForFunction(() => {
       return document.body.innerText.includes('Your Cart') ||

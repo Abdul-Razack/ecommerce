@@ -5,8 +5,26 @@ import Container from '@/shared/ui/layout/Container';
 import Button from '@/shared/ui/Button';
 import ProductCard from '@/domains/products/components/ProductCard';
 import HeroSlider from './components/HeroSlider';
+import JsonLd from '@/shared/ui/JsonLd';
+import { faqSchema, breadcrumbSchema, siteUrl } from '@/shared/lib/seo';
+import { homepageFaqs, BRAND } from '@/shared/lib/seo';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata = {
+  title: 'Premium Women\'s Leggings, Sarees & Nighties — Posh Pigeon',
+  description:
+    'Shop premium stretchable leggings, elegant sarees, cosy nighties & inskirts at Posh Pigeon. Free shipping on orders above ₹999. Made in India.',
+  alternates: {
+    canonical: siteUrl(),
+  },
+  openGraph: {
+    title: 'Posh Pigeon — Premium Women\'s Apparel',
+    description: 'Shop premium stretchable leggings, elegant sarees, cosy nighties & inskirts at Posh Pigeon.',
+    url: siteUrl(),
+    images: [{ url: BRAND.ogImage, width: 1200, height: 630, alt: 'Posh Pigeon Premium Collection' }],
+  },
+};
 
 function formatServerPrice(priceInINR: number) {
   const envCurrency = process.env.NEXT_PUBLIC_DEFAULT_CURRENCY;
@@ -72,6 +90,13 @@ export default async function Homepage() {
 
   return (
     <main className="bg-bone pb-40">
+      {/* SEO: FAQ + Breadcrumb JSON-LD */}
+      <JsonLd data={faqSchema(homepageFaqs)} />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: 'Home', url: siteUrl('/') },
+        ])}
+      />
 
       {/* 01. EDITORIAL HERO */}
       <section className="relative w-full bg-bone min-h-[450px] lg:min-h-[600px] flex items-center py-12 lg:py-0">

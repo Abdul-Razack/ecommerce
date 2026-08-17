@@ -17,32 +17,32 @@ test.describe('Search & Category Filtering', () => {
   });
 
   test('02 – Category filter via URL param "leggings" shows correct page', async ({ page }) => {
-    await page.goto('/shop?category=leggings');
+    await page.goto('/shop?category=leggings', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: /^shop$/i })).toBeVisible({ timeout: 10_000 });
     // URL param should be intact
     await expect(page).toHaveURL(/category=leggings/);
   });
 
   test('03 – Category filter via URL param "nighty" shows correct page', async ({ page }) => {
-    await page.goto('/shop?category=nighty');
+    await page.goto('/shop?category=nighty', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: /^shop$/i })).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveURL(/category=nighty/);
   });
 
   test('04 – Category filter via URL param "sarees" shows correct page', async ({ page }) => {
-    await page.goto('/shop?category=sarees');
+    await page.goto('/shop?category=sarees', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: /^shop$/i })).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveURL(/category=sarees/);
   });
 
   test('05 – Category filter via URL param "inskirt" shows correct page', async ({ page }) => {
-    await page.goto('/shop?category=inskirt');
+    await page.goto('/shop?category=inskirt', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: /^shop$/i })).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveURL(/category=inskirt/);
   });
 
   test('06 – Non-matching search shows empty state', async ({ page }) => {
-    await page.goto('/shop?search=xyznonexistentproduct12345');
+    await page.goto('/shop?search=xyznonexistentproduct12345', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: /^shop$/i })).toBeVisible({ timeout: 10_000 });
 
     const emptyState = page.getByRole('heading', { name: /no products yet/i });
@@ -55,7 +55,7 @@ test.describe('Search & Category Filtering', () => {
   });
 
   test('07 – Homepage category pill links navigate to filtered shop', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     // Wait for collections section
     await page.locator('#collections').waitFor({ timeout: 10_000 });
 

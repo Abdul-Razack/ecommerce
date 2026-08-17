@@ -62,7 +62,7 @@ export class ShopPage {
     if (options.category) params.set('category', options.category);
     if (options.search)   params.set('search',   options.search);
     const qs = params.toString();
-    await this.page.goto(qs ? `/shop?${qs}` : '/shop');
+    await this.page.goto(qs ? `/shop?${qs}` : '/shop', { waitUntil: 'domcontentloaded' });
     await expect(this.heading).toBeVisible({ timeout: 20_000 });
   }
 

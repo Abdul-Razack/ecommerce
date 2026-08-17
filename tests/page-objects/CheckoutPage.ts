@@ -57,7 +57,7 @@ export class CheckoutPage {
   }
 
   async goto() {
-    await this.page.goto('/checkout');
+    await this.page.goto('/checkout', { waitUntil: 'domcontentloaded' });
     await expect(this.heading).toBeVisible({ timeout: 20_000 });
   }
 

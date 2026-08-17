@@ -3,15 +3,81 @@ import ProductCardWrapper from '@/domains/products/components/ProductCardWrapper
 import Container from '@/shared/ui/layout/Container';
 import Link from 'next/link';
 import Button from '@/shared/ui/Button';
+import JsonLd from '@/shared/ui/JsonLd';
+import { BRAND, siteUrl, breadcrumbSchema, faqSchema, categoryFaqs, collectionPageSchema } from '@/shared/lib/seo';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = {
-  title: 'All Products - Posh Pigeon',
-  description: 'Browse our complete collection of premium products at the best prices.',
+const CATEGORY_META: Record<string, { title: string; description: string; keywords: string[] }> = {
+  leggings: {
+    title: 'Premium Stretchable Leggings Online — Posh Pigeon',
+    description:
+      'Buy premium stretchable leggings online at Posh Pigeon. Four-way stretch, opaque, breathable fabric. Free shipping on orders above ₹999.',
+    keywords: ['buy leggings online', 'premium leggings India', 'stretchable leggings women', 'opaque leggings online'],
+  },
+  nighty: {
+    title: 'Women\'s Nighties & Sleepwear Online — Posh Pigeon',
+    description:
+      'Shop cosy nighties and sleepwear for women at Posh Pigeon. Soft breathable cotton. Premium comfort for every night.',
+    keywords: ['buy nighties online', 'women sleepwear India', 'cotton nighties', 'premium nighties online'],
+  },
+  inskirt: {
+    title: 'Premium Inskirts for Sarees — Posh Pigeon',
+    description:
+      'Buy anti-chafing inskirts for sarees at Posh Pigeon. Soft, seamless, comfortable foundation wear. Free shipping on orders above ₹999.',
+    keywords: ['buy inskirt online', 'saree inskirt India', 'anti-chafing inskirt', 'premium inskirts'],
+  },
+  sarees: {
+    title: 'Elegant Sarees Online Shopping — Posh Pigeon',
+    description:
+      'Shop elegant sarees online at Posh Pigeon. Rich fabrics, vibrant colours, flawless drape. Traditional Indian wear delivered to your door.',
+    keywords: ['buy sarees online', 'elegant sarees India', 'premium sarees shopping', 'women sarees online'],
+  },
 };
 
-export default async function ProductsPage({ searchParams }) {
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ category?: string; search?: string }> }): Promise<Metadata> {
+  const { category, search } = await searchParams;
+
+  if (category && CATEGORY_META[category]) {
+    const meta = CATEGORY_META[category];
+    return {
+      title: meta.title,
+      description: meta.description,
+      keywords: meta.keywords,
+      alternates: { canonical: siteUrl(`/shop?category=${category}`) },
+      openGraph: {
+        title: meta.title,
+        description: meta.description,
+        url: siteUrl(`/shop?category=${category}`),
+        type: 'website',
+      },
+    };
+  }
+
+  if (search) {
+    return {
+      title: `Search results for "${search}" — Posh Pigeon`,
+      description: `Browse products matching "${search}" at Posh Pigeon. Premium women's apparel.`,
+      alternates: { canonical: siteUrl(`/shop?search=${encodeURIComponent(search)}`) },
+      robots: { index: false, follow: true },
+    };
+  }
+
+  return {
+    title: 'Shop All Products — Posh Pigeon',
+    description:
+      'Browse our complete collection of premium leggings, sarees, nighties and inskirts. Free shipping on orders above ₹999.',
+    alternates: { canonical: siteUrl('/shop') },
+    openGraph: {
+      title: 'Shop All Products — Posh Pigeon',
+      description: 'Browse our complete collection of premium women\'s apparel.',
+      url: siteUrl('/shop'),
+    },
+  };
+}
+
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ category?: string; search?: string }> }) {
   const { category, search } = await searchParams;
   let products = [];
 
@@ -29,8 +95,49 @@ export default async function ProductsPage({ searchParams }) {
     console.error('Error fetching products:', error);
   }
 
+  const pageTitle = category
+    ? CATEGORY_META[category]?.title || 'Shop Products — Posh Pigeon'
+    : search
+      ? `Search: ${search} — Posh Pigeon`
+      : 'Shop All Products — Posh Pigeon';
+  const pageDescription = category
+    ? CATEGORY_META[category]?.description || 'Browse products at Posh Pigeon.'
+    : search
+      ? `Browse products matching "${search}" at Posh Pigeon.`
+      : 'Browse our complete collection of premium women\'s apparel.';
+
+  const breadcrumbItems = [
+    { name: 'Home', url: siteUrl('/') },
+    { name: 'Shop', url: siteUrl('/shop') },
+  ];
+  if (category) {
+    breadcrumbItems.push({
+      name: CATEGORY_META[category]?.title?.split(' — ')[0] || category,
+      url: siteUrl(`/shop?category=${category}`),
+    });
+  }
+
+  // Build ItemList for category page JSON-LD
+  const itemList = products.map((p, i) => ({
+    name: p.name,
+    url: siteUrl(`/shop/${p.slug}`),
+    image: p.imageUrl,
+    position: i + 1,
+  }));
+
   return (
     <div className="bg-bone min-h-screen">
+      {/* SEO JSON-LD */}
+      <JsonLd data={breadcrumbSchema(breadcrumbItems)} />
+      {category && itemList.length > 0 && (
+        <JsonLd
+          data={collectionPageSchema(pageTitle, pageDescription, siteUrl(`/shop?category=${category}`), itemList)}
+        />
+      )}
+      {category && categoryFaqs[category] && (
+        <JsonLd data={faqSchema(categoryFaqs[category])} />
+      )}
+
       {/* Hero Section */}
       <div className="relative bg-neutral-soft py-32 md:py-44 border-b border-onyx/5 overflow-hidden">
         {/* Background Image */}

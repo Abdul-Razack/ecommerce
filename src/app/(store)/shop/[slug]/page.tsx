@@ -2,24 +2,59 @@ import { productService } from '@/domains/products/services/product.service';
 import { urlFor } from '@/shared/lib/sanity';
 import { notFound } from 'next/navigation';
 import ProductDetails from '@/domains/products/components/ProductDetails';
+import JsonLd from '@/shared/ui/JsonLd';
+import { productSchema, breadcrumbSchema, faqSchema, categoryFaqs, siteUrl, BRAND } from '@/shared/lib/seo';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const product = await productService.getProductBySlug(slug);
-  
+
   if (!product) {
-    return { title: 'Product Not Found - Posh Pigeon' };
+    return {
+      title: 'Product Not Found',
+      robots: { index: false },
+    };
   }
 
+  const title = product.seo?.metaTitle || `${product.name} — Premium ${product.category || 'Apparel'} | Posh Pigeon`;
+  const description =
+    product.seo?.metaDescription ||
+    product.description ||
+    `Buy ${product.name} at the best price on Posh Pigeon. Premium ${product.category || 'women\'s apparel'}. Free shipping on orders above ₹999.`;
+
   return {
-    title: `${product.name} - Posh Pigeon`,
-    description: product.description || `Buy ${product.name} at the best price on Posh Pigeon.`,
+    title,
+    description,
+    keywords: [
+      product.name,
+      `buy ${product.name}`,
+      `${product.category} online`,
+      'Posh Pigeon',
+      'premium women apparel India',
+    ],
+    alternates: { canonical: siteUrl(`/shop/${slug}`) },
+    openGraph: {
+      title,
+      description,
+      url: siteUrl(`/shop/${slug}`),
+      type: 'website',
+      images: product.imageUrl
+        ? [{ url: product.imageUrl, width: 800, height: 1000, alt: product.name }]
+        : [{ url: BRAND.ogImage, width: 1200, height: 630, alt: product.name }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: product.imageUrl ? [product.imageUrl] : [BRAND.ogImage],
+    },
   };
 }
 
-export default async function ProductDetailPage({ params }) {
+export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const product = await productService.getProductBySlug(slug);
 
@@ -97,14 +132,55 @@ export default async function ProductDetailPage({ params }) {
     });
   }
 
+  // JSON-LD structured data
+  const breadcrumbItems = [
+    { name: 'Home', url: siteUrl('/') },
+    { name: 'Shop', url: siteUrl('/shop') },
+  ];
+  if (product.category) {
+    breadcrumbItems.push({
+      name: product.category,
+      url: siteUrl(`/shop?category=${product.category.toLowerCase()}`),
+    });
+  }
+  breadcrumbItems.push({ name: product.name, url: siteUrl(`/shop/${product.slug}`) });
+
+  // Category-specific FAQ for AEO
+  const categorySlug = product.category?.toLowerCase().replace(/\s+/g, '') || '';
+  const categoryFaqKey = Object.keys(categoryFaqs).find(
+    (k) => k === categorySlug || categorySlug.includes(k),
+  );
+  const faqItems = categoryFaqKey ? categoryFaqs[categoryFaqKey] : [];
+
   return (
-    <ProductDetails
-      product={{
-        ...product,
-        slug: product.slug?.current,
-        processedImages: images,
-      }}
-      relatedProducts={relatedProducts}
-    />
+    <>
+      <JsonLd data={productSchema({
+        name: product.name,
+        description: product.description || undefined,
+        slug: product.slug,
+        imageUrl: product.imageUrl,
+        price: product.price,
+        comparePrice: product.comparePrice,
+        stock: product.stock,
+        category: product.category,
+        variants: product.variants?.map((v: any) => ({
+          color: v.color,
+          size: v.size,
+          price: v.price,
+          stock: v.stock,
+        })),
+      })} />
+      <JsonLd data={breadcrumbSchema(breadcrumbItems)} />
+      {faqItems.length > 0 && <JsonLd data={faqSchema(faqItems)} />}
+
+      <ProductDetails
+        product={{
+          ...product,
+          slug: product.slug?.current || product.slug,
+          processedImages: images,
+        }}
+        relatedProducts={relatedProducts}
+      />
+    </>
   );
 }

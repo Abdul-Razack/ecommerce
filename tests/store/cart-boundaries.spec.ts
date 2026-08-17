@@ -70,7 +70,7 @@ test.describe('Cart Boundary Conditions', () => {
   });
 
   test('6. Negative quantity manipulation via local storage is corrected or rejected', async ({ page }) => {
-    await page.goto('/shop');
+    await page.goto('/shop', { waitUntil: 'domcontentloaded' });
     
     // Inject malicious local storage state
     await page.evaluate(() => {
@@ -89,7 +89,7 @@ test.describe('Cart Boundary Conditions', () => {
       }));
     });
     
-    await page.goto('/cart');
+    await page.goto('/cart', { waitUntil: 'domcontentloaded' });
     
     // The cart should either sanitize this to 0/1, remove it, or display empty
     // It must NOT calculate a negative subtotal
@@ -155,7 +155,7 @@ test.describe('Cart Boundary Conditions', () => {
 
   test('10, 11, 12. Simulating backend price/stock drift during checkout', async ({ page }) => {
     // We simulate an item in cart whose price drops or goes out of stock
-    await page.goto('/shop');
+    await page.goto('/shop', { waitUntil: 'domcontentloaded' });
     
     await page.evaluate(() => {
       localStorage.setItem('cart-storage', JSON.stringify({

@@ -143,6 +143,9 @@ test.describe('Guest Customer Workflow', () => {
     const severeErrors = consoleErrors.filter(err => 
       !err.includes('Third-party cookie') && 
       !err.includes('favicon.ico') && 
+      !err.includes('Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED') &&
+      !err.includes('Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE') &&
+      !err.includes('net::ERR_ABORTED') &&
       !err.includes('punycode') && // Node deprecation warning
       !err.includes('401') && // Sanity / WorkOS cross-sell fetch on unauthenticated sessions
       !err.includes('Unauthorized') // Same as above

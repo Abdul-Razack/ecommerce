@@ -29,7 +29,7 @@ export class CartPage {
   }
 
   async goto() {
-    await this.page.goto('/cart');
+    await this.page.goto('/cart', { waitUntil: 'domcontentloaded' });
     await expect(this.heading.or(this.emptyMessage)).toBeVisible({ timeout: 15_000 });
   }
 

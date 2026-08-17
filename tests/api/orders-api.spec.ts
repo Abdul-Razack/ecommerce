@@ -19,14 +19,14 @@ test.describe('API – /api/orders contract', () => {
     expect(body.error).toBeTruthy();
   });
 
-  test('02 – GET /api/orders with email returns 200 and orders array', async ({ request }) => {
+  test('02 – GET /api/orders with email requires authentication', async ({ request }) => {
     const res = await request.get(`${BASE}/api/orders?email=nonexistent@test.com`);
-    // Even if no orders found, the API should succeed (empty array)
-    expect(res.status()).toBe(200);
+    // Order lookup is protected to prevent users from reading another customer's orders.
+    expect(res.status()).toBe(401);
 
     const body = await res.json();
-    expect(body.success).toBe(true);
-    expect(Array.isArray(body.orders)).toBe(true);
+    expect(body.success).toBe(false);
+    expect(body.error).toBeTruthy();
   });
 
   test('03 – POST /api/orders with missing fields returns 500 or validation error', async ({ request }) => {

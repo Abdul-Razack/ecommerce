@@ -2,10 +2,28 @@ import React from 'react';
 import Container from '@/shared/ui/layout/Container';
 import Button from '@/shared/ui/Button';
 import Link from 'next/link';
+import JsonLd from '@/shared/ui/JsonLd';
+import { BRAND, siteUrl, breadcrumbSchema, faqSchema, aboutFaqs, organizationSchema } from '@/shared/lib/seo';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Our Story - Posh Pigeon',
-  description: 'Discover Posh Pigeon, India\'s premium women\'s clothing brand offering high-grade stretchable leggings, elegant sarees, cozy nighties, and comfortable inskirts.',
+export const metadata: Metadata = {
+  title: 'Our Story — Premium Women\'s Clothing Brand in India',
+  description:
+    'Discover Posh Pigeon, India\'s premium women\'s clothing brand offering high-grade stretchable leggings, elegant sarees, cosy nighties, and comfortable inskirts. Based in Chennai.',
+  keywords: [
+    'about Posh Pigeon',
+    'premium women clothing India',
+    'women apparel brand Chennai',
+    'leggings brand India',
+    'sarees online brand',
+  ],
+  alternates: { canonical: siteUrl('/about') },
+  openGraph: {
+    title: 'Our Story — Posh Pigeon',
+    description: 'Discover Posh Pigeon, India\'s premium women\'s clothing brand.',
+    url: siteUrl('/about'),
+    type: 'website',
+  },
 };
 
 function formatServerPrice(priceInINR: number) {
@@ -35,7 +53,16 @@ function formatServerPrice(priceInINR: number) {
 export default function AboutPage() {
   return (
     <main className="bg-bone min-h-screen pt-12 pb-0 space-y-16 md:space-y-24 overflow-x-hidden">
-      
+      {/* SEO JSON-LD */}
+      <JsonLd data={organizationSchema()} />
+      <JsonLd data={faqSchema(aboutFaqs)} />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: 'Home', url: siteUrl('/') },
+          { name: 'About Us', url: siteUrl('/about') },
+        ])}
+      />
+
       {/* 01. VIBRANT HERO */}
       <section className="relative min-h-[65vh] flex flex-col justify-center overflow-hidden py-8 md:py-12">
         {/* Soft colorful ambient glowing background blobs */}
@@ -128,14 +155,14 @@ export default function AboutPage() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                    <h4 className="text-xs tracking-wider uppercase font-black text-onyx">Flex-Stretch Technology</h4>
+                    <h3 className="text-xs tracking-wider uppercase font-black text-onyx">Flex-Stretch Technology</h3>
                   </div>
                   <p className="text-xs text-onyx/50 leading-relaxed uppercase">Our leggings offer four-way stretch, conforming to your body without losing shape over time.</p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                    <h4 className="text-xs tracking-wider uppercase font-black text-onyx">Deep Color Retention</h4>
+                    <h3 className="text-xs tracking-wider uppercase font-black text-onyx">Deep Color Retention</h3>
                   </div>
                   <p className="text-xs text-onyx/50 leading-relaxed uppercase">We use advanced reactive dyes, ensuring your sarees and nighties stay vibrant after countless washes.</p>
                 </div>
@@ -197,7 +224,7 @@ export default function AboutPage() {
               <div className="p-8 flex flex-col flex-grow justify-between space-y-4">
                 <div className="space-y-2">
                   <h3 className="text-lg font-black text-onyx uppercase tracking-tight">Elegant Sarees</h3>
-                  <p className="text-xs text-onyx/60 leading-relaxed font-sans">Rich, traditional fabrics presenting exceptional color depth and flawless drape. Perfect for all seasons.</p>
+                  <p className="text-xs text-onyx/60 leading-relaxed font-sans">Rich, traditional fabrics presenting exceptional colour depth and flawless drape. Perfect for all seasons.</p>
                 </div>
                 <Link href="/shop?category=sarees" className="inline-block w-full">
                   <span className="inline-flex items-center justify-center w-full py-3 rounded-xl border border-amber-600/20 text-[10px] font-black uppercase tracking-wider text-amber-600 hover:bg-amber-600 hover:text-white hover:border-amber-600 transition-all duration-300">
@@ -247,7 +274,7 @@ export default function AboutPage() {
               <div className="p-8 flex flex-col flex-grow justify-between space-y-4">
                 <div className="space-y-2">
                   <h3 className="text-lg font-black text-onyx uppercase tracking-tight">Premium Inskirts</h3>
-                  <p className="text-xs text-onyx/60 leading-relaxed font-sans">Soft, anti-chafing inskirts designed to form the perfect, seamless foundation under your favorite sarees.</p>
+                  <p className="text-xs text-onyx/60 leading-relaxed font-sans">Soft, anti-chafing inskirts designed to form the perfect, seamless foundation under your favourite sarees.</p>
                 </div>
                 <Link href="/shop?category=inskirt" className="inline-block w-full">
                   <span className="inline-flex items-center justify-center w-full py-3 rounded-xl border border-teal-600/20 text-[10px] font-black uppercase tracking-wider text-teal-600 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-all duration-300">
@@ -309,7 +336,7 @@ export default function AboutPage() {
               <span className="editorial italic lowercase font-normal text-amber-400 bg-gradient-to-r from-amber-400 via-rose-300 to-indigo-200 bg-clip-text text-transparent">level of comfort</span>
             </h2>
             <p className="text-white/70 max-w-xl mx-auto text-sm md:text-base font-sans">
-              Update your wardrobe with our newest collections of premium leggings, classic sarees, and cozy nighties. Handcrafted with the finest fabrics.
+              Update your wardrobe with our newest collections of premium leggings, classic sarees, and cosy nighties. Handcrafted with the finest fabrics.
             </p>
             <div className="inline-block pt-6">
               <Link href="/shop">

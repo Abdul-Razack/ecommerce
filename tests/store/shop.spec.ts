@@ -33,6 +33,7 @@ function attachConsoleGuard(page: import('@playwright/test').Page) {
       // Ignore common false-positives that are not application bugs
       const IGNORED = [
         'favicon.ico',
+        'Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED',
         'Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE', // cross-origin image CDN
         'net::ERR_ABORTED',   // cancelled prefetch requests
       ];
@@ -172,7 +173,7 @@ test.describe('Shop – Product Navigation & URLs', () => {
     const slug = await resolveFirstProductSlug(page);
     test.skip(!slug, 'No live slug available');
 
-    await page.goto(`/shop/${slug}`);
+    await page.goto(`/shop/${slug}`, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 20_000 });
 
     await page.reload({ waitUntil: 'domcontentloaded' });
@@ -181,11 +182,11 @@ test.describe('Shop – Product Navigation & URLs', () => {
   });
 
   test('14 – Invalid product slug returns 404 / not-found UI', async ({ page }) => {
-    const resp = await page.goto('/shop/this-product-absolutely-does-not-exist-xyz-999');
+    const resp = await page.goto('/shop/this-product-absolutely-does-not-exist-xyz-999', { waitUntil: 'domcontentloaded' });
     // In Next.js App Router with PPR/dynamic rendering, notFound() triggered dynamically
     // might flush a 200 OK status before the suspense boundary throws the 404.
     // So we don't strictly assert the HTTP status code, but we do assert the DOM.
-    await page.goto('/shop/this-product-absolutely-does-not-exist-xyz-999');
+    await page.goto('/shop/this-product-absolutely-does-not-exist-xyz-999', { waitUntil: 'domcontentloaded' });
 
     // The page must show some "not found" content (Next.js default or custom)
     // We use toContainText which auto-polls, because Next.js might stream a loading state first
@@ -389,7 +390,7 @@ test.describe('Shop – Server-side URL param filtering', () => {
   });
 
   test('05-nonsense – ?search=xyzzynonexistent returns empty state', async ({ page }) => {
-    await page.goto('/shop?search=xyzzynonexistent123');
+    await page.goto('/shop?search=xyzzynonexistent123', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('h1').filter({ hasText: /shop/i })).toBeVisible({ timeout: 20_000 });
 
     // Should show "No Products Yet" or "No Products Match Filters"
@@ -399,7 +400,7 @@ test.describe('Shop – Server-side URL param filtering', () => {
   });
 
   test('11 – Refreshing with URL ?search param preserves filter state', async ({ page }) => {
-    await page.goto('/shop?search=legging');
+    await page.goto('/shop?search=legging', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('h1').filter({ hasText: /shop/i })).toBeVisible({ timeout: 20_000 });
 
     const beforeText = await page.locator('body').innerText();

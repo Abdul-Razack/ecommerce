@@ -20,7 +20,7 @@ export class AdminLoginPage {
   }
 
   async goto() {
-    await this.page.goto('/admin/login');
+    await this.page.goto('/admin/login', { waitUntil: 'domcontentloaded' });
     await expect(this.emailInput).toBeVisible({ timeout: 10_000 });
   }
 

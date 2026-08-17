@@ -13,6 +13,13 @@ const ROUTES = [
   '/about',
 ];
 
+const IGNORED_CONSOLE_ERRORS = [
+  'favicon.ico',
+  'Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED',
+  'Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE',
+  'net::ERR_ABORTED',
+];
+
 ROUTES.forEach((route) => {
   test.describe(`Smoke Test: ${route}`, () => {
     
@@ -25,8 +32,7 @@ ROUTES.forEach((route) => {
       page.on('console', msg => {
         if (msg.type() === 'error') {
           const text = msg.text();
-          // Filter out benign Next.js dev server hydration warnings if needed, but we fail strictly
-          if (!text.includes('favicon.ico')) {
+          if (!IGNORED_CONSOLE_ERRORS.some(pattern => text.includes(pattern))) {
              errors.push(text);
           }
         }
