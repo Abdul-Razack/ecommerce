@@ -11,6 +11,7 @@ import Badge from '@/shared/ui/Badge';
 import Skeleton from '@/shared/ui/Skeleton';
 import Section from '@/shared/ui/Section';
 import Link from 'next/link';
+import Pagination, { usePagination } from '@/shared/ui/Pagination';
 
 function formatOrderPrice(amount: number, orderCurrency?: string) {
   const currencyCode = orderCurrency || 'INR';
@@ -61,6 +62,19 @@ function OrdersContent() {
     fetchOrders(email);
   };
 
+  const {
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    totalPages,
+    paginatedItems: paginatedOrders,
+    totalItems,
+  } = usePagination({
+    items: orders,
+    initialPageSize: 5,
+  });
+
   return (
     <div className="bg-bone min-h-screen">
       <Section 
@@ -95,7 +109,7 @@ function OrdersContent() {
           </div>
         ) : orders.length > 0 ? (
           <div className="space-y-16 mt-16">
-            {orders.map((order) => (
+            {paginatedOrders.map((order: any) => (
               <Card key={order.orderId || order._id} variant="outline" padding="p-0" className="overflow-hidden bg-neutral-soft shadow-sm border-onyx/5">
                 <div className="bg-bone/50 border-b border-onyx/5 px-10 py-6 flex flex-col md:flex-row justify-between md:items-center gap-6">
                   <div className="flex flex-col md:flex-row gap-8 md:gap-16">
@@ -223,6 +237,19 @@ function OrdersContent() {
                 </div>
               </Card>
             ))}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                pageSize={pageSize}
+                pageSizeOptions={[5, 10, 20]}
+                onPageChange={setCurrentPage}
+                onPageSizeChange={setPageSize}
+                itemLabel="orders"
+                className="rounded-2xl border border-onyx/5 shadow-sm mt-8"
+              />
+            )}
           </div>
         ) : searched ? (
           <div className="flex flex-col items-center justify-center py-40 text-center">

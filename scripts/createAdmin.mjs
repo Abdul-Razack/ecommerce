@@ -14,7 +14,7 @@ const client = createClient({
 
 async function main() {
   const email = 'admin@shopverse.com';
-  const password = 'admin-password-2026';
+  const password = 'admin123';
   const name = 'Admin User';
 
   console.log(`Creating admin user: ${email}...`);

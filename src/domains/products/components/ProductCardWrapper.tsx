@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import ProductCard from './ProductCard';
 import { useCurrency } from '@/providers/CurrencyProvider';
+import Pagination from '@/shared/ui/Pagination';
 
 interface Variant {
   color: string;
@@ -38,7 +39,7 @@ const COLOR_OPTIONS = [
   { name: 'Gold', hex: '#C5A059' }
 ];
 
-const SIZE_OPTIONS = ["All Sizes", "XS", "S", "M", "L", "XL", "XXL"];
+const SIZE_OPTIONS = ["All Sizes", "XS", "S", "M", "L", "XL", "XXL", "3XL", "Free Size"];
 
 const PRICE_OPTIONS = [
   { label: 'All Prices', min: 0, max: Infinity },
@@ -78,6 +79,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
   const [gridCols, setGridCols] = useState<number>(4);
   
   // Pagination state
+  const [pageSize, setPageSize] = useState<number>(8);
   const [currentPage, setCurrentPage] = useState<number>(1);
   
   // Dropdown open states
@@ -138,19 +140,11 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
   }, [selectedCategory, selectedColor, selectedSize, selectedPrice, selectedSort]);
 
   // Paginated List
-  const totalPages = Math.ceil(filteredAndSorted.length / ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(filteredAndSorted.length / pageSize));
   const paginatedProducts = useMemo(() => {
-    const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredAndSorted.slice(startIdx, startIdx + ITEMS_PER_PAGE);
-  }, [filteredAndSorted, currentPage]);
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
+    const startIdx = (currentPage - 1) * pageSize;
+    return filteredAndSorted.slice(startIdx, startIdx + pageSize);
+  }, [filteredAndSorted, currentPage, pageSize]);
 
   return (
     <div className="space-y-16">
@@ -352,38 +346,20 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
 
       {/* Pagination component */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 pt-12 border-t border-zinc-50">
-          <button
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center text-xs font-black uppercase hover:border-black transition-colors disabled:opacity-30 disabled:hover:border-zinc-200"
-          >
-            ←
-          </button>
-          {Array.from({ length: totalPages }, (_, idx) => {
-            const pageNum = idx + 1;
-            return (
-              <button
-                key={pageNum}
-                onClick={() => setCurrentPage(pageNum)}
-                className={`w-10 h-10 rounded-full text-xs font-black transition-all flex items-center justify-center ${
-                  currentPage === pageNum
-                    ? 'bg-black text-white'
-                    : 'border border-zinc-200 hover:border-black text-black'
-                }`}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center text-xs font-black uppercase hover:border-black transition-colors disabled:opacity-30 disabled:hover:border-zinc-200"
-          >
-            →
-          </button>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredAndSorted.length}
+          pageSize={pageSize}
+          pageSizeOptions={[8, 16, 24, 48]}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setCurrentPage(1);
+          }}
+          itemLabel="products"
+          className="rounded-xl border border-zinc-100 mt-12"
+        />
       )}
     </div>
   );

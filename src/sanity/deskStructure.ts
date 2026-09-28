@@ -62,10 +62,24 @@ export const deskStructure = (S) =>
                 ),
             ])
         ),
+      S.divider(),
+      
+      // Promotions Section
+      S.listItem()
+        .title("Promotions")
+        .child(
+          S.list()
+            .title("Promotional Campaigns")
+            .items([
+              S.listItem()
+                .title("Coupons")
+                .child(S.documentTypeList("coupon").title("All Coupons")),
+            ])
+        ),
       
       // Automatic list for other types
       S.divider(),
       ...S.documentTypeListItems().filter(
-        (listItem) => !["homePage", "adminUser", "product", "category", "order", "customer"].includes(listItem.getId())
+        (listItem) => !["homePage", "adminUser", "product", "category", "order", "customer", "coupon"].includes(listItem.getId())
       ),
     ]);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Container from '@/shared/ui/layout/Container';
 import Button from '@/shared/ui/Button';
@@ -9,16 +9,31 @@ import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { urlFor } from '@/shared/lib/sanity';
 import { useCurrency } from '@/providers/CurrencyProvider';
+import { Ruler, Check, X } from 'lucide-react';
 
 /**
  * Onyx & Bone Product Details
  * Features: Tactile image galleries, custom variants selectors, coupon code copies, and dynamic trust badges.
  */
+const SIZE_DISPLAY_MAP: Record<string, string> = {
+  "XS": "XS (26\")",
+  "S": "S (28\")",
+  "M": "M (30\")",
+  "L": "L (32\")",
+  "XL": "XL (34\")",
+  "XXL": "XXL (36\")",
+  "3XL": "3XL (38\")",
+  "Free Size": "Free Size (FS)",
+  "FS": "Free Size (FS)",
+};
+
 export default function ProductDetails({ product, relatedProducts }) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
   const router = useRouter();
+
+  const [showSizeChart, setShowSizeChart] = useState(false);
 
   // Extract colors and sizes
   const colors = Array.from(new Set(product.variants?.map((v) => v.color).filter(Boolean) || [])) as string[];
@@ -132,11 +147,22 @@ export default function ProductDetails({ product, relatedProducts }) {
     },
   ];
 
-  const coupons = [
-    { code: 'SAVE10', desc: 'Flat 10% OFF on your first purchase' },
-    { code: 'POSH500', desc: `Flat ${formatPrice(500)} OFF on orders above ${formatPrice(4999)}` },
-    { code: 'FESTIVE15', desc: `Get 15% OFF on minimum purchase of ${formatPrice(2499)}` }
-  ];
+  const [coupons, setCoupons] = useState<any[]>([]);
+
+  // Live coupons from Sanity so promo codes can be paused or created without a
+  // deploy. The public endpoint only exposes marketing-safe fields.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/coupons')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data.success) setCoupons(data.coupons || []);
+      })
+      .catch((err) => console.error('Error fetching coupons:', err));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="bg-bone min-h-screen pt-12 pb-20">
@@ -246,18 +272,31 @@ export default function ProductDetails({ product, relatedProducts }) {
               {/* Sizes Grid selector */}
               {selectedColor && (
                 <div className="space-y-3">
-                  <span className="technical text-onyx/40 text-[8px] uppercase tracking-widest block">Select Size: {selectedSize || 'None'}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="technical text-onyx/40 text-[8px] uppercase tracking-widest block">
+                      Select Size: {selectedSize ? (SIZE_DISPLAY_MAP[selectedSize] || selectedSize) : 'None'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowSizeChart(true)}
+                      className="text-[9px] font-bold text-chrome hover:underline uppercase tracking-wider bg-transparent border-none cursor-pointer flex items-center gap-1"
+                    >
+                      <Ruler className="w-3.5 h-3.5 text-chrome" />
+                      View Size Guide
+                    </button>
+                  </div>
                   <div className="flex flex-wrap gap-2">
-                    {["XS", "S", "M", "L", "XL", "XXL"].map((sz) => {
-                      const isAvailable = availableSizesForColor.includes(sz);
+                    {["XS", "S", "M", "L", "XL", "XXL", "3XL", "Free Size"].map((sz) => {
+                      const isAvailable = availableSizesForColor.includes(sz) || availableSizesForColor.length === 0;
                       const isSelected = selectedSize === sz;
+                      const displayLabel = SIZE_DISPLAY_MAP[sz] || sz;
                       
                       return (
                         <button
                           key={sz}
                           disabled={!isAvailable}
                           onClick={() => setSelectedSize(sz)}
-                          className={`min-w-[3.5rem] h-10 px-3 rounded-lg border text-xs font-black uppercase transition-all tracking-wider ${
+                          className={`min-w-[4rem] h-10 px-3 rounded-lg border text-xs font-black uppercase transition-all tracking-wider ${
                             !isAvailable 
                               ? 'border-onyx/5 text-onyx/20 line-through cursor-not-allowed bg-neutral-soft/50' 
                               : isSelected
@@ -265,7 +304,7 @@ export default function ProductDetails({ product, relatedProducts }) {
                                 : 'border-onyx/10 hover:border-onyx text-onyx bg-white/80'
                           }`}
                         >
-                          {sz}
+                          {displayLabel}
                         </button>
                       );
                     })}
@@ -311,29 +350,40 @@ export default function ProductDetails({ product, relatedProducts }) {
                 </svg>
                 <h4 className="text-[10px] font-black uppercase tracking-widest text-onyx">Active Promo Coupons</h4>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {coupons.map((c) => (
-                  <div key={c.code} className="bg-white/80 border border-onyx/5 p-4 rounded-xl flex items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <span className="font-mono text-xs font-black bg-bone text-onyx px-2 py-0.5 rounded border border-onyx/10 uppercase">
-                        {c.code}
-                      </span>
-                      <p className="text-[9px] text-onyx/50 font-bold leading-tight">{c.desc}</p>
+              {coupons.length === 0 ? (
+                <p className="text-[9px] text-onyx/40 font-bold uppercase tracking-wider">
+                  No active promo codes right now
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {coupons.map((c) => (
+                    <div key={c._id || c.code} className="bg-white/80 border border-onyx/5 p-4 rounded-xl flex items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <span className="font-mono text-xs font-black bg-bone text-onyx px-2 py-0.5 rounded border border-onyx/10 uppercase">
+                          {c.code}
+                        </span>
+                        <p className="text-[9px] text-onyx/50 font-bold leading-tight">{c.description}</p>
+                        {c.scope && (
+                          <p className="text-[9px] text-onyx/30 font-bold uppercase tracking-wider">
+                            {c.scope}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyCoupon(c.code)}
+                        className={`text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded transition-all flex-shrink-0 ${
+                          copiedCoupon === c.code 
+                            ? 'bg-green-700 text-bone' 
+                            : 'bg-onyx text-bone hover:bg-black'
+                        }`}
+                      >
+                        {copiedCoupon === c.code ? 'Copied' : 'Copy'}
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleCopyCoupon(c.code)}
-                      className={`text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded transition-all flex-shrink-0 ${
-                        copiedCoupon === c.code 
-                          ? 'bg-green-700 text-bone' 
-                          : 'bg-onyx text-bone hover:bg-black'
-                      }`}
-                    >
-                      {copiedCoupon === c.code ? 'Copied' : 'Copy'}
-                    </button>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* CTAs: High-Velocity Action Bar */}
@@ -478,6 +528,112 @@ export default function ProductDetails({ product, relatedProducts }) {
             </div>
           </Container>
         </section>
+      )}
+
+      {/* Size Guide Modal */}
+      {showSizeChart && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl relative border border-onyx/10 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowSizeChart(false)}
+              className="absolute top-6 right-6 text-onyx/40 hover:text-onyx w-8 h-8 rounded-full border border-onyx/10 flex items-center justify-center bg-bone hover:bg-neutral-soft transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="space-y-6">
+              <div className="space-y-1 border-b border-onyx/10 pb-4">
+                <span className="technical text-[9px] font-black uppercase tracking-widest text-chrome">Size & Measurement Standard</span>
+                <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight">Women's Apparel Size Guide</h3>
+                <p className="text-xs text-onyx/60">Standard waist & hip measurements in inches for Leggings, Inskirts, Chudidars & Nighties.</p>
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto rounded-2xl border border-onyx/10">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-bone text-onyx font-black uppercase tracking-wider text-[10px] border-b border-onyx/10">
+                    <tr>
+                      <th className="py-3 px-4">Size Code</th>
+                      <th className="py-3 px-4">Waist (Inches)</th>
+                      <th className="py-3 px-4">Hip (Inches)</th>
+                      <th className="py-3 px-4">Garment Length</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-onyx/5 text-onyx font-medium">
+                    <tr className="hover:bg-bone/40">
+                      <td className="py-3 px-4 font-black">XS</td>
+                      <td className="py-3 px-4">26" (66 cm)</td>
+                      <td className="py-3 px-4">34" (86 cm)</td>
+                      <td className="py-3 px-4">38" (96 cm)</td>
+                    </tr>
+                    <tr className="hover:bg-bone/40">
+                      <td className="py-3 px-4 font-black">S</td>
+                      <td className="py-3 px-4">28" (71 cm)</td>
+                      <td className="py-3 px-4">36" (91 cm)</td>
+                      <td className="py-3 px-4">39" (99 cm)</td>
+                    </tr>
+                    <tr className="hover:bg-bone/40">
+                      <td className="py-3 px-4 font-black">M</td>
+                      <td className="py-3 px-4">30" (76 cm)</td>
+                      <td className="py-3 px-4">38" (96 cm)</td>
+                      <td className="py-3 px-4">40" (101 cm)</td>
+                    </tr>
+                    <tr className="hover:bg-bone/40">
+                      <td className="py-3 px-4 font-black">L</td>
+                      <td className="py-3 px-4">32" (81 cm)</td>
+                      <td className="py-3 px-4">40" (101 cm)</td>
+                      <td className="py-3 px-4">41" (104 cm)</td>
+                    </tr>
+                    <tr className="hover:bg-bone/40">
+                      <td className="py-3 px-4 font-black">XL</td>
+                      <td className="py-3 px-4">34" (86 cm)</td>
+                      <td className="py-3 px-4">42" (106 cm)</td>
+                      <td className="py-3 px-4">42" (106 cm)</td>
+                    </tr>
+                    <tr className="hover:bg-bone/40">
+                      <td className="py-3 px-4 font-black">XXL</td>
+                      <td className="py-3 px-4">36" (91 cm)</td>
+                      <td className="py-3 px-4">44" (111 cm)</td>
+                      <td className="py-3 px-4">42" (106 cm)</td>
+                    </tr>
+                    <tr className="hover:bg-bone/40">
+                      <td className="py-3 px-4 font-black">3XL</td>
+                      <td className="py-3 px-4">38" (96 cm)</td>
+                      <td className="py-3 px-4">46" (116 cm)</td>
+                      <td className="py-3 px-4">43" (109 cm)</td>
+                    </tr>
+                    <tr className="hover:bg-bone/40 bg-amber-50/40">
+                      <td className="py-3 px-4 font-black text-amber-900">Free Size (FS)</td>
+                      <td className="py-3 px-4 text-amber-900 font-bold">28" - 42" (Stretchable)</td>
+                      <td className="py-3 px-4 text-amber-900">36" - 48"</td>
+                      <td className="py-3 px-4 text-amber-900">39" - 42"</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Measurement Tips */}
+              <div className="bg-bone p-4 rounded-2xl space-y-2 border border-onyx/5">
+                <h4 className="text-[10px] font-black uppercase tracking-wider text-onyx">How to Measure:</h4>
+                <ul className="text-xs text-onyx/70 space-y-1 list-disc pl-4">
+                  <li><strong>Waist:</strong> Measure around your natural waistline, keeping tape comfortably loose.</li>
+                  <li><strong>Hips:</strong> Measure around the fullest part of your hips/seat.</li>
+                  <li><strong>Free Size:</strong> Fabric includes high elastic stretch suitable for waist sizes 28" up to 42".</li>
+                </ul>
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowSizeChart(false)}
+                  className="px-6 py-2.5 bg-onyx text-bone font-black text-xs rounded-full uppercase tracking-wider hover:bg-black transition-all"
+                >
+                  Got It
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

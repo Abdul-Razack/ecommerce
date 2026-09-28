@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
-import { useToast } from '@/components/ui/Toast';
+import { useToast } from '@/shared/ui/Toast';
 import { useCurrency } from '@/providers/CurrencyProvider';
+import { Truck, Banknote, RotateCcw, ShieldCheck } from 'lucide-react';
 
 export default function ProductDetailClient({ product }) {
   const [selectedImage, setSelectedImage] = useState(0);
@@ -99,16 +100,16 @@ export default function ProductDetailClient({ product }) {
             <div className="mt-4">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '24px', borderTop: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-                  <span style={{ width: '20px', textAlign: 'center' }}>🚚</span> Free delivery on orders above {formatPrice(999)}
+                  <Truck className="w-4 h-4 text-zinc-600 flex-shrink-0" /> Free delivery on orders above {formatPrice(999)}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-                  <span style={{ width: '20px', textAlign: 'center' }}>💵</span> Cash on Delivery available (+{formatPrice(50)})
+                  <Banknote className="w-4 h-4 text-zinc-600 flex-shrink-0" /> Cash on Delivery available (+{formatPrice(50)})
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-                  <span style={{ width: '20px', textAlign: 'center' }}>↩️</span> 7-day easy returns
+                  <RotateCcw className="w-4 h-4 text-zinc-600 flex-shrink-0" /> 7-day easy returns
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-                  <span style={{ width: '20px', textAlign: 'center' }}>🔒</span> Secure Razorpay payment
+                  <ShieldCheck className="w-4 h-4 text-zinc-600 flex-shrink-0" /> Secure Razorpay payment
                 </div>
               </div>
             </div>

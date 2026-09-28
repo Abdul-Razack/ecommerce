@@ -83,7 +83,7 @@ export const homePage = defineType({
     }),
     defineField({
       name: "promotionalBanner",
-      title: "Promotional Banner",
+      title: "Promotional Banner (Legacy)",
       type: "object",
       fields: [
         { name: "isActive", type: "boolean", initialValue: true },
@@ -92,6 +92,25 @@ export const homePage = defineType({
         { name: "discount", type: "string" },
         { name: "image", type: "image", options: { hotspot: true } },
       ]
+    }),
+    defineField({
+      name: "promotionalBanners",
+      title: "Promotional Ad Banners Carousel",
+      type: "array",
+      of: [{
+        type: "object",
+        fields: [
+          { name: "isActive", type: "boolean", initialValue: true },
+          { name: "tag", type: "string", title: "Tagline / Eyebrow" },
+          { name: "heading", type: "string", title: "Heading" },
+          { name: "subtext", type: "string", title: "Subtext / Description" },
+          { name: "discount", type: "string", title: "Discount Badge Text (e.g. 40%)" },
+          { name: "buttonText", type: "string", title: "Button Text" },
+          { name: "buttonLink", type: "string", title: "Button Link" },
+          { name: "image", type: "image", options: { hotspot: true }, title: "Banner Image (Right Side)" },
+          { name: "customImageUrl", type: "string", title: "Custom Image URL or Path" },
+        ]
+      }]
     }),
     defineField({
       name: "dynamicProductRows",

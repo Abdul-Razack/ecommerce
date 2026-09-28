@@ -4,10 +4,13 @@ import { useState, useEffect } from 'react';
 import Card from '@/shared/ui/Card';
 import Skeleton from '@/shared/ui/Skeleton';
 import { useCurrency } from '@/providers/CurrencyProvider';
+import Pagination, { usePagination } from '@/shared/ui/Pagination';
+import { DollarSign, TrendingUp, CreditCard, Banknote, Calendar, Trophy } from 'lucide-react';
 
 export default function AdminReportsPage() {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [productSearch, setProductSearch] = useState('');
   const { formatPrice } = useCurrency();
 
   useEffect(() => {
@@ -28,6 +31,38 @@ export default function AdminReportsPage() {
     }
   };
 
+  // Monthly Sales pagination
+  const {
+    currentPage: monthPage,
+    setCurrentPage: setMonthPage,
+    pageSize: monthPageSize,
+    setPageSize: setMonthPageSize,
+    totalPages: monthTotalPages,
+    paginatedItems: paginatedMonthlySales,
+    totalItems: monthTotalItems,
+  } = usePagination({
+    items: stats?.monthlySales || [],
+    initialPageSize: 12,
+  });
+
+  // Product-wise Sales search & pagination
+  const filteredProductSales = (stats?.productSales || []).filter((p: any) =>
+    !productSearch.trim() || p.product_name?.toLowerCase().includes(productSearch.toLowerCase())
+  );
+
+  const {
+    currentPage: productPage,
+    setCurrentPage: setProductPage,
+    pageSize: productPageSize,
+    setPageSize: setProductPageSize,
+    totalPages: productTotalPages,
+    paginatedItems: paginatedProductSales,
+    totalItems: productTotalItems,
+  } = usePagination({
+    items: filteredProductSales,
+    initialPageSize: 10,
+  });
+
   if (loading) {
     return (
       <div className="p-8 space-y-8 bg-white min-h-screen">
@@ -41,7 +76,7 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <div className="p-8 space-y-12 bg-white min-h-screen">
+    <div suppressHydrationWarning className="p-8 space-y-12 bg-white min-h-screen">
       {/* Header */}
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight text-black">Reports & Analytics</h1>
@@ -57,7 +92,7 @@ export default function AdminReportsPage() {
               {formatPrice(stats?.totalRevenue || 0)}
             </p>
           </div>
-          <span className="absolute -bottom-4 -right-4 text-6xl opacity-5 select-none">💰</span>
+          <DollarSign className="absolute -bottom-2 -right-2 w-16 h-16 text-zinc-200 opacity-20 pointer-events-none" />
         </Card>
  
         <Card className="relative overflow-hidden">
@@ -67,7 +102,7 @@ export default function AdminReportsPage() {
               {formatPrice(stats?.totalProfit || 0)}
             </p>
           </div>
-          <span className="absolute -bottom-4 -right-4 text-6xl opacity-5 select-none">📈</span>
+          <TrendingUp className="absolute -bottom-2 -right-2 w-16 h-16 text-zinc-200 opacity-20 pointer-events-none" />
         </Card>
 
         <Card className="relative overflow-hidden">
@@ -78,7 +113,7 @@ export default function AdminReportsPage() {
               {stats?.totalOrders ? Math.round((stats.onlineOrders / stats.totalOrders) * 100) : 0}% of total
             </span>
           </div>
-          <span className="absolute -bottom-4 -right-4 text-6xl opacity-5 select-none">💳</span>
+          <CreditCard className="absolute -bottom-2 -right-2 w-16 h-16 text-zinc-200 opacity-20 pointer-events-none" />
         </Card>
 
         <Card className="relative overflow-hidden">
@@ -89,14 +124,17 @@ export default function AdminReportsPage() {
               {stats?.totalOrders ? Math.round((stats.codOrders / stats.totalOrders) * 100) : 0}% of total
             </span>
           </div>
-          <span className="absolute -bottom-4 -right-4 text-6xl opacity-5 select-none">💵</span>
+          <Banknote className="absolute -bottom-2 -right-2 w-16 h-16 text-zinc-200 opacity-20 pointer-events-none" />
         </Card>
       </div>
 
       {/* Monthly Sales Table */}
       <div className="space-y-6">
-        <h3 className="text-[11px] uppercase tracking-widest font-bold text-black">📅 Monthly Sales</h3>
-        <Card padding={false} className="overflow-hidden">
+        <h3 className="text-[11px] uppercase tracking-widest font-bold text-black flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-zinc-500" />
+          Monthly Sales
+        </h3>
+        <Card padding="p-0" className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -108,8 +146,8 @@ export default function AdminReportsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-50 text-xs">
-                {stats?.monthlySales?.length > 0 ? (
-                  stats.monthlySales.map((month, index) => (
+                {paginatedMonthlySales.length > 0 ? (
+                  paginatedMonthlySales.map((month: any, index: number) => (
                     <tr key={index} className="hover:bg-zinc-50 transition-colors">
                       <td className="px-6 py-4 font-semibold text-black">
                         {new Date(month.month + '-01').toLocaleDateString('en-IN', {
@@ -136,13 +174,40 @@ export default function AdminReportsPage() {
               </tbody>
             </table>
           </div>
+          {monthTotalPages > 1 && (
+            <Pagination
+              currentPage={monthPage}
+              totalPages={monthTotalPages}
+              totalItems={monthTotalItems}
+              pageSize={monthPageSize}
+              pageSizeOptions={[6, 12, 24]}
+              onPageChange={setMonthPage}
+              onPageSizeChange={setMonthPageSize}
+              itemLabel="months"
+            />
+          )}
         </Card>
       </div>
 
       {/* Product-wise Sales Table */}
       <div className="space-y-6">
-        <h3 className="text-[11px] uppercase tracking-widest font-bold text-black">🏆 Product-wise Sales</h3>
-        <Card padding={false} className="overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h3 className="text-[11px] uppercase tracking-widest font-bold text-black flex items-center gap-2">
+            <Trophy className="w-4 h-4 text-amber-500" />
+            Product-wise Sales
+          </h3>
+          <input
+            type="text"
+            placeholder="Search by product name..."
+            value={productSearch}
+            onChange={(e) => {
+              setProductSearch(e.target.value);
+              setProductPage(1);
+            }}
+            className="w-full sm:w-72 h-9 px-3 bg-zinc-50 border border-zinc-200 text-xs font-medium uppercase tracking-wider focus:outline-none focus:border-black transition-colors"
+          />
+        </div>
+        <Card padding="p-0" className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -154,26 +219,29 @@ export default function AdminReportsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-50 text-xs">
-                {stats?.productSales?.length > 0 ? (
-                  stats.productSales.map((product, index) => (
-                    <tr key={index} className="hover:bg-zinc-50 transition-colors">
-                      <td className="px-6 py-4 font-mono font-bold text-black">
-                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] ${
-                          index === 0 ? 'bg-amber-100 text-amber-800' :
-                          index === 1 ? 'bg-zinc-100 text-zinc-800' :
-                          index === 2 ? 'bg-orange-100 text-orange-800' :
-                          'bg-zinc-50 text-zinc-500'
-                        }`}>
-                          {index + 1}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 font-semibold text-black">{product.product_name}</td>
-                      <td className="px-6 py-4 text-center text-zinc-600 font-medium">{product.total_sold}</td>
-                      <td className="px-6 py-4 text-right font-semibold text-black">
-                        {formatPrice(parseFloat(product.total_revenue || 0))}
-                      </td>
-                    </tr>
-                  ))
+                {paginatedProductSales.length > 0 ? (
+                  paginatedProductSales.map((product: any, index: number) => {
+                    const rank = (productPage - 1) * productPageSize + index + 1;
+                    return (
+                      <tr key={index} className="hover:bg-zinc-50 transition-colors">
+                        <td className="px-6 py-4 font-mono font-bold text-black">
+                          <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] ${
+                            rank === 1 ? 'bg-amber-100 text-amber-800' :
+                            rank === 2 ? 'bg-zinc-100 text-zinc-800' :
+                            rank === 3 ? 'bg-orange-100 text-orange-800' :
+                            'bg-zinc-50 text-zinc-500'
+                          }`}>
+                            {rank}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-semibold text-black">{product.product_name}</td>
+                        <td className="px-6 py-4 text-center text-zinc-600 font-medium">{product.total_sold}</td>
+                        <td className="px-6 py-4 text-right font-semibold text-black">
+                          {formatPrice(parseFloat(product.total_revenue || 0))}
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan={4} className="px-6 py-12 text-center text-zinc-400 italic">
@@ -184,6 +252,16 @@ export default function AdminReportsPage() {
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={productPage}
+            totalPages={productTotalPages}
+            totalItems={productTotalItems}
+            pageSize={productPageSize}
+            pageSizeOptions={[10, 25, 50]}
+            onPageChange={setProductPage}
+            onPageSizeChange={setProductPageSize}
+            itemLabel="products"
+          />
         </Card>
       </div>
 

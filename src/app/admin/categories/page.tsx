@@ -6,6 +6,7 @@ import Button from '@/shared/ui/Button';
 import Input from '@/shared/ui/Input';
 import Skeleton from '@/shared/ui/Skeleton';
 import { useToast } from '@/shared/ui/Toast';
+import Pagination, { usePagination } from '@/shared/ui/Pagination';
 
 export default function CategoriesPage() {
   const { showToast } = useToast();
@@ -13,6 +14,7 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Form state
   const [name, setName] = useState('');
@@ -96,8 +98,31 @@ export default function CategoriesPage() {
     }
   };
 
+  const filteredCategories = categories.filter((cat) => {
+    if (!searchTerm.trim()) return true;
+    const term = searchTerm.toLowerCase();
+    return (
+      cat.name?.toLowerCase().includes(term) ||
+      cat.slug?.toLowerCase().includes(term) ||
+      cat.description?.toLowerCase().includes(term)
+    );
+  });
+
+  const {
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    totalPages,
+    paginatedItems: paginatedCategories,
+    totalItems,
+  } = usePagination({
+    items: filteredCategories,
+    initialPageSize: 10,
+  });
+
   return (
-    <div className="p-8 space-y-12 bg-white min-h-screen">
+    <div suppressHydrationWarning className="p-8 space-y-12 bg-white min-h-screen">
       <header className="flex flex-col gap-2 flex-wrap sm:flex-row justify-between items-start sm:items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-black">Categories</h1>
@@ -106,10 +131,27 @@ export default function CategoriesPage() {
         <Button onClick={handleOpenNew}>+ Add Category</Button>
       </header>
 
+      {/* Search Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h3 className="text-[11px] uppercase tracking-widest font-black text-black">
+          All Categories <span className="text-zinc-400 ml-2">({filteredCategories.length} Categories)</span>
+        </h3>
+        <input
+          type="text"
+          placeholder="Search categories by name or slug..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-full sm:w-80 h-10 px-4 bg-zinc-50 border border-zinc-200 text-xs font-medium uppercase tracking-wider focus:outline-none focus:border-black transition-colors"
+        />
+      </div>
+
       {loading ? (
         <Skeleton className="h-64 w-full" />
       ) : (
-        <Card padding={false} className="overflow-hidden">
+        <Card padding="p-0" className="overflow-hidden">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-zinc-50 border-b border-zinc-100">
@@ -119,7 +161,7 @@ export default function CategoriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-50">
-              {categories.map((cat) => (
+              {paginatedCategories.map((cat) => (
                 <tr key={cat._id} className="hover:bg-zinc-50 transition-colors">
                   <td className="px-6 py-4 text-xs font-bold text-black">{cat.name}</td>
                   <td className="px-6 py-4 text-[10px] font-mono text-zinc-500">{cat.slug}</td>
@@ -129,13 +171,23 @@ export default function CategoriesPage() {
                   </td>
                 </tr>
               ))}
-              {categories.length === 0 && (
+              {filteredCategories.length === 0 && (
                 <tr>
                   <td colSpan={3} className="px-6 py-12 text-center text-xs text-zinc-400 italic">No categories found.</td>
                 </tr>
               )}
             </tbody>
           </table>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            pageSizeOptions={[10, 20, 50]}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            itemLabel="categories"
+          />
         </Card>
       )}
 

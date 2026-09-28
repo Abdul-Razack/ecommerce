@@ -94,6 +94,6 @@ export class CheckoutPage {
   }
 
   async submitOrder() {
-    await this.placeOrderBtn.evaluate((el) => el.click());
+    await this.placeOrderBtn.evaluate((el) => (el as HTMLElement).click());
   }
 }

@@ -38,7 +38,7 @@ export async function PATCH(request) {
 
     const { orderId, orderStatus, trackingId, paymentStatus } = await request.json();
 
-    const patch = {};
+    const patch: Record<string, any> = {};
     if (orderStatus) patch.status = orderStatus;
     if (trackingId) patch.trackingId = trackingId;
     if (paymentStatus) patch.paymentStatus = paymentStatus;

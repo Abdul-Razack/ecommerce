@@ -7,21 +7,52 @@ import { useCart } from '@/hooks/useCart';
 import { useCurrency } from '@/providers/CurrencyProvider';
 import Container from './Container';
 import { handleSignOut } from '@/app/actions';
+import { 
+  Sparkles, 
+  Shirt, 
+  Crown, 
+  Heart, 
+  Moon, 
+  Shield, 
+  Gem, 
+  Flower2, 
+  Search, 
+  User as UserIcon, 
+  ShoppingBag, 
+  Menu, 
+  ChevronDown,
+  ArrowRight 
+} from 'lucide-react';
+
+const CATEGORY_ITEMS = [
+  { name: 'Leggings & Churidar', href: '/shop?category=leggings', Icon: Sparkles },
+  { name: 'Chudidar Suits', href: '/shop?category=chudidar', Icon: Shirt },
+  { name: 'Festive Lehenga', href: '/shop?category=lehenga', Icon: Crown },
+  { name: 'Kids Silk Skirt', href: '/shop?category=children-silk-skirt', Icon: Heart },
+  { name: 'Cotton Nighties', href: '/shop?category=nighty', Icon: Moon },
+  { name: 'Saree Inskirts', href: '/shop?category=inskirt', Icon: Shield },
+  { name: 'Silk & Cotton Sarees', href: '/shop?category=sarees', Icon: Gem },
+  { name: 'Kurtis & Tunics', href: '/shop?category=kurtis', Icon: Flower2 },
+];
 
 export default function Navbar({ user, signInUrl }) {
   const { getCartCount, isLoaded, openCart } = useCart();
   const { currency, setCurrency, formatPrice } = useCurrency();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isUserDropdownOpen) return;
-    const handleClose = () => setIsUserDropdownOpen(false);
+    const handleClose = () => {
+      setIsUserDropdownOpen(false);
+      setIsCategoryMenuOpen(false);
+    };
     window.addEventListener('click', handleClose);
     return () => window.removeEventListener('click', handleClose);
-  }, [isUserDropdownOpen]);
+  }, []);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -34,16 +65,14 @@ export default function Navbar({ user, signInUrl }) {
 
   return (
     <header className="sticky top-0 left-0 right-0 z-[100] w-full bg-white shadow-sm font-sans">
-      {/* 1. Top Announcement Bar */}
-      <div className="bg-black text-white border-b border-white/5 relative">
-        <Container className="max-w-[1400px] h-9 flex items-center justify-between gap-4 px-4 md:px-8 text-[8px] md:text-[10px] uppercase font-bold tracking-widest relative">
+      {/* 1. Slim Announcement Bar */}
+      <div className="bg-black text-white border-b border-white/5">
+        <Container className="h-8 flex items-center justify-between gap-4 text-[9px] uppercase font-bold tracking-widest">
           <div className="truncate">
             FREE SHIPPING ON ALL ORDERS OVER {formatPrice(999)} | EASY 7-DAY RETURNS
           </div>
-          <div className="flex items-center gap-3 text-[9px] font-bold text-zinc-400 flex-shrink-0">
-            <div className="hidden md:flex items-center gap-3">
-              <Link href="/about" className="hover:text-white transition-colors">Store Locator</Link>
-              <span>•</span>
+          <div className="flex items-center gap-3 text-zinc-400 flex-shrink-0">
+            <div className="hidden md:flex items-center gap-3 text-[9px]">
               <Link href="/about" className="hover:text-white transition-colors">Help</Link>
               <span>•</span>
             </div>
@@ -59,71 +88,127 @@ export default function Navbar({ user, signInUrl }) {
         </Container>
       </div>
 
-      {/* 2. Main Navigation Header */}
-      <div className="bg-bone/90 backdrop-blur-md transition-colors duration-300">
-        <Container className="max-w-[1400px] h-20 md:h-24 flex items-center justify-between gap-4 px-4 md:px-8">
+      {/* 2. Short Compact Navigation Header */}
+      <div className="bg-bone/95 backdrop-blur-md border-b border-zinc-100">
+        <Container className="h-14 md:h-16 flex items-center justify-between gap-4">
           
-          {/* Left: Brand Logo */}
-          <div className="flex-1 flex justify-start">
-            <Link href="/" className="flex-shrink-0 flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-              <img src="/images/logo.png" alt="Posh Pigeon Logo" className="h-10 md:h-12 w-auto object-contain py-1" />
+          {/* Left: Brand Logo & Mobile Menu Toggle */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+              }}
+              className="lg:hidden p-1.5 text-zinc-700 hover:text-black focus:outline-none"
+              title="Toggle Menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <Link href="/" className="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
+              <img src="/images/logo.png" alt="Posh Pigeon Logo" className="h-7 md:h-8 w-auto object-contain" />
             </Link>
           </div>
 
-          {/* Center: Directory Links (Desktop Only) */}
-          <div className="hidden lg:flex flex-none items-center justify-center gap-8 xl:gap-10">
-            {[
-              { name: 'NEW IN', href: '/shop' },
-              { name: 'LEGGINGS', href: '/shop?category=leggings' },
-              { name: 'NIGHTIES', href: '/shop?category=nighty' },
-              { name: 'INSKIRTS', href: '/shop?category=inskirt' },
-              { name: 'SAREES', href: '/shop?category=sarees' },
-              { name: 'ABOUT', href: '/about' }
-            ].map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link 
-                  key={link.name} 
-                  href={link.href}
-                  className={`text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] transition-all hover:text-black hover:-translate-y-0.5 ${
-                    isActive 
-                      ? 'text-black' 
-                      : 'text-zinc-500'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              );
-            })}
+          {/* Center: Clean Compact Links */}
+          <div className="hidden lg:flex items-center justify-center gap-6 xl:gap-8">
+            <Link 
+              href="/shop"
+              className={`text-[10px] xl:text-[11px] font-black uppercase tracking-[0.18em] transition-colors hover:text-black ${
+                pathname === '/shop' ? 'text-black font-black border-b-2 border-black pb-0.5' : 'text-zinc-600'
+              }`}
+            >
+              SHOP ALL
+            </Link>
+
+            {/* Dropdown for All Categories */}
+            <div className="relative" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+                className={`flex items-center gap-1 text-[10px] xl:text-[11px] font-black uppercase tracking-[0.18em] transition-colors hover:text-black cursor-pointer bg-transparent border-none p-0 ${
+                  isCategoryMenuOpen ? 'text-black' : 'text-zinc-600'
+                }`}
+              >
+                <span>CATEGORIES</span>
+                <ChevronDown className="w-3 h-3 stroke-[2.5]" />
+              </button>
+
+              {isCategoryMenuOpen && (
+                <div className="absolute left-1/2 -translate-x-1/2 top-9 mt-1 w-64 bg-white border border-zinc-200 rounded-2xl shadow-2xl p-3 grid grid-cols-1 gap-1 z-[150] animate-deploy">
+                  <div className="px-3 py-1.5 border-b border-zinc-100 text-[8px] font-black uppercase tracking-widest text-zinc-400">
+                    Women's Apparel Range
+                  </div>
+                  {CATEGORY_ITEMS.map((cat) => {
+                    const IconComponent = cat.Icon;
+                    return (
+                      <Link
+                        key={cat.name}
+                        href={cat.href}
+                        onClick={() => setIsCategoryMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-zinc-700 hover:bg-zinc-50 hover:text-black rounded-lg transition-colors"
+                      >
+                        <IconComponent className="w-3.5 h-3.5 text-zinc-500" />
+                        <span>{cat.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <Link 
+              href="/shop?category=sarees"
+              className={`text-[10px] xl:text-[11px] font-black uppercase tracking-[0.18em] transition-colors hover:text-black ${
+                pathname.includes('sarees') ? 'text-black font-black border-b-2 border-black pb-0.5' : 'text-zinc-600'
+              }`}
+            >
+              SAREES
+            </Link>
+
+            <Link 
+              href="/shop?category=leggings"
+              className={`text-[10px] xl:text-[11px] font-black uppercase tracking-[0.18em] transition-colors hover:text-black ${
+                pathname.includes('leggings') ? 'text-black font-black border-b-2 border-black pb-0.5' : 'text-zinc-600'
+              }`}
+            >
+              LEGGINGS
+            </Link>
+
+            <Link 
+              href="/shop?category=chudidar"
+              className={`text-[10px] xl:text-[11px] font-black uppercase tracking-[0.18em] transition-colors hover:text-black ${
+                pathname.includes('chudidar') ? 'text-black font-black border-b-2 border-black pb-0.5' : 'text-zinc-600'
+              }`}
+            >
+              CHUDIDAR
+            </Link>
+
+            <Link 
+              href="/shop?category=children-silk-skirt"
+              className={`text-[10px] xl:text-[11px] font-black uppercase tracking-[0.18em] transition-colors hover:text-black ${
+                pathname.includes('children-silk-skirt') ? 'text-black font-black border-b-2 border-black pb-0.5' : 'text-zinc-600'
+              }`}
+            >
+              KIDS WEAR
+            </Link>
           </div>
 
-          {/* Right: Action Zone (Search, Wishlist, Profile, Cart) */}
-          <div className="flex-1 flex justify-end items-center gap-3 md:gap-5">
+          {/* Right: Actions (Search, Account, Cart) */}
+          <div className="flex items-center gap-3">
             
-            {/* Search Input Bar (Desktop/Tablet) */}
-            <form onSubmit={handleSearchSubmit} className="hidden lg:flex items-center relative w-48 xl:w-64">
+            {/* Compact Search Bar */}
+            <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center relative w-40 xl:w-52">
               <button type="submit" className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-black transition-colors bg-transparent border-none p-0 cursor-pointer">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <circle cx="11" cy="11" r="8" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
+                <Search className="w-3.5 h-3.5" />
               </button>
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 rounded-full border border-zinc-200/50 bg-white/50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-black/20 text-[11px] font-medium placeholder-zinc-400 text-black transition-all"
+                className="w-full h-8 pl-9 pr-3 rounded-full border border-zinc-200/80 bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-black text-[10px] font-medium text-black transition-all"
               />
             </form>
-
-            {/* Mobile Search Icon (redirects to shop page) */}
-            <Link href="/shop" className="lg:hidden p-2 text-zinc-600 hover:text-black transition-colors" title="Search">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </Link>
 
             {/* Profile Dropdown */}
             <div className="relative" onClick={(e) => e.stopPropagation()}>
@@ -131,34 +216,34 @@ export default function Navbar({ user, signInUrl }) {
                 <>
                   <button 
                     onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                    className="w-8 h-8 rounded-full bg-black text-bone flex items-center justify-center text-xs font-black select-none shadow-sm transition-all hover:scale-105 border-none cursor-pointer focus:outline-none"
+                    className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-black shadow-sm transition-all hover:scale-105 border-none cursor-pointer"
                   >
                     {(userDisplayName?.split(' ')[0] || 'U').charAt(0).toUpperCase()}
                   </button>
 
                   {isUserDropdownOpen && (
-                    <div className="absolute right-0 top-10 mt-2 w-48 bg-bone border border-zinc-200/50 rounded-2xl p-4 shadow-kinetic space-y-3 flex flex-col z-[150] animate-deploy">
-                      <div className="pb-2 border-b border-zinc-200/50 truncate">
-                        <span className="technical text-[7px] text-zinc-500 uppercase tracking-widest block mb-1">Account</span>
-                        <span className="text-[10px] font-black uppercase tracking-[0.1em] text-black truncate block">
-                          {userDisplayName}
-                        </span>
+                    <div className="absolute right-0 top-9 mt-1 w-44 bg-white border border-zinc-200 rounded-xl p-3 shadow-xl space-y-2 flex flex-col z-[150] animate-deploy">
+                      <div className="pb-2 border-b border-zinc-100 truncate">
+                        <span className="text-[7px] text-zinc-400 uppercase tracking-widest block">Signed in as</span>
+                        <span className="text-[9px] font-bold text-black truncate block">{userDisplayName}</span>
                       </div>
                       <Link 
                         href="/account"
                         onClick={() => setIsUserDropdownOpen(false)}
-                        className="w-full text-left text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 hover:text-black transition-colors block pb-1 border-b border-zinc-200/50"
+                        className="text-[9px] font-black uppercase tracking-wider text-zinc-600 hover:text-black transition-colors flex items-center justify-between py-1"
                       >
-                        MY DASHBOARD →
+                        <span>MY DASHBOARD</span>
+                        <ArrowRight className="w-3 h-3" />
                       </Link>
                       <button 
                         onClick={() => {
                           setIsUserDropdownOpen(false);
                           handleSignOut();
                         }}
-                        className="w-full text-left text-[9px] font-black uppercase tracking-[0.2em] text-rose-600 hover:text-rose-800 transition-colors cursor-pointer bg-transparent border-none p-0 pt-1"
+                        className="text-[9px] font-black uppercase tracking-wider text-rose-600 hover:text-rose-800 transition-colors cursor-pointer bg-transparent border-none p-0 text-left pt-1 border-t border-zinc-100 flex items-center justify-between"
                       >
-                        LOGOUT →
+                        <span>LOGOUT</span>
+                        <ArrowRight className="w-3 h-3" />
                       </button>
                     </div>
                   )}
@@ -166,37 +251,23 @@ export default function Navbar({ user, signInUrl }) {
               ) : (
                 <a 
                   href={signInUrl}
-                  className="p-2 text-zinc-600 hover:text-black transition-colors flex items-center justify-center"
+                  className="p-1.5 text-zinc-600 hover:text-black transition-colors flex items-center justify-center"
                   title="Login"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
+                  <UserIcon className="w-4 h-4" />
                 </a>
               )}
             </div>
 
-            {/* Wishlist Icon */}
-            <Link href="/shop" className="p-2 text-zinc-600 hover:text-red-500 transition-colors flex items-center justify-center" title="Wishlist">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
-              </svg>
-            </Link>
-
             {/* Shopping Cart Bag Icon */}
             <button 
               onClick={openCart}
-              className="p-2 text-zinc-600 hover:text-black transition-colors flex items-center justify-center relative group"
+              className="p-1.5 text-zinc-700 hover:text-black transition-colors flex items-center justify-center relative"
               title="Shopping Cart"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-                <path d="M3 6h18" />
-                <path d="M16 10a4 4 0 01-8 0" />
-              </svg>
+              <ShoppingBag className="w-4 h-4" />
               {isLoaded && getCartCount() > 0 && (
-                <span className="absolute top-0 right-0 bg-black text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-black">
+                <span className="absolute -top-1 -right-1 bg-black text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-black">
                   {getCartCount()}
                 </span>
               )}
@@ -204,13 +275,41 @@ export default function Navbar({ user, signInUrl }) {
 
           </div>
         </Container>
+
+        {/* Mobile Navigation Drawer */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden border-t border-zinc-100 bg-white px-4 py-3 space-y-2 text-xs font-bold uppercase tracking-wider animate-deploy">
+            <Link 
+              href="/shop" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block py-2 text-black border-b border-zinc-50"
+            >
+              SHOP ALL PRODUCTS
+            </Link>
+            <div className="py-1 text-[9px] font-black tracking-widest text-zinc-400">CATEGORIES</div>
+            {CATEGORY_ITEMS.map((cat) => {
+              const IconComponent = cat.Icon;
+              return (
+                <Link
+                  key={cat.name}
+                  href={cat.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2 py-1.5 text-zinc-600 hover:text-black pl-2"
+                >
+                  <IconComponent className="w-4 h-4 text-zinc-500" />
+                  <span>{cat.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <style jsx global>{`
         @keyframes deploy {
           from {
             opacity: 0;
-            transform: translateY(-10px) scale(0.95);
+            transform: translateY(-6px) scale(0.98);
           }
           to {
             opacity: 1;
@@ -218,7 +317,7 @@ export default function Navbar({ user, signInUrl }) {
           }
         }
         .animate-deploy {
-          animation: deploy 0.25s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+          animation: deploy 0.2s cubic-bezier(0.2, 0, 0.2, 1) forwards;
         }
       `}</style>
     </header>

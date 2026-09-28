@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Card from '@/shared/ui/Card';
 import Badge from '@/shared/ui/Badge';
 import Skeleton from '@/shared/ui/Skeleton';
 import { useCurrency } from '@/providers/CurrencyProvider';
+import Pagination, { usePagination } from '@/shared/ui/Pagination';
+import { Package, DollarSign, TrendingUp, Clock } from 'lucide-react';
 
 function formatOrderPrice(amount: number, orderCurrency?: string) {
   const currencyCode = orderCurrency || 'INR';
@@ -19,7 +22,7 @@ function formatOrderPrice(amount: number, orderCurrency?: string) {
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { formatPrice } = useCurrency();
 
@@ -41,6 +44,19 @@ export default function AdminDashboard() {
     }
   };
 
+  const {
+    currentPage: orderPage,
+    setCurrentPage: setOrderPage,
+    pageSize: orderPageSize,
+    setPageSize: setOrderPageSize,
+    totalPages: orderTotalPages,
+    paginatedItems: paginatedOrders,
+    totalItems: orderTotalItems,
+  } = usePagination({
+    items: stats?.recentOrders || [],
+    initialPageSize: 5,
+  });
+
   if (loading) {
     return (
       <div className="p-8 space-y-8">
@@ -54,7 +70,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="p-8 space-y-12 bg-white min-h-screen">
+    <div suppressHydrationWarning className="p-8 space-y-12 bg-white min-h-screen">
       {/* Header */}
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight text-black">Dashboard</h1>
@@ -63,18 +79,18 @@ export default function AdminDashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Orders" value={stats?.totalOrders || 0} icon="📦" />
+        <StatCard title="Total Orders" value={stats?.totalOrders || 0} Icon={Package} />
         <StatCard 
           title="Total Revenue" 
           value={formatPrice(stats?.totalRevenue || 0)} 
-          icon="💰" 
+          Icon={DollarSign} 
         />
         <StatCard 
           title="Total Profit" 
           value={formatPrice(stats?.totalProfit || 0)} 
-          icon="📈" 
+          Icon={TrendingUp} 
         />
-        <StatCard title="Pending Orders" value={stats?.pendingOrders || 0} icon="⏳" />
+        <StatCard title="Pending Orders" value={stats?.pendingOrders || 0} Icon={Clock} />
       </div>
 
       {/* Main Content Grid */}
@@ -84,8 +100,14 @@ export default function AdminDashboard() {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-[11px] uppercase tracking-widest font-bold text-black">Recent Orders</h3>
+            <Link
+              href="/admin/orders"
+              className="text-[10px] uppercase tracking-widest font-black text-zinc-500 hover:text-black transition-colors"
+            >
+              View All Orders →
+            </Link>
           </div>
-          <Card padding={false} className="overflow-hidden">
+          <Card padding="p-0" className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -98,7 +120,7 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-50">
-                  {stats?.recentOrders?.map((order) => {
+                  {paginatedOrders.map((order: any) => {
                     const id = order.orderId || order._id || '';
                     return (
                       <tr key={order._id} className="hover:bg-zinc-50 transition-colors group cursor-pointer">
@@ -123,7 +145,7 @@ export default function AdminDashboard() {
                   })}
                   {(!stats?.recentOrders || stats.recentOrders.length === 0) && (
                     <tr>
-                      <td colSpan="5" className="px-6 py-12 text-center text-xs text-zinc-400 italic">
+                      <td colSpan={5} className="px-6 py-12 text-center text-xs text-zinc-400 italic">
                         No orders yet.
                       </td>
                     </tr>
@@ -131,6 +153,18 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
             </div>
+            {orderTotalPages > 1 && (
+              <Pagination
+                currentPage={orderPage}
+                totalPages={orderTotalPages}
+                totalItems={orderTotalItems}
+                pageSize={orderPageSize}
+                pageSizeOptions={[5, 10, 20]}
+                onPageChange={setOrderPage}
+                onPageSizeChange={setOrderPageSize}
+                itemLabel="orders"
+              />
+            )}
           </Card>
         </div>
 
@@ -139,7 +173,7 @@ export default function AdminDashboard() {
           <h3 className="text-[11px] uppercase tracking-widest font-bold text-black">Top Selling</h3>
           <Card className="bg-zinc-50 border-0">
             <div className="space-y-6">
-              {stats?.productSales?.map((product, index) => (
+              {stats?.productSales?.slice(0, 8).map((product: any, index: number) => (
                 <div key={index} className="flex items-center justify-between group">
                   <div>
                     <p className="text-xs font-bold text-black group-hover:underline cursor-pointer">{product.product_name}</p>
@@ -161,12 +195,14 @@ export default function AdminDashboard() {
   );
 }
 
-const StatCard = ({ title, value, icon }) => (
-  <Card hoverEffect className="relative overflow-hidden">
+const StatCard = ({ title, value, Icon }: { title: string; value: any; Icon: any }) => (
+  <Card hover className="relative overflow-hidden">
     <div className="flex flex-col gap-2 relative z-10">
       <span className="text-[10px] uppercase tracking-widest font-bold text-zinc-400">{title}</span>
       <p className="text-2xl font-bold text-black tracking-tight">{value}</p>
     </div>
-    <span className="absolute -bottom-4 -right-4 text-6xl opacity-5 select-none">{icon}</span>
+    <div className="absolute bottom-2 right-2 text-zinc-100 select-none pointer-events-none">
+      <Icon className="w-12 h-12 stroke-[1.2]" />
+    </div>
   </Card>
 );

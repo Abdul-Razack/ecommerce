@@ -23,6 +23,7 @@ export async function updateProfile(formData: FormData) {
     .commit();
 
   revalidatePath('/account');
+  return { success: true };
 }
 
 export async function addAddress(formData: FormData) {
@@ -49,6 +50,7 @@ export async function addAddress(formData: FormData) {
     .commit();
 
   revalidatePath('/account');
+  return { success: true };
 }
 
 export async function removeAddress(addressKey: string) {
@@ -63,6 +65,7 @@ export async function removeAddress(addressKey: string) {
     .commit();
 
   revalidatePath('/account');
+  return { success: true };
 }
 
 export async function setDefaultAddress(addressKey: string) {

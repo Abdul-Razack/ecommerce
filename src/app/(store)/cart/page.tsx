@@ -7,10 +7,13 @@ import Button from '@/shared/ui/Button';
 import Card from '@/shared/ui/Card';
 import Skeleton from '@/shared/ui/Skeleton';
 import { useCurrency } from '@/providers/CurrencyProvider';
+import { useCoupon } from '@/hooks/useCoupon';
+import { calculateTotals, FREE_DELIVERY_THRESHOLD } from '@/domains/coupons/lib/discount';
 
 export default function CartPage() {
-  const { cartItems, removeFromCart, updateQuantity, getCartTotal, getCartCount, isLoaded } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, getCartCount, isLoaded } = useCart();
   const { formatPrice } = useCurrency();
+  const { applied, isApplied, discount, freeShipping, removeCoupon } = useCoupon();
 
   if (!isLoaded) {
     return (
@@ -45,9 +48,14 @@ export default function CartPage() {
     );
   }
 
-  const subtotal = getCartTotal();
-  const deliveryCharge = subtotal >= 999 ? 0 : 50;
-  const total = subtotal + deliveryCharge;
+  // Same engine the checkout and order route use, so the cart never disagrees
+  // with what will ultimately be charged.
+  const { subtotal, deliveryCharge, total } = calculateTotals(
+    cartItems,
+    isApplied
+      ? { valid: true, discount, freeShipping, giftItems: [], affectedLineIds: [], freeUnitsByLine: {} }
+      : null
+  );
 
   return (
     <div className="bg-bone min-h-screen pb-20 md:pb-32 pt-8 md:pt-12">
@@ -143,18 +151,42 @@ export default function CartPage() {
                   <span className="technical text-[9px] sm:text-[10px] text-onyx/60 uppercase tracking-[0.2em] font-bold">Subtotal</span>
                   <span className="font-black text-onyx text-sm sm:text-base">{formatPrice(subtotal)}</span>
                 </div>
+                {isApplied && (
+                  <div className="flex justify-between items-center border-b border-onyx/5 pb-3 sm:pb-4">
+                    <span className="technical text-[9px] sm:text-[10px] text-green-700 uppercase tracking-[0.2em] font-bold">
+                      {applied.code}
+                    </span>
+                    <span className="font-black text-green-700 text-sm sm:text-base">
+                      {discount > 0 ? `-${formatPrice(discount)}` : freeShipping ? 'FREE DELIVERY' : 'APPLIED'}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center border-b border-onyx/5 pb-3 sm:pb-4">
                   <span className="technical text-[9px] sm:text-[10px] text-onyx/60 uppercase tracking-[0.2em] font-bold">Delivery</span>
                   <span className={`font-black text-[9px] sm:text-[10px] tracking-wider uppercase px-2 py-1 rounded ${deliveryCharge === 0 ? 'bg-green-100/50 text-green-700 border border-green-200/50' : 'text-onyx'}`}>
                     {deliveryCharge === 0 ? 'FREE' : formatPrice(deliveryCharge)}
                   </span>
                 </div>
-                {deliveryCharge > 0 && (
+                {deliveryCharge > 0 && !isApplied && (
                   <p className="text-[9px] sm:text-[10px] text-chrome font-bold uppercase tracking-wider text-center pt-2">
-                    Add {formatPrice(999 - subtotal)} more for free delivery
+                    Add {formatPrice(FREE_DELIVERY_THRESHOLD - subtotal)} more for free delivery
                   </p>
                 )}
               </div>
+
+              {isApplied && (
+                <div className="flex items-center justify-between gap-3 bg-green-50/60 border border-green-200/60 rounded-xl sm:rounded-2xl px-4 py-3 mb-6 sm:mb-8">
+                  <p className="text-[9px] sm:text-[10px] text-green-800 font-bold uppercase tracking-wider truncate">
+                    {applied.code} applied
+                  </p>
+                  <button
+                    onClick={removeCoupon}
+                    className="text-[9px] font-black uppercase tracking-widest text-green-800 hover:text-onyx transition-colors flex-shrink-0"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
 
               <div className="bg-white/50 border border-onyx/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 flex justify-between items-end">
                 <div>

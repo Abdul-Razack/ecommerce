@@ -72,6 +72,68 @@ export const order = defineType({
       type: "number",
     }),
     defineField({
+      name: "subtotal",
+      title: "Items Subtotal (INR Base)",
+      type: "number",
+      description: "Server verified line item total before discount and delivery.",
+    }),
+    defineField({
+      name: "discountAmount",
+      title: "Discount Amount (INR Base)",
+      type: "number",
+      description: "Server verified coupon discount actually applied.",
+    }),
+    defineField({
+      name: "deliveryCharge",
+      title: "Delivery Charge (INR Base)",
+      type: "number",
+      description: "Shipping fee after any free-shipping coupon.",
+    }),
+    defineField({
+      name: "couponCode",
+      title: "Coupon Code",
+      type: "string",
+      readOnly: true,
+    }),
+    defineField({
+      name: "couponType",
+      title: "Coupon Type",
+      type: "string",
+      readOnly: true,
+      options: {
+        list: [
+          { title: "Flat Amount Off", value: "flat" },
+          { title: "Percentage Off", value: "percentage" },
+          { title: "Flat Amount Per Item", value: "flatPerItem" },
+          { title: "Buy X Get Y Free", value: "buyXgetY" },
+          { title: "Free Gift Product", value: "freeGift" },
+          { title: "Free Shipping", value: "freeShipping" },
+        ],
+      },
+    }),
+    defineField({
+      name: "couponRef",
+      title: "Coupon Document",
+      type: "reference",
+      to: [{ type: "coupon" }],
+      readOnly: true,
+      description: "Pointer back to the Sanity coupon used at checkout.",
+    }),
+    defineField({
+      name: "giftItems",
+      title: "Free Gift Items",
+      type: "array",
+      description: "Line items granted at zero cost by a freeGift coupon.",
+      of: [{
+        type: "object",
+        fields: [
+          { name: "product", type: "reference", to: [{ type: "product" }] },
+          { name: "name", type: "string" },
+          { name: "quantity", type: "number" },
+        ]
+      }],
+    }),
+    defineField({
       name: "status",
       title: "Order Status",
       type: "string",

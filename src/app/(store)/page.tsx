@@ -5,6 +5,7 @@ import Container from '@/shared/ui/layout/Container';
 import Button from '@/shared/ui/Button';
 import ProductCard from '@/domains/products/components/ProductCard';
 import HeroSlider from './components/HeroSlider';
+import PromoBannerSlider from './components/PromoBannerSlider';
 import JsonLd from '@/shared/ui/JsonLd';
 import { faqSchema, breadcrumbSchema, siteUrl } from '@/shared/lib/seo';
 import { homepageFaqs, BRAND } from '@/shared/lib/seo';
@@ -12,17 +13,17 @@ import { homepageFaqs, BRAND } from '@/shared/lib/seo';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Premium Women\'s Leggings, Sarees & Nighties — Posh Pigeon',
+  title: 'Posh Pigeon — Women\'s Apparel: Leggings, Chudidars, Lehengas, Sarees & Nighties',
   description:
-    'Shop premium stretchable leggings, elegant sarees, cosy nighties & inskirts at Posh Pigeon. Free shipping on orders above ₹999. Made in India.',
+    'Shop premium women\'s textiles & apparel: 4-way stretch leggings, designer chudidars, festive lehengas, kids silk skirts (pattupavadai), cotton nighties & soft sarees. Free shipping over ₹999.',
   alternates: {
     canonical: siteUrl(),
   },
   openGraph: {
-    title: 'Posh Pigeon — Premium Women\'s Apparel',
-    description: 'Shop premium stretchable leggings, elegant sarees, cosy nighties & inskirts at Posh Pigeon.',
+    title: 'Posh Pigeon — Women\'s Apparel & Textiles Destination',
+    description: 'Shop premium stretchable leggings, chudidars, lehengas, kids silk skirts, nighties & sarees at Posh Pigeon.',
     url: siteUrl(),
-    images: [{ url: BRAND.ogImage, width: 1200, height: 630, alt: 'Posh Pigeon Premium Collection' }],
+    images: [{ url: BRAND.ogImage, width: 1200, height: 630, alt: 'Posh Pigeon Women Apparel' }],
   },
 };
 
@@ -51,41 +52,39 @@ function formatServerPrice(priceInINR: number) {
 }
 
 export default async function Homepage() {
-  // Fetch multiple sets of products for different category sections
-  const [homePage, leggingsProducts, sareesProducts, nightyProducts] = await Promise.all([
+  const productFields = `
+    _id, name, price, comparePrice, stock,
+    "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
+    "category": category->name, "slug": slug.current, variants
+  `;
+
+  // Fetch multiple sets of products for all women's apparel sections
+  const [
+    homePage,
+    leggingsProducts,
+    chudidarProducts,
+    lehengaProducts,
+    kidsSkirtProducts,
+    sareesProducts,
+    nightyProducts
+  ] = await Promise.all([
     client.fetch(`*[_type == "homePage"][0]{
       ...,
       hero {
         ...,
         "images": images[].asset->url
       },
-      dynamicProductRows[] {
-        title,
-        "categorySlug": category->slug.current,
-        "products": *[_type == "product" && category->slug.current == ^.category->slug.current] | order(_createdAt desc)[0...4] {
-          _id, name, price, comparePrice, stock,
-          "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
-          "category": category->name, "slug": slug.current, variants
-        }
+      promotionalBanners[] {
+        ...,
+        "image": coalesce(image.asset->url, customImageUrl)
       }
     }`, {}, { next: { revalidate: 0 } }),
-    client.fetch(`*[_type == "product" && category->slug.current == "leggings"] | order(_createdAt desc)[0...4] {
-      _id, name, price, comparePrice, stock,
-      "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
-      "category": category->name, "slug": slug.current, variants
-    }`, {}, { next: { revalidate: 0 } }),
-
-    client.fetch(`*[_type == "product" && category->slug.current == "sarees"] | order(_createdAt desc)[0...4] {
-      _id, name, price, comparePrice, stock,
-      "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
-      "category": category->name, "slug": slug.current, variants
-    }`, {}, { next: { revalidate: 0 } }),
-
-    client.fetch(`*[_type == "product" && category->slug.current == "nighty"] | order(_createdAt desc)[0...4] {
-      _id, name, price, comparePrice, stock,
-      "imageUrl": coalesce(mainImage.asset->url, select(externalImageUrl != "" => externalImageUrl), variants[0].images[0].asset->url, select(variants[0].externalImageUrls[0] != "" => variants[0].externalImageUrls[0])),
-      "category": category->name, "slug": slug.current, variants
-    }`, {}, { next: { revalidate: 0 } })
+    client.fetch(`*[_type == "product" && category->slug.current == "leggings"] | order(_createdAt desc)[0...4] { ${productFields} }`, {}, { next: { revalidate: 0 } }),
+    client.fetch(`*[_type == "product" && category->slug.current == "chudidar"] | order(_createdAt desc)[0...4] { ${productFields} }`, {}, { next: { revalidate: 0 } }),
+    client.fetch(`*[_type == "product" && category->slug.current == "lehenga"] | order(_createdAt desc)[0...4] { ${productFields} }`, {}, { next: { revalidate: 0 } }),
+    client.fetch(`*[_type == "product" && category->slug.current == "children-silk-skirt"] | order(_createdAt desc)[0...4] { ${productFields} }`, {}, { next: { revalidate: 0 } }),
+    client.fetch(`*[_type == "product" && category->slug.current == "sarees"] | order(_createdAt desc)[0...4] { ${productFields} }`, {}, { next: { revalidate: 0 } }),
+    client.fetch(`*[_type == "product" && category->slug.current == "nighty"] | order(_createdAt desc)[0...4] { ${productFields} }`, {}, { next: { revalidate: 0 } })
   ]);
 
   return (
@@ -99,28 +98,31 @@ export default async function Homepage() {
       />
 
       {/* 01. EDITORIAL HERO */}
-      <section className="relative w-full bg-bone min-h-[450px] lg:min-h-[600px] flex items-center py-12 lg:py-0">
+      <section className="relative w-full bg-bone min-h-[480px] lg:min-h-[620px] flex items-center py-12 lg:py-0">
         
         {/* Multi-Image Hero Slider Component */}
         <HeroSlider images={homePage?.hero?.images || []} />
 
         <Container className="relative z-10 w-full pt-10 pb-32 lg:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-6 space-y-6 max-w-lg bg-white/40 lg:bg-transparent p-6 lg:p-0 rounded-3xl backdrop-blur-sm lg:backdrop-blur-none">
-              <span className="technical text-onyx tracking-[0.4em] uppercase">Posh Pigeon Premium</span>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-onyx leading-[1.05]" dangerouslySetInnerHTML={{ __html: homePage?.hero?.heading || "WEAR YOUR <br/><span class='editorial italic lowercase font-normal text-onyx'>confidence</span>" }} />
-              <p className="text-sm md:text-base text-onyx font-medium leading-relaxed font-sans">
-                {homePage?.hero?.subtext || "Trendy pieces. Timeless style. Posh Pigeon has everything you need to look and feel your best."}
+            <div className="lg:col-span-7 space-y-6 max-w-xl bg-white/60 lg:bg-transparent p-6 lg:p-0 rounded-3xl backdrop-blur-md lg:backdrop-blur-none border border-white/40 lg:border-none shadow-xl lg:shadow-none">
+              <span className="technical text-onyx tracking-[0.4em] uppercase font-bold text-[10px]">Posh Pigeon Women's Apparel</span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-onyx leading-[1.08]">
+                Elegance in Every <br />
+                <span className="editorial italic lowercase font-normal text-onyx">textile & thread</span>
+              </h1>
+              <p className="text-sm md:text-base text-onyx/80 font-medium leading-relaxed font-sans">
+                Discover our signature collection of stretchable leggings, designer chudidars, festive lehengas, kids silk skirts (Pattupavadai), cotton nighties & sarees crafted for your everyday comfort and festive grace.
               </p>
               <div className="flex flex-wrap gap-4 pt-4">
                 <Link href="/shop">
                   <span className="inline-flex items-center justify-center h-14 px-8 rounded-full bg-onyx text-bone hover:bg-black transition-colors text-[10px] font-black uppercase tracking-widest cursor-pointer shadow-md">
-                    {homePage?.hero?.buttonText || "SHOP NEW IN"}
+                    SHOP ALL WOMEN'S WEAR
                   </span>
                 </Link>
-                <Link href="#collections">
+                <Link href="#categories">
                   <span className="inline-flex items-center justify-center h-14 px-8 rounded-full border border-onyx/20 text-onyx hover:bg-onyx hover:text-bone hover:border-onyx transition-all text-[10px] font-black uppercase tracking-widest cursor-pointer">
-                    EXPLORE COLLECTIONS
+                    EXPLORE CATEGORIES
                   </span>
                 </Link>
               </div>
@@ -130,7 +132,7 @@ export default async function Homepage() {
 
         {/* Floating Features Bar (Desktop Only) */}
         <div className="absolute bottom-0 translate-y-1/2 left-0 right-0 z-20 hidden lg:flex justify-center">
-          <div className="bg-white border border-gray-150/50 rounded-full shadow-kinetic px-10 py-5 max-w-5xl w-full flex justify-between items-center divide-x divide-gray-100">
+          <div className="bg-white border border-gray-150/50 rounded-full shadow-kinetic px-10 py-5 max-w-5xl 2xl:max-w-6xl w-full flex justify-between items-center divide-x divide-gray-100">
             {/* Feature 1 */}
             <div className="flex items-center gap-4 px-6 first:pl-0 flex-1">
               <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-black">
@@ -178,138 +180,149 @@ export default async function Homepage() {
         </div>
       </section>
 
-      {/* Mobile Features Bar */}
-      <div className="lg:hidden bg-white border-y border-gray-150 py-6 px-4">
-        <div className="grid grid-cols-2 gap-y-6 gap-x-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-black flex-shrink-0">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 8h7.88a1 1 0 01.97 1.2l-.96 4.8a1 1 0 01-.97.8H13" /></svg>
-            </div>
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-wider text-black">Free Shipping</p>
-              <p className="text-[8px] text-gray-400 font-medium uppercase mt-0.5">Over {formatServerPrice(999)}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-black flex-shrink-0">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>
-            </div>
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-wider text-black">Easy Returns</p>
-              <p className="text-[8px] text-gray-400 font-medium uppercase mt-0.5">7-Day Returns</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-black flex-shrink-0">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-            </div>
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-wider text-black">Secure Pay</p>
-              <p className="text-[8px] text-gray-400 font-medium uppercase mt-0.5">100% Encrypted</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-black flex-shrink-0">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-            </div>
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-wider text-black">Premium Quality</p>
-              <p className="text-[8px] text-gray-400 font-medium uppercase mt-0.5">Made in India</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 02. PREMIUM SHADES / COLLECTIONS FOCUS */}
-      <section id="collections" className="py-24 border-t border-onyx/5">
+      {/* 02. FULL WOMEN'S APPAREL CATEGORY GRID */}
+      <section id="categories" className="py-24 border-t border-onyx/5">
         <Container>
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Premium Shades</h2>
-            <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Explore curated categories designed for everyday elegance</p>
+            <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Women's Textiles & Apparel Range</h2>
+            <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Explore all specialized women & kids apparel sections</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Pill 1: Leggings */}
-            <div className="bg-neutral-soft h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow border border-onyx/5">
-              <div className="space-y-2 z-10">
-                <h4 className="text-xs font-black uppercase text-onyx tracking-wider">Leggings Gallery</h4>
-                <Link href="/shop?category=leggings">
-                  <span className="inline-block text-[9px] bg-bone text-onyx border border-onyx/10 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-onyx hover:text-bone transition-colors cursor-pointer">
-                    Click Now
-                  </span>
-                </Link>
-              </div>
-              <img
-                src="https://assets0.mirraw.com/images/8288550/RoyalBlue_4fe606c6-8430-41df-812b-c2b0eb46bb6d_zoom.jpg?1600076914"
-                alt="Leggings Focus"
-                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
-              />
-            </div>
+            {[
+              {
+                num: '01',
+                tag: 'Leggings',
+                title: 'Stretch Leggings',
+                href: '/shop?category=leggings',
+                buttonText: 'Shop Leggings →',
+                img: 'https://assets0.mirraw.com/images/8288550/RoyalBlue_4fe606c6-8430-41df-812b-c2b0eb46bb6d_zoom.jpg?1600076914'
+              },
+              {
+                num: '02',
+                tag: 'Chudidar',
+                title: 'Chudidar & Suits',
+                href: '/shop?category=chudidar',
+                buttonText: 'Shop Chudidars →',
+                img: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=800&auto=format&fit=crop'
+              },
+              {
+                num: '03',
+                tag: 'Lehenga',
+                title: 'Festive Lehenga',
+                href: '/shop?category=lehenga',
+                buttonText: 'Shop Lehengas →',
+                img: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?q=80&w=800&auto=format&fit=crop'
+              },
+              {
+                num: '04',
+                tag: 'Kids Wear',
+                title: 'Kids Pattupavadai',
+                href: '/shop?category=children-silk-skirt',
+                buttonText: 'Shop Kids Wear →',
+                img: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=800&auto=format&fit=crop'
+              },
+              {
+                num: '05',
+                tag: 'Sleepwear',
+                title: 'Cotton Nighties',
+                href: '/shop?category=nighty',
+                buttonText: 'Shop Nighties →',
+                img: 'https://www.ankitadesigns.in/cdn/shop/files/350nilima.png?v=1777283189'
+              },
+              {
+                num: '06',
+                tag: 'Foundation',
+                title: 'Saree Inskirts',
+                href: '/shop?category=inskirt',
+                buttonText: 'Shop Inskirts →',
+                img: 'https://jisboutique.com/cdn/shop/files/24_166af726-83fd-4c7c-a62f-54444fbbefc3.jpg?v=1718281040'
+              },
+              {
+                num: '07',
+                tag: 'Ethnic',
+                title: 'Silk Sarees',
+                href: '/shop?category=sarees',
+                buttonText: 'Shop Sarees →',
+                img: 'https://pochampallysarees.com/cdn/shop/files/PureSoftSilkBlueYellowSari.jpg?v=1762248060'
+              },
+              {
+                num: '08',
+                tag: 'Daily Ethnic',
+                title: 'Kurtis & Tunics',
+                href: '/shop?category=kurtis',
+                buttonText: 'Shop Kurtis →',
+                img: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop'
+              }
+            ].map((card) => (
+              <div 
+                key={card.num}
+                className="bg-[#EFECE6] hover:bg-[#EAE5DD] h-44 rounded-[1.75rem] p-5 flex items-center justify-between overflow-hidden relative group shadow-sm hover:shadow-md transition-all border border-onyx/5"
+              >
+                <div className="flex flex-col justify-between h-full py-0.5 pr-2 z-10 flex-1 min-w-0">
+                  <div>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-chrome block mb-1">
+                      {card.num} / {card.tag}
+                    </span>
+                    <h4 className="text-xs font-black uppercase text-onyx tracking-wider leading-tight truncate">
+                      {card.title}
+                    </h4>
+                  </div>
+                  <Link href={card.href} className="inline-block mt-2">
+                    <span className="inline-flex items-center text-[9px] bg-white text-onyx border border-onyx/10 font-black px-3.5 py-2 rounded-full uppercase tracking-wider hover:bg-onyx hover:text-bone transition-colors cursor-pointer whitespace-nowrap shadow-xs">
+                      {card.buttonText}
+                    </span>
+                  </Link>
+                </div>
 
-            {/* Pill 2: Nighty */}
-            <div className="bg-[#E6DFD3] h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow border border-onyx/5">
-              <div className="space-y-2 z-10">
-                <h4 className="text-xs font-black uppercase text-onyx tracking-wider">Nighty Fashion</h4>
-                <Link href="/shop?category=nighty">
-                  <span className="inline-block text-[9px] bg-bone text-onyx border border-onyx/10 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-onyx hover:text-bone transition-colors cursor-pointer">
-                    Shop Now
-                  </span>
-                </Link>
+                <div className="w-24 sm:w-28 xl:w-28 h-full flex-shrink-0 ml-2.5 rounded-2xl overflow-hidden border border-black/5 shadow-xs">
+                  <img
+                    src={card.img}
+                    alt={card.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
               </div>
-              <img
-                src="https://www.ankitadesigns.in/cdn/shop/files/350nilima.png?v=1777283189"
-                alt="Nighty Focus"
-                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
-              />
-            </div>
-
-            {/* Pill 3: Inskirt */}
-            <div className="bg-[#DFD8CD] h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow border border-onyx/5">
-              <div className="space-y-2 z-10">
-                <h4 className="text-xs font-black uppercase text-onyx tracking-wider">Inskirt Core</h4>
-                <Link href="/shop?category=inskirt">
-                  <span className="inline-block text-[9px] bg-bone text-onyx border border-onyx/10 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-onyx hover:text-bone transition-colors cursor-pointer">
-                    Explore
-                  </span>
-                </Link>
-              </div>
-              <img
-                src="https://jisboutique.com/cdn/shop/files/24_166af726-83fd-4c7c-a62f-54444fbbefc3.jpg?v=1718281040"
-                alt="Inskirt Focus"
-                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
-              />
-            </div>
-
-            {/* Pill 4: Sarees */}
-            <div className="bg-[#E2DCD3] h-36 rounded-full p-6 pl-10 flex items-center justify-between overflow-hidden relative group hover:shadow-lg transition-shadow border border-onyx/5">
-              <div className="space-y-2 z-10">
-                <h4 className="text-xs font-black uppercase text-onyx tracking-wider">Sarees Style</h4>
-                <Link href="/shop?category=sarees">
-                  <span className="inline-block text-[9px] bg-bone text-onyx border border-onyx/10 font-black px-4 py-2 rounded-full uppercase tracking-wider hover:bg-onyx hover:text-bone transition-colors cursor-pointer">
-                    View Saree
-                  </span>
-                </Link>
-              </div>
-              <img
-                src="https://pochampallysarees.com/cdn/shop/files/PureSoftSilkBlueYellowSari.jpg?v=1762248060"
-                alt="Sarees Focus"
-                className="h-full w-24 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700 mr-2 border border-onyx/5"
-              />
-            </div>
+            ))}
           </div>
         </Container>
       </section>
 
-      {/* 03. LEGGINGS COLLECTION */}
+      {/* 03. CHUDIDAR & SALWAR SUITS SECTION */}
+      {chudidarProducts.length > 0 && (
+        <section className="py-20 border-t border-onyx/5 bg-neutral-soft">
+          <Container>
+            <div className="flex justify-between items-end mb-12">
+              <div className="space-y-3">
+                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-chrome">Traditional Elegance</span>
+                <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Designer Chudidar Collection</h2>
+                <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Ready-to-wear Salwar Kameez & dress materials for all occasions.</p>
+              </div>
+              <Link href="/shop?category=chudidar" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4 hidden md:block">
+                View All Chudidar →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+              {chudidarProducts.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          </Container>
+        </section>
+      )}
+
+      {/* 04. LEGGINGS COLLECTION */}
       <section className="py-20 border-t border-onyx/5">
         <Container>
-          <div className="flex justify-between items-end mb-16">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Leggings Collection</h2>
-              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Premium stretch and comfort for your everyday.</p>
+          <div className="flex justify-between items-end mb-12">
+            <div className="space-y-3">
+              <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-chrome">Daily Comfort Essential</span>
+              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Leggings & Churidar Bottoms</h2>
+              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Premium 4-way stretchable combed cotton for all-day freedom.</p>
             </div>
             <Link href="/shop?category=leggings" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4 hidden md:block">
-              Shop Leggings
+              Shop Leggings →
             </Link>
           </div>
 
@@ -321,86 +334,80 @@ export default async function Homepage() {
         </Container>
       </section>
 
-      {/* 04. SPRING SALE PROMOTIONAL BANNER SECTION */}
+      {/* 05. FESTIVE AD BANNER CAROUSEL SECTION */}
       {homePage?.promotionalBanner?.isActive !== false && (
         <section className="py-12 border-t border-onyx/5">
           <Container>
-            <div className="bg-onyx rounded-3xl overflow-hidden shadow-kinetic grid grid-cols-1 md:grid-cols-12 relative items-stretch min-h-[280px]">
-              {/* Left Content Column */}
-              <div className="md:col-span-5 p-8 md:p-12 flex flex-col justify-center space-y-4 text-bone z-10">
-                <div className="flex items-center gap-2">
-                  <span className="text-chrome font-black text-[9px] tracking-[0.2em] uppercase">✦ Limited Time Offer</span>
-                </div>
-                <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tight leading-none text-white">
-                  {homePage?.promotionalBanner?.heading || "Spring Sale is Live!"}
-                </h3>
-                <p className="text-xs text-white/70 font-medium tracking-wide">
-                  {homePage?.promotionalBanner?.subtext || "Enjoy up to 40% off on selected clothing collections."}
-                </p>
-                <Link href="/shop" className="pt-2 block">
-                  <span className="inline-block text-[9px] bg-[#DCA095] hover:bg-white text-zinc-950 font-black px-6 py-3 rounded-full uppercase tracking-widest transition-colors cursor-pointer">
-                    Explore Deals →
-                  </span>
+            <PromoBannerSlider
+              banners={homePage?.promotionalBanners || []}
+              fallbackBanner={homePage?.promotionalBanner}
+            />
+          </Container>
+        </section>
+      )}
+
+      {/* 06. LEHENGA & KIDS SILK SKIRTS SECTION */}
+      {(lehengaProducts.length > 0 || kidsSkirtProducts.length > 0) && (
+        <section className="py-20 border-t border-onyx/5 bg-neutral-soft">
+          <Container>
+            <div className="flex justify-between items-end mb-12">
+              <div className="space-y-3">
+                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-chrome">Festive & Traditional</span>
+                <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Lehengas & Kids Pattupavadai</h2>
+                <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Grand celebration wear for mothers and little ones.</p>
+              </div>
+              <div className="flex gap-4 hidden md:flex">
+                <Link href="/shop?category=lehenga" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4">
+                  Shop Lehengas
+                </Link>
+                <Link href="/shop?category=children-silk-skirt" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4">
+                  Shop Kids Silk Skirts
                 </Link>
               </div>
+            </div>
 
-              {/* Overlapping Badge Circle */}
-              <div className="hidden md:flex absolute left-[38%] top-1/2 -translate-y-1/2 z-20 w-28 h-28 bg-[#DCA095] text-white rounded-full border-[6px] border-[#F8F6F4] flex flex-col items-center justify-center shadow-lg pointer-events-none">
-                <span className="text-[9px] uppercase tracking-widest font-black opacity-80">Up To</span>
-                <span className="text-xl font-black leading-none my-0.5">{homePage?.promotionalBanner?.discount || "40%"}</span>
-                <span className="text-[9px] uppercase tracking-widest font-black opacity-80">Off</span>
-              </div>
-
-              {/* Right Banner Image Column */}
-              <div className="md:col-span-7 relative min-h-[200px] md:min-h-full">
-                <img
-                  src="/images/poster-image.png"
-                  className="w-full h-full object-cover"
-                  alt="Spring Sale Flatlay"
-                />
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+              {[...lehengaProducts, ...kidsSkirtProducts].slice(0, 4).map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
             </div>
           </Container>
         </section>
       )}
 
-      {/* 05. SAREES COLLECTION */}
-      <section className="py-20 border-t border-onyx/5 bg-neutral-soft">
+      {/* 07. SAREES COLLECTION */}
+      <section className="py-20 border-t border-onyx/5">
         <Container>
-          <div className="flex justify-between items-end mb-16">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Exclusive Sarees</h2>
-              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Timeless elegance woven into every thread.</p>
+          <div className="flex justify-between items-end mb-12">
+            <div className="space-y-3">
+              <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-chrome">Ethnic Grace</span>
+              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Exclusive Silk & Cotton Sarees</h2>
+              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Timeless weaves, rich palettes and flawless drape.</p>
             </div>
             <Link href="/shop?category=sarees" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4 hidden md:block">
-              Shop Sarees
+              Shop Sarees →
             </Link>
           </div>
 
-          {sareesProducts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-              {sareesProducts.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="py-16 text-center text-zinc-400 italic text-xs uppercase tracking-wider font-bold">
-              Sarees collection is currently being loaded. Check back soon!
-            </div>
-          )}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            {sareesProducts.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
         </Container>
       </section>
 
-      {/* 06. NIGHTWEAR COLLECTION */}
-      <section className="py-20 border-t border-onyx/5">
+      {/* 08. NIGHTWEAR COLLECTION */}
+      <section className="py-20 border-t border-onyx/5 bg-neutral-soft">
         <Container>
-          <div className="flex justify-between items-end mb-16">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Nightwear & Sleepwear</h2>
-              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Luxurious comfort for your evenings.</p>
+          <div className="flex justify-between items-end mb-12">
+            <div className="space-y-3">
+              <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-chrome">Pure Cotton Comfort</span>
+              <h2 className="text-3xl font-black uppercase tracking-tight text-onyx">Nighties & Loungewear</h2>
+              <p className="text-xs uppercase tracking-widest text-onyx/50 font-medium">Soft, breathable cotton nightgowns and feeding nightwear.</p>
             </div>
             <Link href="/shop?category=nighty" className="text-[10px] font-black uppercase tracking-widest hover:text-onyx text-onyx/70 underline decoration-2 underline-offset-4 hidden md:block">
-              Shop Nightwear
+              Shop Nightwear →
             </Link>
           </div>
 
@@ -412,20 +419,22 @@ export default async function Homepage() {
         </Container>
       </section>
 
-
-
-      {/* 08. FINAL CTA */}
+      {/* 09. FINAL CTA */}
       <section className="py-16 md:py-20 text-center bg-bone border-t border-onyx/5">
         <Container>
-          <div className="max-w-4xl mx-auto bg-neutral-soft border border-onyx/10 rounded-[2.5rem] md:rounded-[4rem] py-14 md:py-16 px-6 md:px-10 shadow-sm relative overflow-hidden">
-            {/* Decorative subtle gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
+          <div className="max-w-4xl 2xl:max-w-5xl mx-auto bg-white border border-onyx/10 rounded-[2.5rem] md:rounded-[4rem] py-14 md:py-16 px-6 md:px-10 shadow-sm relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-neutral-soft to-transparent pointer-events-none" />
 
             <div className="relative max-w-2xl mx-auto space-y-6">
-              <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-tight uppercase text-onyx" dangerouslySetInnerHTML={{ __html: homePage?.globalCta?.heading || "JOIN THE <span class='text-chrome'>COLLECTION</span>" }} />
-              <Link href={homePage?.globalCta?.buttonLink || "/shop"} className="inline-block pt-4">
+              <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase text-onyx">
+                EXPLORE POSH PIGEON <span className="text-chrome">COLLECTIONS</span>
+              </h2>
+              <p className="text-xs text-onyx/70 font-medium uppercase tracking-widest">
+                From everyday leggings & inskirts to grand sarees, chudidars & lehengas.
+              </p>
+              <Link href="/shop" className="inline-block pt-4">
                 <Button className="h-14 md:h-16 px-10 md:px-14 bg-onyx text-bone text-[9px] md:text-[11px] font-black tracking-[0.4em] shadow-kinetic hover:scale-105 transition-transform uppercase rounded-full">
-                  {homePage?.globalCta?.buttonText || "EXPLORE SHOP"}
+                  EXPLORE FULL SHOP
                 </Button>
               </Link>
             </div>

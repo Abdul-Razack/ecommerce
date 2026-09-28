@@ -9,6 +9,7 @@ import Badge from '@/shared/ui/Badge';
 import { useToast } from '@/shared/ui/Toast';
 import OrderTimeline from '@/domains/orders/components/OrderTimeline';
 import { updateProfile, addAddress, removeAddress, setDefaultAddress } from './actions';
+import Pagination, { usePagination } from '@/shared/ui/Pagination';
 
 interface AccountDashboardProps {
   customer: any;
@@ -46,6 +47,19 @@ export default function AccountDashboard({ customer, orders }: AccountDashboardP
     zipCode: '',
     country: 'India',
     isDefault: false
+  });
+
+  const {
+    currentPage: orderPage,
+    setCurrentPage: setOrderPage,
+    pageSize: orderPageSize,
+    setPageSize: setOrderPageSize,
+    totalPages: orderTotalPages,
+    paginatedItems: paginatedOrders,
+    totalItems: orderTotalItems,
+  } = usePagination({
+    items: orders,
+    initialPageSize: 5,
   });
 
   const handleTabChange = (tab: string) => {
@@ -298,7 +312,7 @@ export default function AccountDashboard({ customer, orders }: AccountDashboardP
 
             {orders.length > 0 ? (
               <div className="space-y-6">
-                {orders.map((order) => {
+                {paginatedOrders.map((order) => {
                   const isExpanded = expandedOrderId === order._id;
                   return (
                     <Card 
@@ -494,6 +508,19 @@ export default function AccountDashboard({ customer, orders }: AccountDashboardP
                     </Card>
                   );
                 })}
+                {orderTotalPages > 1 && (
+                  <Pagination
+                    currentPage={orderPage}
+                    totalPages={orderTotalPages}
+                    totalItems={orderTotalItems}
+                    pageSize={orderPageSize}
+                    pageSizeOptions={[5, 10, 20]}
+                    onPageChange={setOrderPage}
+                    onPageSizeChange={setOrderPageSize}
+                    itemLabel="orders"
+                    className="rounded-2xl border border-onyx/5 shadow-sm mt-8"
+                  />
+                )}
               </div>
             ) : (
               <Card variant="outline" className="bg-neutral-soft border-onyx/5 text-center py-24">

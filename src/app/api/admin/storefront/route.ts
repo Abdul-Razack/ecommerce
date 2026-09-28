@@ -31,6 +31,19 @@ export async function GET() {
         "imageAssetId": image.asset->_id
       },
       promotionalBanner,
+      promotionalBanners[] {
+        _key,
+        isActive,
+        tag,
+        heading,
+        subtext,
+        discount,
+        buttonText,
+        buttonLink,
+        customImageUrl,
+        "image": coalesce(image.asset->url, customImageUrl),
+        "imageAssetId": image.asset->_id
+      },
       dynamicProductRows[] {
         title,
         "categoryId": category->_id,

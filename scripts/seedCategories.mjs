@@ -11,40 +11,38 @@ const client = createClient({
   useCdn: false,
 });
 
-const CATEGORIES = ["Leggings", "Nighty", "Inskirt", "Sarees"];
+const CATEGORIES = [
+  { name: "Leggings", description: "Premium 4-way stretchable ankle & churidar leggings" },
+  { name: "Chudidar", description: "Designer ready-made suits, salwar kameez & dress materials" },
+  { name: "Lehenga", description: "Bridal, party wear & festive lehenga cholis" },
+  { name: "Children Silk Skirt", description: "Traditional kids Pattupavadai & silk skirt sets" },
+  { name: "Nighty", description: "Pure cotton & soft breathable nighties & loungewear" },
+  { name: "Inskirt", description: "Seamless cotton inskirts & saree shapewear petticoats" },
+  { name: "Sarees", description: "Kanchipuram silk, soft silk & daily cotton sarees" },
+  { name: "Kurtis", description: "Anarkali, straight ethnic kurtis & stylish tunics" }
+];
 
 async function main() {
-  console.log('Seeding categories...');
+  console.log('Seeding updated women\'s apparel categories...');
   
   const categoryIds = [];
   
-  for (const name of CATEGORIES) {
-    const slug = name.toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-');
+  for (const cat of CATEGORIES) {
+    const slug = cat.name.toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-');
     const doc = {
       _type: 'category',
       _id: `cat-${slug}`,
-      name,
-      slug: { _type: 'slug', current: slug }
+      name: cat.name,
+      slug: { _type: 'slug', current: slug },
+      description: cat.description
     };
     
     const result = await client.createOrReplace(doc);
-    categoryIds.push(result._id);
-    console.log(`✓ Category: ${name}`);
+    categoryIds.push({ id: result._id, slug });
+    console.log(`✓ Category created: ${cat.name} (${slug})`);
   }
 
-  // Assign to products in transaction (batch)
-  const products = await client.fetch('*[_type == "product"]');
-  console.log(`Assigning categories to ${products.length} products via transaction...`);
-
-  const transaction = client.transaction();
-  for (const product of products) {
-    const randomCat = categoryIds[Math.floor(Math.random() * categoryIds.length)];
-    transaction.patch(product._id, p => p.set({ category: { _type: 'reference', _ref: randomCat } }));
-  }
-
-  await transaction.commit();
-  console.log('✓ Successfully assigned all product categories!');
-  console.log('Done!');
+  console.log('Done creating all categories!');
 }
 
 main();

@@ -6,14 +6,17 @@ import { useCart } from '@/hooks/useCart';
 import { client, urlFor } from '@/shared/lib/sanity';
 import Button from '@/shared/ui/Button';
 import { useCurrency } from '@/providers/CurrencyProvider';
+import { useCoupon } from '@/hooks/useCoupon';
+import { calculateTotals } from '@/domains/coupons/lib/discount';
 
 /**
  * Onyx & Bone Cart Drawer
  * Features: Liquid Slide transition, tactile item rows, and acid lime conversion accents.
  */
 export default function CartDrawer() {
-  const { isCartOpen, closeCart, cartItems, removeFromCart, updateQuantity, getCartTotal, isLoaded } = useCart();
+  const { isCartOpen, closeCart, cartItems, removeFromCart, updateQuantity, isLoaded } = useCart();
   const { formatPrice } = useCurrency();
+  const { applied, isApplied, discount, freeShipping, removeCoupon } = useCoupon();
   const [crossSells, setCrossSells] = useState([]);
 
   useEffect(() => {
@@ -36,9 +39,12 @@ export default function CartDrawer() {
 
   if (!isLoaded) return null;
 
-  const subtotal = getCartTotal();
-  const delivery = subtotal >= 999 ? 0 : 50;
-  const total = subtotal + delivery;
+  const { subtotal, deliveryCharge, total } = calculateTotals(
+    cartItems,
+    isApplied
+      ? { valid: true, discount, freeShipping, giftItems: [], affectedLineIds: [], freeUnitsByLine: {} }
+      : null
+  );
 
   return (
     <>
@@ -110,15 +116,32 @@ export default function CartDrawer() {
                 <span>Subtotal</span>
                 <span>{formatPrice(subtotal)}</span>
               </div>
+              {isApplied && (
+                <div className="flex justify-between technical text-[9px] text-green-700 font-black">
+                  <span className="truncate pr-3">{applied.code}</span>
+                  <span className="flex-shrink-0">
+                    {discount > 0 ? `-${formatPrice(discount)}` : freeShipping ? 'FREE DELIVERY' : 'APPLIED'}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between technical text-[9px] text-onyx/40">
                 <span>Delivery Charges</span>
-                <span className={delivery === 0 ? 'text-onyx font-black' : ''}>{delivery === 0 ? 'FREE' : formatPrice(delivery)}</span>
+                <span className={deliveryCharge === 0 ? 'text-onyx font-black' : ''}>{deliveryCharge === 0 ? 'FREE' : formatPrice(deliveryCharge)}</span>
               </div>
               <div className="flex justify-between text-lg font-black pt-4 border-t border-onyx/10">
                 <span className="technical">Total Amount</span>
                 <span>{formatPrice(total)}</span>
               </div>
             </div>
+
+            {isApplied && (
+              <button
+                onClick={removeCoupon}
+                className="technical text-[8px] text-green-800 hover:text-onyx transition-colors"
+              >
+                REMOVE PROMO CODE
+              </button>
+            )}
             
             <Link href="/checkout" onClick={closeCart}>
               <Button className="h-20 w-full rounded-full bg-onyx text-white hover:scale-[1.02] active:scale-95 transition-all text-xs font-black tracking-[0.4em] shadow-kinetic relative overflow-hidden group">

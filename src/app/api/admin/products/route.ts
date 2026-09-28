@@ -47,7 +47,7 @@ export async function GET() {
     `);
     
     const categories = await writeClient.fetch(`
-      *[_type == "category" && name in ["Leggings", "Nighty", "Inskirt", "Sarees"]] | order(name asc) {
+      *[_type == "category"] | order(name asc) {
         _id,
         name
       }

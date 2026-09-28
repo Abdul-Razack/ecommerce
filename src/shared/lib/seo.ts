@@ -51,24 +51,30 @@ export const BRAND = {
   priceRange: '₹₹',
   // Main product categories
   categories: [
-    { name: 'Leggings', slug: 'leggings', description: 'Premium stretchable leggings for everyday comfort. Four-way stretch, breathable, opaque fabric.' },
-    { name: 'Sarees', slug: 'sarees', description: 'Elegant sarees with rich colour depth and flawless drape. Traditional Indian wear for all occasions.' },
-    { name: 'Nighties', slug: 'nighty', description: 'Cozy nighties and loungewear made with soft breathable cotton. Premium sleepwear for women.' },
-    { name: 'Inskirts', slug: 'inskirt', description: 'Soft anti-chafing inskirts designed as the perfect seamless foundation under sarees.' },
+    { name: 'Leggings', slug: 'leggings', description: 'Premium 4-way stretchable leggings for everyday comfort. Opaque & breathable.' },
+    { name: 'Chudidar', slug: 'chudidar', description: 'Designer readymade salwar kameez, churidar suit sets and dress materials.' },
+    { name: 'Lehenga', slug: 'lehenga', description: 'Grand bridal & festive partywear lehenga cholis.' },
+    { name: 'Children Silk Skirt', slug: 'children-silk-skirt', description: 'Traditional kids Pattupavadai and silk skirt sets.' },
+    { name: 'Nighties', slug: 'nighty', description: 'Cozy cotton nightwear, feeding nighties & loungewear.' },
+    { name: 'Inskirts', slug: 'inskirt', description: 'Soft anti-chafing poplin cotton inskirts & saree shapewear.' },
+    { name: 'Sarees', slug: 'sarees', description: 'Kanchipuram silk, soft silk and pure cotton sarees.' },
+    { name: 'Kurtis', slug: 'kurtis', description: 'Anarkali, straight ethnic kurtis and daily wear tunics.' },
   ],
   defaultKeywords: [
-    'premium women leggings India',
-    'stretchable leggings online',
-    'buy sarees online India',
-    'women nighties online shopping',
-    'inskrirt for saree',
-    'Posh Pigeon clothing',
-    'women ethnic wear India',
-    'comfortable women apparel',
+    'women leggings India',
+    'chudidar salwar suits online',
+    'lehenga choli online shopping',
+    'kids silk skirt pattupavadai',
+    'women cotton nighties online',
+    'saree inskirt shapewear',
+    'buy silk sarees online India',
+    'ethnic kurtis for women',
+    'Posh Pigeon apparel',
+    'women textiles India',
   ],
   metaDescription:
-    'Posh Pigeon — India\'s premium women\'s clothing brand. Shop high-grade stretchable leggings, elegant sarees, cosy nighties & inskirts. Free shipping on orders above ₹999.',
-  homepageTitle: 'Posh Pigeon — Premium Women\'s Leggings, Sarees & Nighties',
+    'Posh Pigeon — Premium Women\'s Apparel & Textiles. Shop high-grade stretchable leggings, chudidars, lehengas, kids silk skirts, nighties, inskirts, sarees & kurtis. Free shipping on orders above ₹999.',
+  homepageTitle: 'Posh Pigeon — Premium Women\'s Apparel, Textiles, Sarees & Ethnic Wear',
 };
 
 /* ── FAQ collections (used in JSON-LD) ───────────────────────── */
@@ -77,27 +83,27 @@ export const homepageFaqs = [
   {
     question: 'What products does Posh Pigeon sell?',
     answer:
-      'Posh Pigeon offers premium women\'s apparel including stretchable leggings, elegant sarees, cosy nighties, and anti-chafing inskirts — all made in India with high-grade fabrics.',
+      'Posh Pigeon is a comprehensive women\'s apparel destination offering stretchable leggings, chudidars, festive lehengas, kids silk skirts (pattupavadai), cosy cotton nighties, anti-chafing inskirts, sarees, and kurtis.',
   },
   {
     question: 'Does Posh Pigeon offer free shipping?',
     answer:
-      'Yes. Free shipping is available on all orders above ₹999. Orders are delivered in premium sanitary packaging.',
+      'Yes. Free shipping is available on all orders above ₹999 across India.',
   },
   {
     question: 'What is the return policy?',
     answer:
-      'Posh Pigeon offers a hassle-free 7-day return policy. You can swap sizes or request a full refund through our returns portal.',
+      'Posh Pigeon offers a hassle-free 7-day return policy. You can exchange sizes or request a return via our customer dashboard.',
   },
   {
     question: 'What payment methods are accepted?',
     answer:
-      'We accept Cash on Delivery (COD), UPI, credit/debit cards, and net banking via Razorpay — 100% secure checkout.',
+      'We accept Cash on Delivery (COD), UPI, credit/debit cards, and net banking via Razorpay.',
   },
   {
-    question: 'Are Posh Pigeon leggings opaque and breathable?',
+    question: 'Are Posh Pigeon leggings opaque and stretchable?',
     answer:
-      'Absolutely. Our leggings use a premium combed-cotton and spandex blend offering four-way stretch, full opacity, and excellent moisture-wicking for all-day comfort.',
+      'Yes. Our leggings use a premium combed-cotton and spandex blend offering 4-way stretch, full opacity, and moisture-wicking comfort.',
   },
 ];
 
@@ -105,22 +111,22 @@ export const aboutFaqs = [
   {
     question: 'Where is Posh Pigeon based?',
     answer:
-      'Posh Pigeon is an Indian premium women\'s clothing brand based in Chennai, Tamil Nadu. We design and ship across India and to select international regions.',
+      'Posh Pigeon is an Indian premium women\'s textile & clothing brand based in Chennai, Tamil Nadu. We ship across India and internationally.',
   },
   {
     question: 'What fabrics does Posh Pigeon use?',
     answer:
-      'We use premium combed cottons, durable spandex blends, and skin-friendly synthetic yarns designed for sweat-wicking, breathability, and opacity.',
+      'We use premium combed cottons, Chanderi silks, Kanchipuram soft silks, georgette, organza, and durable spandex blends designed for skin comfort and durability.',
   },
   {
     question: 'How can I track my order?',
     answer:
-      'After placing an order you will receive a tracking link via email and SMS. You can also track orders through your Posh Pigeon account dashboard.',
+      'After placing an order you will receive tracking updates via SMS and email, or view live status on your Posh Pigeon dashboard.',
   },
   {
     question: 'Does Posh Pigeon ship internationally?',
     answer:
-      'Yes, Posh Pigeon ships to select international regions including Malaysia. Shipping rates and delivery times are calculated at checkout.',
+      'Yes, Posh Pigeon ships to select international destinations including Malaysia.',
   },
 ];
 
@@ -129,53 +135,61 @@ export const categoryFaqs: Record<string, { question: string; answer: string }[]
     {
       question: 'Are Posh Pigeon leggings see-through?',
       answer:
-        'No. Our leggings are engineered with a thick, opaque four-way-stretch knit that provides complete coverage in all positions.',
+        'No. Our leggings are engineered with a thick, opaque 4-way-stretch knit that provides 100% opacity.',
     },
     {
       question: 'What sizes are available for leggings?',
       answer:
-        'Our leggings are available in XS, S, M, L, XL, and XXL. Refer to the size chart on each product page for exact measurements.',
+        'Our leggings are available in XS, S, M, L, XL, and XXL.',
     },
+  ],
+  chudidar: [
     {
-      question: 'How do I wash Posh Pigeon leggings?',
+      question: 'Are the Chudidar suits readymade or unstitched?',
       answer:
-        'Machine wash cold with similar colours and hang dry for best results. Avoid bleach and fabric softeners to preserve stretch.',
+        'We offer both fully stitched ready-to-wear Chudidar sets and unstitched premium dress materials.',
+    },
+  ],
+  lehenga: [
+    {
+      question: 'Do lehengas come with blouses and dupattas?',
+      answer:
+        'Yes, all Posh Pigeon lehenga sets include the flared skirt, unstitched/stitched blouse, and matching embellished dupatta.',
+    },
+  ],
+  'children-silk-skirt': [
+    {
+      question: 'What age groups are supported for Kids Pattupavadai?',
+      answer:
+        'Our Children Silk Skirts (Pattupavadai) are available for girls aged 1 to 14 years with comfortable inner cotton lining.',
     },
   ],
   sarees: [
     {
       question: 'What material are Posh Pigeon sarees made from?',
       answer:
-        'Our sarees are crafted from premium fabrics including soft silk, georgette, and cotton blends — chosen for excellent drape, colour depth, and comfort.',
-    },
-    {
-      question: 'Do Posh Pigeon sarees come with a blouse piece?',
-      answer:
-        'Most of our sarees include a matching blouse piece. Product details will specify if a blouse piece is included.',
+        'Our collection features Kanchipuram soft silk, mulmul cotton, and organza sarees.',
     },
   ],
   nighty: [
     {
       question: 'What fabrics are the nighties made from?',
       answer:
-        'Our nighties are made from soft, breathable cotton and cotton-blend fabrics designed for maximum comfort during sleep.',
-    },
-    {
-      question: 'Are the nighties suitable for all seasons?',
-      answer:
-        'Yes. Our lightweight cotton nighties are comfortable year-round, keeping you cool in summer and cosy in cooler months.',
+        'Our nighties are crafted from 100% soft breathable cotton and alpine knit for all-night comfort.',
     },
   ],
   inskirt: [
     {
-      question: 'Why should I wear an inskirt under my saree?',
+      question: 'Why choose Posh Pigeon shapewear inskirts?',
       answer:
-        'An inskirt provides a smooth, anti-chafing foundation under your saree, prevents fabric cling, and adds a layer of comfort for all-day wear.',
+        'Our inskirts feature anti-chafing side slits, tummy control waistbands, and breathable stretch micro-fibers.',
     },
+  ],
+  kurtis: [
     {
-      question: 'What sizes are available for inskirts?',
+      question: 'What styles of Kurtis are available?',
       answer:
-        'Our inskirts come in sizes XS through XXL with an elastic waist for a flexible, comfortable fit.',
+        'We feature Anarkali flared kurtis, straight-cut daily tunics, and embroidered festive tops.',
     },
   ],
 };

@@ -10,7 +10,7 @@ export default function HeroSlider({ images }: HeroSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // If no images are provided, use a default fallback
-  const validImages = images && images.length > 0 ? images : ['/images/banner-1.png'];
+  const validImages = images && images.length > 0 ? images : ['/images/banner-child.png'];
   
   useEffect(() => {
     // If there's only 1 image or none, don't run the interval

@@ -6,33 +6,50 @@ import Button from '@/shared/ui/Button';
 import JsonLd from '@/shared/ui/JsonLd';
 import { BRAND, siteUrl, breadcrumbSchema, faqSchema, categoryFaqs, collectionPageSchema } from '@/shared/lib/seo';
 import type { Metadata } from 'next';
+import { Package } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 const CATEGORY_META: Record<string, { title: string; description: string; keywords: string[] }> = {
   leggings: {
-    title: 'Premium Stretchable Leggings Online — Posh Pigeon',
-    description:
-      'Buy premium stretchable leggings online at Posh Pigeon. Four-way stretch, opaque, breathable fabric. Free shipping on orders above ₹999.',
-    keywords: ['buy leggings online', 'premium leggings India', 'stretchable leggings women', 'opaque leggings online'],
+    title: 'Premium Stretchable Leggings — Posh Pigeon',
+    description: 'Buy premium stretchable leggings online at Posh Pigeon. 4-way stretch, opaque, breathable fabric.',
+    keywords: ['buy leggings online', 'premium leggings India', 'stretchable leggings women', 'churidar leggings'],
+  },
+  chudidar: {
+    title: 'Designer Chudidar & Salwar Kameez — Posh Pigeon',
+    description: 'Shop readymade Chudidar suit sets, salwar kameez & dress materials online at Posh Pigeon.',
+    keywords: ['buy chudidar online', 'salwar kameez India', 'readymade chudidar set', 'ethnic suit material'],
+  },
+  lehenga: {
+    title: 'Bridal & Festive Lehenga Choli — Posh Pigeon',
+    description: 'Explore royal bridal & partywear lehenga cholis online at Posh Pigeon. Heavy embroidery & rich fabrics.',
+    keywords: ['buy lehenga online', 'party wear lehenga', 'bridal lehenga choli', 'chaniya choli India'],
+  },
+  'children-silk-skirt': {
+    title: 'Kids Pattupavadai & Children Silk Skirts — Posh Pigeon',
+    description: 'Shop traditional kids Pattupavadai silk skirt & blouse sets for festive celebrations at Posh Pigeon.',
+    keywords: ['kids pattupavadai online', 'children silk skirt', 'pattu pavadai set', 'traditional kids wear'],
   },
   nighty: {
-    title: 'Women\'s Nighties & Sleepwear Online — Posh Pigeon',
-    description:
-      'Shop cosy nighties and sleepwear for women at Posh Pigeon. Soft breathable cotton. Premium comfort for every night.',
-    keywords: ['buy nighties online', 'women sleepwear India', 'cotton nighties', 'premium nighties online'],
+    title: 'Women\'s Pure Cotton Nighties & Loungewear — Posh Pigeon',
+    description: 'Shop cosy cotton nighties, feeding nightwear, and loungewear for women at Posh Pigeon.',
+    keywords: ['buy nighties online', 'cotton nighty India', 'feeding nighty', 'women sleepwear'],
   },
   inskirt: {
-    title: 'Premium Inskirts for Sarees — Posh Pigeon',
-    description:
-      'Buy anti-chafing inskirts for sarees at Posh Pigeon. Soft, seamless, comfortable foundation wear. Free shipping on orders above ₹999.',
-    keywords: ['buy inskirt online', 'saree inskirt India', 'anti-chafing inskirt', 'premium inskirts'],
+    title: 'Poplin Cotton & Shapewear Inskirts — Posh Pigeon',
+    description: 'Buy anti-chafing cotton inskirts and saree shapewear petticoats at Posh Pigeon.',
+    keywords: ['buy inskirt online', 'saree inskirt India', 'shapewear petticoat', 'anti chafing inskirt'],
   },
   sarees: {
-    title: 'Elegant Sarees Online Shopping — Posh Pigeon',
-    description:
-      'Shop elegant sarees online at Posh Pigeon. Rich fabrics, vibrant colours, flawless drape. Traditional Indian wear delivered to your door.',
-    keywords: ['buy sarees online', 'elegant sarees India', 'premium sarees shopping', 'women sarees online'],
+    title: 'Kanchipuram Silk & Soft Cotton Sarees — Posh Pigeon',
+    description: 'Shop elegant silk, organza & daily wear cotton sarees online at Posh Pigeon.',
+    keywords: ['buy sarees online', 'kanchipuram silk saree', 'soft silk saree', 'cotton sarees online'],
+  },
+  kurtis: {
+    title: 'Ethnic Kurtis, Anarkalis & Tunics — Posh Pigeon',
+    description: 'Shop stylish Anarkali kurtis, straight-cut daily tunics and festive tops at Posh Pigeon.',
+    keywords: ['buy kurtis online', 'anarkali kurti India', 'ethnic tunics women', 'daily wear kurti'],
   },
 };
 
@@ -168,7 +185,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             <ProductCardWrapper products={products} />
           ) : (
             <div className="flex flex-col items-center justify-center py-32 text-center">
-              <div className="text-5xl mb-6">📦</div>
+              <Package className="w-12 h-12 text-zinc-400 stroke-[1.5] mb-6" />
               <h2 className="text-xl font-bold text-onyx mb-2">No Products Yet</h2>
               <p className="text-sm text-onyx/60 mb-8 max-w-xs">
                 Our inventory is currently being updated. Please check back later.

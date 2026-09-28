@@ -7,6 +7,17 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 import Button from '@/shared/ui/Button';
 import Skeleton from '@/shared/ui/Skeleton';
+import { 
+  LayoutDashboard, 
+  ShoppingBag, 
+  FolderTree, 
+  ShoppingCart, 
+  Boxes, 
+  BarChart3, 
+  Store, 
+  TicketPercent,
+  ExternalLink 
+} from 'lucide-react';
 
 function AdminLayoutInner({ children }) {
   const { data: session, status } = useSession();
@@ -25,7 +36,7 @@ function AdminLayoutInner({ children }) {
 
   if (status === 'loading') {
     return (
-      <div className="flex min-h-screen bg-white">
+      <div suppressHydrationWarning className="flex min-h-screen bg-white">
         <aside className="w-64 border-r border-zinc-100 p-8 space-y-8">
           <Skeleton className="h-10 w-32 mb-12" />
           {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-6 w-full" />)}
@@ -40,45 +51,58 @@ function AdminLayoutInner({ children }) {
   if (!session) return null;
 
   const navItems = [
-    { href: '/admin', label: 'Dashboard' },
-    { href: '/admin/products', label: 'Products' },
-    { href: '/admin/categories', label: 'Categories' },
-    { href: '/admin/orders', label: 'Orders' },
-    { href: '/admin/stock', label: 'Inventory' },
-    { href: '/admin/reports', label: 'Performance' },
-    { href: '/admin/storefront', label: 'Storefront' },
-    { href: '/', label: 'View Store' },
+    { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/products', label: 'Products', icon: ShoppingBag },
+    { href: '/admin/categories', label: 'Categories', icon: FolderTree },
+    { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+    { href: '/admin/coupons', label: 'Coupons', icon: TicketPercent },
+    { href: '/admin/stock', label: 'Inventory', icon: Boxes },
+    { href: '/admin/reports', label: 'Performance', icon: BarChart3 },
+    { href: '/admin/storefront', label: 'Storefront', icon: Store },
+    { href: '/', label: 'View Store', icon: ExternalLink },
   ];
 
   return (
-    <div className="flex min-h-screen bg-white font-sans text-black">
+    <div suppressHydrationWarning className="flex min-h-screen bg-white font-sans text-black">
       {/* Sidebar */}
       <aside className="w-64 border-r border-zinc-100 flex flex-col fixed inset-y-0 left-0 bg-white z-20">
-        <div className="p-8 pb-12">
-          <Link href="/admin" className="text-xl font-bold tracking-tight uppercase text-black">
-            POSH PIGEON
-          </Link>
-          <p className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 mt-2">
-            Administrator
-          </p>
+        <div className="p-6 pb-8 border-b border-zinc-100 flex items-center gap-3">
+          <img 
+            src="/images/logo.png" 
+            alt="Posh Pigeon Logo" 
+            className="w-10 h-10 object-contain rounded-xl border border-zinc-100 bg-zinc-50 p-1"
+          />
+          <div>
+            <Link href="/admin" className="text-sm font-black tracking-tight uppercase text-black block leading-none">
+              POSH PIGEON
+            </Link>
+            <p className="text-[9px] uppercase tracking-widest font-extrabold text-zinc-400 mt-1">
+              Administrator
+            </p>
+          </div>
         </div>
 
-        <nav className="flex-grow px-4">
+        <nav className="flex-grow px-4 py-6">
           <ul className="space-y-1">
-            {navItems.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center px-4 py-3 text-[11px] uppercase tracking-widest font-bold transition-all duration-200 ${
-                    pathname === item.href 
-                      ? 'bg-black text-white' 
-                      : 'text-zinc-500 hover:text-black hover:bg-zinc-50'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`flex items-center px-4 py-3 text-[11px] uppercase tracking-widest font-extrabold transition-all duration-200 rounded-xl ${
+                      isActive 
+                        ? 'bg-black text-white shadow-sm' 
+                        : 'text-zinc-500 hover:text-black hover:bg-zinc-50'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 mr-3 transition-colors ${isActive ? 'text-white' : 'text-zinc-400'}`} />
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -92,7 +116,7 @@ function AdminLayoutInner({ children }) {
             fullWidth 
             size="sm"
             onClick={() => signOut({ callbackUrl: '/admin/login' })}
-            className="text-[10px] uppercase tracking-widest h-10 border-zinc-200 hover:border-black"
+            className="text-[10px] uppercase tracking-widest h-10 border-zinc-200 hover:border-black rounded-xl"
           >
             Logout
           </Button>

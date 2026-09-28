@@ -80,7 +80,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {children}
 
       {/* TOAST NOTIFICATIONS PORTAL */}
-      <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
+      <div suppressHydrationWarning className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
         {toasts.map(toast => {
           let bgColor = 'bg-white border-zinc-200';
           let textColor = 'text-zinc-800';

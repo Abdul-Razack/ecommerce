@@ -7,6 +7,7 @@ import Button from '@/shared/ui/Button';
 import Skeleton from '@/shared/ui/Skeleton';
 import { useToast } from '@/shared/ui/Toast';
 import { useCurrency } from '@/providers/CurrencyProvider';
+import Pagination, { usePagination } from '@/shared/ui/Pagination';
 
 interface Variant {
   _key?: string;
@@ -38,7 +39,18 @@ interface Category {
   name: string;
 }
 
-const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+export const SIZE_LABELS: Record<string, string> = {
+  "XS": "XS (26\")",
+  "S": "S (28\")",
+  "M": "M (30\")",
+  "L": "L (32\")",
+  "XL": "XL (34\")",
+  "XXL": "XXL (36\")",
+  "3XL": "3XL (38\")",
+  "Free Size": "Free Size (FS)",
+};
+
+const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "Free Size"];
 
 interface ColorVariantGroup {
   id: string;
@@ -179,7 +191,10 @@ export default function AdminProductsPage() {
     setFormName(product.name);
     setFormPrice(product.price.toString());
     setFormStock(product.stock.toString());
-    setFormCategory(product.categoryId || '');
+    
+    // Resolve categoryId with fallback matching by category name or first available category
+    const catId = product.categoryId || categories.find(c => c.name?.toLowerCase() === product.category?.toLowerCase())?._id || categories[0]?._id || '';
+    setFormCategory(catId);
     setFormDescription(product.description || '');
     setFormImageAssetId((product as any).imageAssetId || '');
     setFormImageUrl(product.imageUrl || '');
@@ -427,7 +442,9 @@ export default function AdminProductsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName || !formPrice || !formCategory) {
+    const resolvedCategory = formCategory || categories.find(c => c.name?.toLowerCase() === editingProduct?.category?.toLowerCase())?._id || categories[0]?._id || '';
+    
+    if (!formName || !formPrice || !resolvedCategory) {
       showAlert({ title: 'Required Fields Missing', message: 'Please fill out all required fields: Name, Price, and Category.' });
       return;
     }
@@ -440,7 +457,7 @@ export default function AdminProductsPage() {
       price: parseFloat(formPrice),
       stock: parseInt(formStock) || 0,
       description: formDescription,
-      categoryId: formCategory,
+      categoryId: resolvedCategory,
       imageAssetId: formImageAssetId || undefined,
       externalImageUrl: formExternalImageUrl,
       galleryImageIds: formUploadedGallery.map(img => img.assetId).filter(Boolean),
@@ -502,6 +519,19 @@ export default function AdminProductsPage() {
     p.category?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const {
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    totalPages,
+    paginatedItems: paginatedProducts,
+    totalItems,
+  } = usePagination({
+    items: filteredProducts,
+    initialPageSize: 10,
+  });
+
   if (loading) {
     return (
       <div className="p-8 space-y-8">
@@ -512,7 +542,7 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <div className="p-8 space-y-12 bg-white min-h-screen relative">
+    <div suppressHydrationWarning className="p-8 space-y-12 bg-white min-h-screen relative">
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-100 pb-8">
         <div className="space-y-2">
@@ -555,7 +585,7 @@ export default function AdminProductsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
-                {filteredProducts.map((product) => (
+                {paginatedProducts.map((product) => (
                   <tr key={product._id} className="hover:bg-zinc-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
@@ -624,6 +654,16 @@ export default function AdminProductsPage() {
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            pageSizeOptions={[10, 20, 50, 100]}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            itemLabel="products"
+          />
         </Card>
       </div>
 
@@ -683,6 +723,7 @@ export default function AdminProductsPage() {
                         onChange={(e) => setFormCategory(e.target.value)}
                         className="w-full h-11 px-4 bg-zinc-50 border border-zinc-200 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-black transition-colors"
                       >
+                        <option value="">Select Category</option>
                         {categories.map((cat) => (
                           <option key={cat._id} value={cat._id}>
                             {cat.name}
@@ -825,7 +866,7 @@ export default function AdminProductsPage() {
                                 const sizeData = group.sizes[sz] || { stock: 0 };
                                 return (
                                   <div key={sz} className="border border-zinc-150 rounded p-3 bg-zinc-50/30 flex flex-col gap-2">
-                                    <span className="text-[10px] font-black text-black uppercase tracking-wider">{sz} Size</span>
+                                    <span className="text-[10px] font-black text-black uppercase tracking-wider">{SIZE_LABELS[sz] || `${sz} Size`}</span>
                                     
                                     <div className="space-y-1">
                                       <label className="block text-[7px] uppercase font-bold text-zinc-400">Stock</label>

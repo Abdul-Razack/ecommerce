@@ -11,10 +11,22 @@ import Input from '@/shared/ui/Input';
 import Card from '@/shared/ui/Card';
 import Skeleton from '@/shared/ui/Skeleton';
 import Badge from '@/shared/ui/Badge';
+import { useCoupon } from '@/hooks/useCoupon';
+import { calculateTotals, COD_FEE } from '@/domains/coupons/lib/discount';
 
 export default function CheckoutPage() {
-  const { cartItems, getCartTotal, getCartCount, clearCart, isLoaded, closeCart } = useCart();
-  const { currency, rate, formatPrice, convertPrice } = useCurrency();
+  const { cartItems, getCartCount, clearCart, isLoaded, closeCart } = useCart();
+  const {
+    applied,
+    isApplied,
+    applying,
+    error: couponError,
+    applyCode,
+    removeCoupon,
+    tryAutoApply,
+    revalidate,
+  } = useCoupon();
+  const { currency, rate, formatPrice } = useCurrency();
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -31,6 +43,7 @@ export default function CheckoutPage() {
 
   const [paymentMethod, setPaymentMethod] = useState('online');
   const [loading, setLoading] = useState(false);
+  const [couponInput, setCouponInput] = useState('');
   
   const [customerId, setCustomerId] = useState(null);
   const [savedAddresses, setSavedAddresses] = useState([]);
@@ -83,10 +96,60 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const subtotal = getCartTotal();
-  const codCharge = paymentMethod === 'cod' ? 50 : 0;
-  const deliveryCharge = subtotal >= 999 ? 0 : 50;
-  const total = subtotal + deliveryCharge + codCharge;
+  // Delegate to the shared discount engine so the figures rendered here match
+  // the ones POST /api/orders will verify and charge. This is a preview; the
+  // server recomputes everything from Sanity before creating the order.
+  const { subtotal, discount, deliveryCharge, total } = calculateTotals(
+    cartItems,
+    isApplied
+      ? {
+          valid: true,
+          discount: applied.discount,
+          freeShipping: applied.freeShipping,
+          giftItems: applied.giftItems,
+          affectedLineIds: applied.affectedLineIds,
+          freeUnitsByLine: applied.freeUnitsByLine,
+        }
+      : null,
+    { paymentType: paymentMethod }
+  );
+  const codCharge = paymentMethod === 'cod' ? COD_FEE : 0;
+
+  // Offer a silently applied coupon the first time a cart is reviewed.
+  useEffect(() => {
+    if (isLoaded && cartItems.length > 0 && !isApplied) {
+      tryAutoApply(cartItems, { email: formData.email });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, cartItems.length, isApplied]);
+
+  // A code applied earlier was priced against the cart as it was *then*. Editing
+  // the basket or switching payment method can invalidate it, so re-check rather
+  // than carry a stale discount into the payment step.
+  useEffect(() => {
+    if (!isLoaded || !isApplied) return;
+    revalidate(cartItems, { email: formData.email, paymentType: paymentMethod });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isLoaded,
+    isApplied,
+    revalidate,
+    paymentMethod,
+    formData.email,
+    cartItems.map((i) => `${i._id}:${i.quantity}:${i.color || ''}:${i.size || ''}`).sort().join('|'),
+  ]);
+
+  const handleApplyCoupon = async () => {
+    const ok = await applyCode(couponInput, cartItems, {
+      email: formData.email,
+      paymentType: paymentMethod,
+    });
+
+    if (ok) {
+      setCouponInput('');
+      showToast('Promo code applied', 'success');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -142,33 +205,40 @@ export default function CheckoutPage() {
     window.scrollTo(0, 0);
   };
 
+  /**
+   * The server re-prices every line and re-verifies the coupon, so the payload
+   * deliberately carries no monetary values the browser could have forged.
+   */
+  const buildOrderPayload = (type: string) => ({
+    ...formData,
+    items: cartItems.map((item) => ({
+      _id: item._id,
+      quantity: item.quantity,
+      color: item.color || null,
+      size: item.size || null,
+    })),
+    couponCode: isApplied ? applied.code : null,
+    currency,
+    exchangeRate: rate,
+    paymentType: type,
+    customerId,
+    saveAddress,
+  });
+
   const handleCODOrder = async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          items: cartItems.map(item => ({
-            ...item,
-            price: convertPrice(item.price)
-          })),
-          totalAmount: convertPrice(total),
-          currency,
-          exchangeRate: rate,
-          paymentType: 'cod',
-          paymentStatus: 'pending',
-          deliveryCharge: convertPrice(deliveryCharge + codCharge),
-          customerId,
-          saveAddress,
-        }),
+        body: JSON.stringify(buildOrderPayload('cod')),
       });
 
       const data = await response.json();
       if (data.success) {
         setOrderPlaced(true);
         clearCart();
+        removeCoupon();
         showToast('Order placed successfully!', 'success');
         router.push(`/orders?email=${formData.email}`);
       } else {
@@ -187,21 +257,7 @@ export default function CheckoutPage() {
       const createRes = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          items: cartItems.map(item => ({
-            ...item,
-            price: convertPrice(item.price)
-          })),
-          totalAmount: convertPrice(total),
-          currency,
-          exchangeRate: rate,
-          paymentType: 'razorpay',
-          paymentStatus: 'pending',
-          deliveryCharge: convertPrice(deliveryCharge),
-          customerId,
-          saveAddress,
-        }),
+        body: JSON.stringify(buildOrderPayload('razorpay')),
       });
 
       const createData = await createRes.json();
@@ -234,6 +290,7 @@ export default function CheckoutPage() {
           if (verifyData.success) {
             setOrderPlaced(true);
             clearCart();
+            removeCoupon();
             showToast('Payment successful! Order placed.', 'success');
             router.push(`/orders?email=${formData.email}`);
           } else {
@@ -574,11 +631,75 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
+                {/* Promo Code Tray */}
+                <div className="pt-8 border-t border-dashed border-onyx/10">
+                  {isApplied ? (
+                    <div className="flex items-center justify-between gap-4 border border-green-200 bg-green-50/60 rounded-inner px-5 py-4">
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-green-800 truncate">
+                          {applied.code} applied
+                        </p>
+                        <p className="text-[10px] text-green-700 mt-1 font-medium">
+                          {applied.freeShipping && applied.discount === 0
+                            ? 'Free delivery unlocked'
+                            : `You save ${formatPrice(applied.discount)}`}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          removeCoupon();
+                          showToast('Promo code removed', 'info');
+                        }}
+                        className="text-[9px] font-black uppercase tracking-widest text-green-800 hover:text-black transition-colors flex-shrink-0"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex gap-3">
+                        <input
+                          type="text"
+                          value={couponInput}
+                          onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleApplyCoupon();
+                            }
+                          }}
+                          placeholder="PROMO CODE"
+                          aria-label="Promo code"
+                          className="flex-1 h-12 px-5 bg-white/80 border border-onyx/10 rounded-inner text-xs font-black uppercase tracking-[0.2em] focus:border-onyx focus:outline-none transition-all"
+                        />
+                        <Button
+                          onClick={handleApplyCoupon}
+                          disabled={applying || !couponInput.trim()}
+                          className="h-12 px-6 text-[10px] font-black tracking-[0.2em] flex-shrink-0"
+                        >
+                          {applying ? 'Checking' : 'Apply'}
+                        </Button>
+                      </div>
+                      {couponError && (
+                        <p className="text-[10px] text-red-600 font-bold uppercase tracking-wider">
+                          {couponError}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <div className="pt-10 border-t border-dashed border-onyx/10 space-y-5">
                   <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
                     <span className="text-onyx/50">Items Subtotal</span>
                     <span className="text-onyx">{formatPrice(subtotal)}</span>
                   </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
+                      <span className="text-green-700">Coupon ({applied.code})</span>
+                      <span className="text-green-700">-{formatPrice(discount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
                     <span className="text-onyx/50">Delivery Charges</span>
                     <span className={deliveryCharge === 0 ? 'text-green-600' : 'text-onyx'}>
@@ -588,7 +709,7 @@ export default function CheckoutPage() {
                   {paymentMethod === 'cod' && (
                     <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em]">
                       <span className="text-onyx/50">Cash on Delivery Fee</span>
-                      <span className="text-onyx">{formatPrice(50)}</span>
+                      <span className="text-onyx">{formatPrice(codCharge)}</span>
                     </div>
                   )}
                 </div>
