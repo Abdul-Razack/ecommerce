@@ -35,22 +35,22 @@ export default function HeroSlider({ images }: HeroSliderProps) {
           <img
             src={src}
             alt={`Hero Banner ${index + 1}`}
-            className="w-full h-full object-cover object-top"
+            className="w-full h-full object-cover object-[72%_center] sm:object-center lg:object-top"
           />
-          {/* Mobile Background dimming overlay for text readability - applied to all images */}
-          <div className="absolute inset-0 z-0 lg:hidden bg-white/50 backdrop-blur-[2px]"></div>
+          {/* Subtle gradient at bottom for slider dots contrast */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none"></div>
         </div>
       ))}
 
       {/* Navigation Dots (Only show if multiple images exist) */}
       {validImages.length > 1 && (
-        <div className="absolute bottom-10 left-0 right-0 z-20 flex justify-center gap-3 lg:bottom-12">
+        <div className="absolute bottom-3 sm:bottom-4 lg:bottom-12 left-0 right-0 z-20 flex justify-center gap-2 lg:gap-3">
           {validImages.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                index === currentIndex ? 'bg-onyx w-8' : 'bg-onyx/30 hover:bg-onyx/60'
+              className={`h-2 rounded-full transition-all duration-300 ${
+                index === currentIndex ? 'bg-white w-6 shadow-md' : 'bg-white/50 hover:bg-white/80 w-2'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

@@ -70,14 +70,14 @@ export default function AdminStockPage() {
   }
 
   return (
-    <div className="p-8 space-y-12 bg-white min-h-screen">
+    <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 md:space-y-12 bg-white min-h-screen">
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-black">Inventory</h1>
-          <p className="text-sm text-zinc-500">Manage your product stock levels and cost tracking.</p>
+      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="space-y-1.5 sm:space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-black">Inventory</h1>
+          <p className="text-xs sm:text-sm text-zinc-500">Manage your product stock levels and cost tracking.</p>
         </div>
-        <div className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 bg-zinc-50 px-4 py-2 border border-zinc-100">
+        <div className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 bg-zinc-50 px-4 py-2 border border-zinc-100 self-start sm:self-auto">
           Managed via Sanity CMS
         </div>
       </header>

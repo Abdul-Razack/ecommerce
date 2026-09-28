@@ -542,16 +542,16 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <div suppressHydrationWarning className="p-8 space-y-12 bg-white min-h-screen relative">
+    <div suppressHydrationWarning className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 md:space-y-12 bg-white min-h-screen relative">
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-100 pb-8">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-black uppercase">Products</h1>
-          <p className="text-sm text-zinc-500 font-medium">Manage your product catalog, sizes/colors inventory, and photo galleries.</p>
+      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 border-b border-zinc-100 pb-6 sm:pb-8">
+        <div className="space-y-1.5 sm:space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-black uppercase">Products</h1>
+          <p className="text-xs sm:text-sm text-zinc-500 font-medium">Manage your product catalog, sizes/colors inventory, and photo galleries.</p>
         </div>
         <Button 
           onClick={handleOpenAdd}
-          className="h-12 px-6 uppercase tracking-widest text-[10px] font-black"
+          className="h-10 sm:h-12 px-6 uppercase tracking-widest text-[10px] font-black w-full sm:w-auto"
         >
           Add Product
         </Button>

@@ -76,15 +76,15 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <div suppressHydrationWarning className="p-8 space-y-12 bg-white min-h-screen">
+    <div suppressHydrationWarning className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 md:space-y-12 bg-white min-h-screen">
       {/* Header */}
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-black">Reports & Analytics</h1>
-        <p className="text-sm text-zinc-500">Track and analyze your store's sales and performance trends.</p>
+      <header className="flex flex-col gap-1.5 sm:gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-black">Reports & Analytics</h1>
+        <p className="text-xs sm:text-sm text-zinc-500">Track and analyze your store's sales and performance trends.</p>
       </header>
 
       {/* Summary Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card className="relative overflow-hidden">
           <div className="flex flex-col gap-2 relative z-10">
             <span className="text-[10px] uppercase tracking-widest font-bold text-zinc-400">Total Revenue</span>

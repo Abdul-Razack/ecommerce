@@ -172,7 +172,7 @@ export default function ProductDetails({ product, relatedProducts }) {
           
           {/* Gallery Layer with High-Class FX */}
           <div className="lg:col-span-5 lg:sticky lg:top-32 space-y-6 h-fit">
-            <div className="aspect-[4/5] rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-tactile tactile-card border border-onyx/5 relative flex items-center justify-center p-6 md:p-8">
+            <div className="aspect-[4/5] rounded-2xl md:rounded-[3rem] overflow-hidden bg-white shadow-tactile tactile-card border border-onyx/5 relative flex items-center justify-center p-3 sm:p-6 md:p-8">
               <img 
                 src={activeImage} 
                 className="max-w-full max-h-full object-contain transition-all duration-[2s] hover:scale-105" 
@@ -182,14 +182,14 @@ export default function ProductDetails({ product, relatedProducts }) {
             
             {/* Thumbnails: Refined Scroll */}
             {product.processedImages && product.processedImages.length > 1 && (
-              <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
+              <div className="flex gap-2.5 sm:gap-4 overflow-x-auto pb-4 hide-scrollbar">
                 {product.processedImages.map((img, i) => (
                   <button 
                     key={i}
                     onClick={() => setActiveImage(img.url)}
-                    className={`w-20 h-24 flex-shrink-0 rounded-2xl overflow-hidden border-2 transition-all duration-500 ${activeImage === img.url ? 'border-chrome scale-95 bg-white' : 'border-transparent opacity-35 bg-white hover:opacity-100'}`}
+                    className={`w-14 h-18 sm:w-20 sm:h-24 flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden border-2 transition-all duration-500 ${activeImage === img.url ? 'border-chrome scale-95 bg-white' : 'border-transparent opacity-35 bg-white hover:opacity-100'}`}
                   >
-                    <img src={img.thumbnailUrl || img.url} className="w-full h-full object-contain p-1" alt={`${cleanName} View ${i}`} />
+                    <img src={img.thumbnailUrl || img.url} className="w-full h-full object-contain p-0.5 sm:p-1" alt={`${cleanName} View ${i}`} />
                   </button>
                 ))}
               </div>
@@ -216,7 +216,7 @@ export default function ProductDetails({ product, relatedProducts }) {
                 </div>
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-black leading-[0.95] tracking-tighter uppercase">{cleanName}</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-black leading-[1.05] md:leading-[0.95] tracking-tighter uppercase">{cleanName}</h1>
               
               {/* Pricing section */}
               <div className="flex items-baseline gap-4 pt-2">
@@ -388,19 +388,19 @@ export default function ProductDetails({ product, relatedProducts }) {
 
             {/* CTAs: High-Velocity Action Bar */}
             <div className="space-y-4 pt-4 border-t border-onyx/5">
-              <div className="flex flex-col sm:flex-row gap-4 items-stretch">
+              <div className="flex gap-2 sm:gap-4 items-center">
                 <Button 
                   onClick={handleAddToCart}
                   variant="outline"
                   disabled={activeStock <= 0}
-                  className="h-16 flex-1 rounded-full border-onyx text-onyx hover:bg-onyx hover:text-white text-[10px] font-black tracking-[0.4em] uppercase hover:shadow-tactile transition-all duration-300 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-onyx"
+                  className="h-12 sm:h-16 flex-1 rounded-full border-onyx text-onyx hover:bg-onyx hover:text-white text-[9px] sm:text-[10px] font-black tracking-wider sm:tracking-[0.4em] uppercase hover:shadow-tactile transition-all duration-300 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-onyx truncate"
                 >
                   ADD TO CART
                 </Button>
                 <Button 
                   onClick={handleBuyNow}
                   disabled={activeStock <= 0}
-                  className="h-16 flex-1 rounded-full bg-onyx text-white hover:bg-chrome hover:text-onyx text-[10px] font-black tracking-[0.4em] uppercase shadow-kinetic transition-all duration-300 disabled:opacity-40 disabled:hover:bg-onyx"
+                  className="h-12 sm:h-16 flex-1 rounded-full bg-onyx text-white hover:bg-chrome hover:text-onyx text-[9px] sm:text-[10px] font-black tracking-wider sm:tracking-[0.4em] uppercase shadow-kinetic transition-all duration-300 disabled:opacity-40 disabled:hover:bg-onyx truncate"
                 >
                   BUY NOW
                 </Button>
@@ -409,18 +409,19 @@ export default function ProductDetails({ product, relatedProducts }) {
                 <button
                   type="button"
                   onClick={() => toggleWishlist(product)}
-                  className={`w-16 h-16 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 bg-white ${
+                  className={`w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 bg-white ${
                     favorited ? 'border-red-200 text-red-600 shadow-md' : 'border-onyx/10 text-onyx/40 hover:border-onyx/40'
                   }`}
                   title="Add to Wishlist"
                 >
                   <svg 
-                    width="20" 
-                    height="20" 
+                    width="18" 
+                    height="18" 
                     viewBox="0 0 24 24" 
                     fill={favorited ? "currentColor" : "none"} 
                     stroke="currentColor" 
                     strokeWidth="2"
+                    className="sm:w-5 sm:h-5"
                   >
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>

@@ -118,7 +118,7 @@ export default function PromoBannerSlider({ banners, fallbackBanner }: PromoBann
       onTouchEnd={handleTouchEnd}
     >
       {/* Slides Container */}
-      <div className="relative w-full h-full min-h-[380px] lg:min-h-[420px]">
+      <div className="relative w-full h-full min-h-[500px] sm:min-h-[460px] md:min-h-[440px] lg:min-h-[420px]">
         {effectiveBanners.map((banner, idx) => {
           const isActive = idx === currentIndex;
           const bgImg = banner.image || banner.customImageUrl || '/images/poster-image.png';
@@ -131,7 +131,7 @@ export default function PromoBannerSlider({ banners, fallbackBanner }: PromoBann
               }`}
             >
               {/* Left Column: Text & CTA */}
-              <div className="md:col-span-5 p-8 md:p-12 lg:p-14 flex flex-col justify-center space-y-4 text-bone z-10 bg-onyx/90 md:bg-onyx">
+              <div className="md:col-span-5 p-6 sm:p-8 md:p-12 lg:p-14 flex flex-col justify-center space-y-3 sm:space-y-4 text-bone z-10 bg-onyx/90 md:bg-onyx">
                 <div className="flex items-center gap-2">
                   <span className="text-chrome font-black text-[9px] tracking-[0.2em] uppercase">
                     {banner.tag || "✦ Exclusive Women's Festives"}

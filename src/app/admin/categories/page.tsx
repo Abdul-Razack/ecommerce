@@ -122,13 +122,13 @@ export default function CategoriesPage() {
   });
 
   return (
-    <div suppressHydrationWarning className="p-8 space-y-12 bg-white min-h-screen">
-      <header className="flex flex-col gap-2 flex-wrap sm:flex-row justify-between items-start sm:items-center">
+    <div suppressHydrationWarning className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 md:space-y-12 bg-white min-h-screen">
+      <header className="flex flex-col gap-3 sm:flex-row justify-between items-start sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-black">Categories</h1>
-          <p className="text-sm text-zinc-500">Manage your product categories.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-black">Categories</h1>
+          <p className="text-xs sm:text-sm text-zinc-500">Manage your product categories.</p>
         </div>
-        <Button onClick={handleOpenNew}>+ Add Category</Button>
+        <Button onClick={handleOpenNew} className="w-full sm:w-auto">+ Add Category</Button>
       </header>
 
       {/* Search Bar */}

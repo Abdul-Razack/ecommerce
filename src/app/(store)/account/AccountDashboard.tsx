@@ -154,10 +154,10 @@ export default function AccountDashboard({ customer, orders }: AccountDashboardP
           <button
             key={tab.key}
             onClick={() => handleTabChange(tab.key)}
-            className={`flex items-center gap-3 px-6 py-4 rounded-xl text-left text-xs font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all duration-300 w-full cursor-pointer border-none focus:outline-none ${
+            className={`flex items-center gap-2 sm:gap-3 px-4 py-2.5 lg:px-6 lg:py-4 rounded-xl text-left text-[11px] lg:text-xs font-black uppercase tracking-wider lg:tracking-[0.2em] whitespace-nowrap transition-all duration-300 w-auto lg:w-full cursor-pointer border-none focus:outline-none flex-shrink-0 ${
               activeTab === tab.key
-                ? 'bg-onyx text-white shadow-kinetic scale-105'
-                : 'text-onyx/40 hover:text-onyx hover:bg-onyx/5/50'
+                ? 'bg-onyx text-white shadow-sm'
+                : 'text-onyx/50 hover:text-onyx hover:bg-onyx/5'
             }`}
           >
             <span>{tab.icon}</span>

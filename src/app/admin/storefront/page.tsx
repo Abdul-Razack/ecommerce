@@ -366,10 +366,10 @@ export default function AdminStorefrontPage() {
   const currentPreviewBanner = promoBanners[previewSlideIdx] || promoBanners[0];
 
   return (
-    <div className="p-8 space-y-12 bg-white min-h-screen pb-32">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-black">Storefront Management</h1>
-        <p className="text-sm text-zinc-500">Control the content, promotional ad carousels, and layout of your homepage.</p>
+    <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 md:space-y-12 bg-white min-h-screen pb-32">
+      <header className="flex flex-col gap-1.5 sm:gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-black">Storefront Management</h1>
+        <p className="text-xs sm:text-sm text-zinc-500">Control the content, promotional ad carousels, and layout of your homepage.</p>
       </header>
 
       {/* 01. PROMOTIONAL AD BANNER CAROUSEL MANAGER (Full Width) */}

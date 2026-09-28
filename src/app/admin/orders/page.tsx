@@ -115,11 +115,11 @@ export default function AdminOrdersPage() {
   const statuses = ['all', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled'];
 
   return (
-    <div suppressHydrationWarning className="p-8 space-y-12 bg-white min-h-screen">
+    <div suppressHydrationWarning className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 md:space-y-12 bg-white min-h-screen">
       {/* Header */}
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-black">Order Management</h1>
-        <p className="text-sm text-zinc-500">View and update customer orders and tracking status.</p>
+      <header className="flex flex-col gap-1.5 sm:gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-black">Order Management</h1>
+        <p className="text-xs sm:text-sm text-zinc-500">View and update customer orders and tracking status.</p>
       </header>
 
       {/* Controls: Filter Tabs + Search */}

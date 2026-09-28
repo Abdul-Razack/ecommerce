@@ -147,14 +147,14 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
   }, [filteredAndSorted, currentPage, pageSize]);
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-8 sm:space-y-16">
       
       {/* Filters & Control bar */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-zinc-100 pb-6 relative z-50">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 border-b border-zinc-100 pb-4 sm:pb-6 relative z-50">
         
         {/* Left Side: Filter Dropdowns */}
-        <div className="flex flex-wrap items-center gap-6 text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
-          <span className="text-zinc-400">Filter by</span>
+        <div className="flex items-center gap-3 sm:gap-6 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto hide-scrollbar text-[10px] sm:text-[11px] font-bold text-zinc-500 uppercase tracking-wider sm:tracking-widest flex-nowrap md:flex-wrap">
+          <span className="text-zinc-400 whitespace-nowrap">Filter by</span>
 
           {/* Categories Filter */}
           <div className="relative">
@@ -310,7 +310,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
       {/* Product Display Grid */}
       <div>
         {paginatedProducts.length > 0 ? (
-          <div className={`grid gap-8 md:gap-x-8 md:gap-y-12 transition-all duration-500 ${
+          <div className={`grid gap-3 sm:gap-6 md:gap-x-8 md:gap-y-12 transition-all duration-500 ${
             gridCols === 2 
               ? 'grid-cols-2 max-w-4xl mx-auto' 
               : gridCols === 3 

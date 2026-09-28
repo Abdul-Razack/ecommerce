@@ -156,13 +156,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       )}
 
       {/* Hero Section */}
-      <div className="relative bg-neutral-soft py-32 md:py-44 border-b border-onyx/5 overflow-hidden">
+      <div className="relative bg-neutral-soft py-14 sm:py-20 md:py-44 border-b border-onyx/5 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
             src="/images/shop-banner.png" 
             alt="Shop Banner" 
-            className="w-full h-full object-cover object-center opacity-20" 
+            className="w-full h-full object-cover object-[60%_center] opacity-25 md:opacity-20" 
           />
         </div>
         

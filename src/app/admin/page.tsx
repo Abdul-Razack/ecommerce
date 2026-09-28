@@ -70,15 +70,15 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div suppressHydrationWarning className="p-8 space-y-12 bg-white min-h-screen">
+    <div suppressHydrationWarning className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 md:space-y-12 bg-white min-h-screen">
       {/* Header */}
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-black">Dashboard</h1>
-        <p className="text-sm text-zinc-500">Track your store's orders and performance in real-time.</p>
+      <header className="flex flex-col gap-1.5 sm:gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-black">Dashboard</h1>
+        <p className="text-xs sm:text-sm text-zinc-500">Track your store's orders and performance in real-time.</p>
       </header>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <StatCard title="Total Orders" value={stats?.totalOrders || 0} Icon={Package} />
         <StatCard 
           title="Total Revenue" 
