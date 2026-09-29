@@ -57,8 +57,21 @@ export default function ProductDetails({ product, relatedProducts }) {
   const originalPrice = activeVariant?.comparePrice || product.comparePrice || Math.round(activePrice * 1.4);
   const activeStock = activeVariant ? activeVariant.stock : product.stock;
 
+  // Resolve authentic photoshoot image if seeded with placeholder toy train
+  const resolvePhotoUrl = (url: string | null | undefined) => {
+    if (!url) return 'https://placehold.co/800x1000?text=Product';
+    if (url.includes('photo-1596461404969-9ae70f2830c1')) {
+      if (product.category?.toLowerCase().includes('skirt') || product.name?.toLowerCase().includes('pattu') || product.name?.toLowerCase().includes('skirt')) {
+        return '/images/banner-child.png';
+      } else if (product.category?.toLowerCase().includes('nighty') || product.name?.toLowerCase().includes('night')) {
+        return 'https://www.ankitadesigns.in/cdn/shop/files/350nilima.png?v=1777283189';
+      }
+    }
+    return url;
+  };
+
   const [activeImage, setActiveImage] = useState(
-    product.processedImages?.[0]?.url || product.imageUrl
+    resolvePhotoUrl(product.processedImages?.[0]?.url || product.imageUrl)
   );
 
   const favorited = isInWishlist(product._id);
@@ -87,10 +100,10 @@ export default function ProductDetails({ product, relatedProducts }) {
       if (firstVar.images?.[0]) {
         try {
           const url = urlFor(firstVar.images[0]).width(800).height(1000).url();
-          if (url) setActiveImage(url);
+          if (url) setActiveImage(resolvePhotoUrl(url));
         } catch (e) {}
       } else if (firstVar.externalImageUrls?.[0]) {
-        setActiveImage(firstVar.externalImageUrls[0]);
+        setActiveImage(resolvePhotoUrl(firstVar.externalImageUrls[0]));
       }
       
       // Auto-select first available size for new color
@@ -165,17 +178,23 @@ export default function ProductDetails({ product, relatedProducts }) {
   }, []);
 
   return (
-    <div className="bg-bone min-h-screen pt-12 pb-20">
+    <div className="bg-bone min-h-screen pt-8 sm:pt-12 pb-36 lg:pb-24">
       <Container>
         {/* Core Detail Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
           {/* Gallery Layer with High-Class FX */}
           <div className="lg:col-span-5 lg:sticky lg:top-32 space-y-6 h-fit">
-            <div className="aspect-[4/5] rounded-2xl md:rounded-[3rem] overflow-hidden bg-white shadow-tactile tactile-card border border-onyx/5 relative flex items-center justify-center p-3 sm:p-6 md:p-8">
+            <div className="aspect-[4/5] rounded-2xl md:rounded-[3rem] overflow-hidden bg-neutral-soft/50 shadow-tactile tactile-card border border-onyx/5 relative flex items-center justify-center">
               <img 
                 src={activeImage} 
-                className="max-w-full max-h-full object-contain transition-all duration-[2s] hover:scale-105" 
+                className={`w-full h-full transition-all duration-700 hover:scale-105 ${
+                  activeImage.includes('banner-child')
+                    ? 'object-cover object-[75%_center]'
+                    : activeImage.includes('unsplash') || activeImage.includes('mirraw') || activeImage.includes('ankitadesigns') || activeImage.includes('pochampallysarees')
+                      ? 'object-cover object-top'
+                      : 'object-contain p-4'
+                }`}
                 alt={cleanName} 
               />
             </div>
@@ -183,15 +202,23 @@ export default function ProductDetails({ product, relatedProducts }) {
             {/* Thumbnails: Refined Scroll */}
             {product.processedImages && product.processedImages.length > 1 && (
               <div className="flex gap-2.5 sm:gap-4 overflow-x-auto pb-4 hide-scrollbar">
-                {product.processedImages.map((img, i) => (
-                  <button 
-                    key={i}
-                    onClick={() => setActiveImage(img.url)}
-                    className={`w-14 h-18 sm:w-20 sm:h-24 flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden border-2 transition-all duration-500 ${activeImage === img.url ? 'border-chrome scale-95 bg-white' : 'border-transparent opacity-35 bg-white hover:opacity-100'}`}
-                  >
-                    <img src={img.thumbnailUrl || img.url} className="w-full h-full object-contain p-0.5 sm:p-1" alt={`${cleanName} View ${i}`} />
-                  </button>
-                ))}
+                {product.processedImages.map((img, i) => {
+                  const resolvedUrl = resolvePhotoUrl(img.url);
+                  const isCurActive = activeImage === resolvedUrl;
+                  return (
+                    <button 
+                      key={i}
+                      onClick={() => setActiveImage(resolvedUrl)}
+                      className={`w-14 h-18 sm:w-20 sm:h-24 flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden border-2 transition-all duration-500 ${isCurActive ? 'border-chrome scale-95 bg-white' : 'border-transparent opacity-40 bg-white hover:opacity-100'}`}
+                    >
+                      <img 
+                        src={resolvePhotoUrl(img.thumbnailUrl || img.url)} 
+                        className={`w-full h-full ${resolvedUrl.includes('banner-child') || resolvedUrl.includes('unsplash') || resolvedUrl.includes('mirraw') || resolvedUrl.includes('ankitadesigns') ? 'object-cover' : 'object-contain p-1'}`} 
+                        alt={`${cleanName} View ${i}`} 
+                      />
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -216,7 +243,7 @@ export default function ProductDetails({ product, relatedProducts }) {
                 </div>
               </div>
               
-              <h1 className="text-2xl sm:text-3xl md:text-5xl font-black leading-[1.05] md:leading-[0.95] tracking-tighter uppercase">{cleanName}</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-black leading-[1.05] md:leading-[0.95] tracking-tight uppercase">{cleanName}</h1>
               
               {/* Pricing section */}
               <div className="flex items-baseline gap-4 pt-2">

@@ -47,7 +47,7 @@ export default async function AccountPage() {
   `, { email: user.email, customerId: customer._id });
 
   return (
-    <div className="bg-bone min-h-screen pt-8 pb-20 md:pt-12 md:pb-28">
+    <div className="bg-bone min-h-screen pt-8 pb-36 md:pt-12 md:pb-28">
       <Container className="max-w-6xl space-y-8">
         <div className="border-b border-onyx/10 pb-6 mb-8">
           <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-onyx">My Account</h1>

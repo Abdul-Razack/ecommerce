@@ -33,6 +33,17 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
       : `Premium Posh Wear ${pageNum}`;
   }
 
+  // Resolve image with fallback for any seeded placeholder
+  let rawImage = product.imageUrl || (typeof product.image === 'string' ? product.image : null);
+  if (rawImage && rawImage.includes('photo-1596461404969-9ae70f2830c1')) {
+    if (product.category?.toLowerCase().includes('skirt') || product.name?.toLowerCase().includes('pattu') || product.name?.toLowerCase().includes('skirt')) {
+      rawImage = '/images/banner-child.png';
+    } else if (product.category?.toLowerCase().includes('nighty') || product.name?.toLowerCase().includes('night')) {
+      rawImage = 'https://www.ankitadesigns.in/cdn/shop/files/350nilima.png?v=1777283189';
+    }
+  }
+  const displayImage = rawImage || 'https://placehold.co/400x500?text=Product';
+
   // Calculate a realistic strike price (comparePrice) if not set
   const originalPrice = product.comparePrice || Math.round(product.price * 1.4);
 
@@ -66,9 +77,15 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
       <div className="relative aspect-[4/5] overflow-hidden bg-neutral-soft border-b border-onyx/5">
         <Link href={`/shop/${product.slug?.current || product.slug}`} className="block w-full h-full">
           <img 
-            src={product.imageUrl || (typeof product.image === 'string' ? product.image : null) || 'https://placehold.co/400x500?text=Product'} 
+            src={displayImage} 
             alt={cleanName}
-            className="w-full h-full object-contain p-1.5 sm:p-2 transition-all duration-700 group-hover:scale-105"
+            className={`w-full h-full ${
+              displayImage.includes('banner-child')
+                ? 'object-cover object-[75%_center]'
+                : displayImage.includes('unsplash') || displayImage.includes('mirraw') || displayImage.includes('ankitadesigns') || displayImage.includes('pochampallysarees')
+                  ? 'object-cover object-top'
+                  : 'object-contain p-2'
+            } transition-all duration-700 group-hover:scale-105`}
             onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://placehold.co/400x500?text=Product'; }}
           />
         </Link>
@@ -101,7 +118,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
           {/* Product Name */}
           <Link href={`/shop/${product.slug?.current || product.slug}`} className="block">
-            <h3 className="text-[11px] sm:text-xs font-black uppercase text-onyx tracking-tight leading-tight line-clamp-1 hover:text-onyx/70 transition-colors">
+            <h3 className="text-[11px] sm:text-xs font-black uppercase text-onyx tracking-tight leading-snug line-clamp-2 min-h-[1.75rem] sm:min-h-[2rem] hover:text-onyx/70 transition-colors">
               {cleanName}
             </h3>
           </Link>
@@ -121,12 +138,18 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
           {/* Color Swatches */}
           {(() => {
-            const productColors = Array.from(new Set(product.variants?.map(v => v.color).filter(Boolean) || []));
+            const validColorNames = ['blue', 'grey', 'gray', 'red', 'yellow', 'black', 'white', 'gold', 'green', 'pink', 'purple', 'maroon', 'navy', 'beige', 'orange', 'teal', 'brown', 'cream', 'peach', 'wine', 'mustard', 'lavender'];
+            const productColors = Array.from(new Set(product.variants?.map((v: any) => v.color).filter(Boolean) || []))
+              .filter((c: any) => {
+                const lower = c.toLowerCase().trim();
+                return !['standard', 'default', 'n/a', 'none', '', 'regular', 'free'].includes(lower);
+              });
+
             if (productColors.length === 0) return null;
             return (
-              <div className="flex gap-1 pt-1 sm:pt-1.5">
-                {productColors.map((color: any, idx) => {
-                  const lowerColor = color.toLowerCase();
+              <div className="flex items-center gap-1 pt-1 sm:pt-1.5">
+                {productColors.slice(0, 5).map((color: any, idx) => {
+                  const lowerColor = color.toLowerCase().trim();
                   const colorMap: Record<string, string> = {
                     blue: '#2563EB',
                     grey: '#71717A',
@@ -136,17 +159,35 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                     black: '#000000',
                     white: '#FFFFFF',
                     gold: '#C5A059',
+                    green: '#16A34A',
+                    pink: '#EC4899',
+                    purple: '#9333EA',
+                    maroon: '#800000',
+                    navy: '#000080',
+                    beige: '#F5F5DC',
+                    orange: '#EA580C',
+                    teal: '#0D9488',
+                    brown: '#78350F',
+                    cream: '#FFFDD0',
+                    peach: '#FFDAB9',
+                    wine: '#722F37',
+                    mustard: '#EAB308',
+                    lavender: '#E6E6FA',
                   };
-                  const bgVal = colorMap[lowerColor] || lowerColor;
+                  const bgVal = colorMap[lowerColor] || (validColorNames.includes(lowerColor) ? lowerColor : null);
+                  if (!bgVal) return null;
                   return (
                     <span 
                       key={idx} 
-                      className="w-2.5 h-2.5 rounded-full border border-black/10 shadow-sm inline-block"
+                      className="w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs inline-block"
                       style={{ backgroundColor: bgVal }}
                       title={color}
                     />
                   );
                 })}
+                {productColors.length > 5 && (
+                  <span className="text-[7px] font-bold text-onyx/40">+{productColors.length - 5}</span>
+                )}
               </div>
             );
           })()}
@@ -161,7 +202,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
               e.stopPropagation();
               addToCart(product);
             }}
-            className="w-1/2 h-8 sm:h-9 text-[7px] sm:text-[8px] tracking-wider sm:tracking-widest font-black bg-transparent hover:bg-onyx/5 border border-onyx/10 text-onyx uppercase transition-all rounded-full active:scale-95 px-1 truncate"
+            className="w-1/2 h-8 sm:h-9 text-[8px] sm:text-[9px] tracking-normal sm:tracking-wider font-black bg-white hover:bg-neutral-soft border border-onyx/15 text-onyx uppercase transition-all rounded-full active:scale-95 px-1 truncate shadow-2xs cursor-pointer"
           >
             Add to Cart
           </button>
@@ -173,7 +214,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
               addToCart(product);
               router.push('/cart');
             }}
-            className="w-1/2 h-8 sm:h-9 text-[7px] sm:text-[8px] tracking-wider sm:tracking-widest font-black bg-onyx hover:bg-black text-bone uppercase transition-all rounded-full active:scale-95 shadow-sm px-1 truncate"
+            className="w-1/2 h-8 sm:h-9 text-[8px] sm:text-[9px] tracking-normal sm:tracking-wider font-black bg-onyx hover:bg-black text-bone uppercase transition-all rounded-full active:scale-95 shadow-sm px-1 truncate cursor-pointer"
           >
             Buy Now
           </button>

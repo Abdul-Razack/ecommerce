@@ -26,6 +26,10 @@ const MobileNav = ({ user, signInUrl }) => {
       : { href: signInUrl, label: 'LOGIN', icon: <UserIcon />, isExternal: true }
   ];
 
+  if (mounted && pathname === '/cart' && cartCount > 0) {
+    return null;
+  }
+
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-2xl border-t border-white/10 flex justify-around items-center h-24 z-50 px-4 pb-4 rounded-t-[2.5rem] shadow-depth-3">
       {navItems.map((item) => {

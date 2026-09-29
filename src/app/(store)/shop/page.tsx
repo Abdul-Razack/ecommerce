@@ -156,7 +156,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       )}
 
       {/* Hero Section */}
-      <div className="relative bg-neutral-soft py-14 sm:py-20 md:py-44 border-b border-onyx/5 overflow-hidden">
+      <div className="relative bg-neutral-soft py-8 sm:py-16 md:py-32 border-b border-onyx/5 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -179,7 +179,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       </div>
 
       {/* Main Grid */}
-      <section className="py-20">
+      <section className="py-6 sm:py-10 md:py-16 pb-36">
         <Container>
           {products.length > 0 ? (
             <ProductCardWrapper products={products} />

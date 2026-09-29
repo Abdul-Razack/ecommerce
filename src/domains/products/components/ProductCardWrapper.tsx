@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from 'react';
 import ProductCard from './ProductCard';
 import { useCurrency } from '@/providers/CurrencyProvider';
-import Pagination from '@/shared/ui/Pagination';
 
 interface Variant {
   color: string;
@@ -78,9 +77,10 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
   // Layout column state (2, 3, or 4 columns)
   const [gridCols, setGridCols] = useState<number>(4);
   
-  // Pagination state
-  const [pageSize, setPageSize] = useState<number>(8);
+  // Pagination & Load More state (Myntra Standard)
+  const PAGE_SIZE = 8;
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [loadedCount, setLoadedCount] = useState<number>(PAGE_SIZE);
   
   // Dropdown open states
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -134,175 +134,459 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
     return result;
   }, [products, selectedCategory, selectedColor, selectedSize, selectedPrice, selectedSort, priceOptions]);
 
-  // Reset pagination if filter changes
+  // Reset pagination & loaded count if filters change
   React.useEffect(() => {
     setCurrentPage(1);
+    setLoadedCount(PAGE_SIZE);
   }, [selectedCategory, selectedColor, selectedSize, selectedPrice, selectedSort]);
 
-  // Paginated List
-  const totalPages = Math.max(1, Math.ceil(filteredAndSorted.length / pageSize));
+  const totalItems = filteredAndSorted.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+
+  // Determine which products to show (supports both continuous Load More and direct page jumping)
   const paginatedProducts = useMemo(() => {
-    const startIdx = (currentPage - 1) * pageSize;
-    return filteredAndSorted.slice(startIdx, startIdx + pageSize);
-  }, [filteredAndSorted, currentPage, pageSize]);
+    if (currentPage === 1) {
+      return filteredAndSorted.slice(0, loadedCount);
+    }
+    const startIdx = (currentPage - 1) * PAGE_SIZE;
+    return filteredAndSorted.slice(startIdx, startIdx + PAGE_SIZE);
+  }, [filteredAndSorted, currentPage, loadedCount]);
+
+  const currentlyShownCount = paginatedProducts.length;
+
+  const hasActiveFilters = selectedCategory !== 'All' || selectedColor !== 'All Colors' || selectedSize !== 'All Sizes' || selectedPrice !== 0;
+
+  const resetFilters = () => {
+    setSelectedCategory('All');
+    setSelectedColor('All Colors');
+    setSelectedSize('All Sizes');
+    setSelectedPrice(0);
+    setSelectedSort('default');
+    setOpenDropdown(null);
+  };
 
   return (
-    <div className="space-y-8 sm:space-y-16">
+    <div className="space-y-6 sm:space-y-12">
       
-      {/* Filters & Control bar */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 border-b border-zinc-100 pb-4 sm:pb-6 relative z-50">
+      {/* Click-away backdrop overlay when dropdown is open */}
+      {openDropdown && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]" 
+          onClick={() => setOpenDropdown(null)} 
+        />
+      )}
+
+      {/* Modern Filter & Control Bar */}
+      <div className="border-b border-onyx/10 pb-3 sm:pb-5 relative z-50">
         
-        {/* Left Side: Filter Dropdowns */}
-        <div className="flex items-center gap-3 sm:gap-6 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto hide-scrollbar text-[10px] sm:text-[11px] font-bold text-zinc-500 uppercase tracking-wider sm:tracking-widest flex-nowrap md:flex-wrap">
-          <span className="text-zinc-400 whitespace-nowrap">Filter by</span>
-
-          {/* Categories Filter */}
-          <div className="relative">
-            <button 
-              onClick={() => toggleDropdown('categories')}
-              className={`hover:text-black flex items-center gap-1 transition-colors select-none ${selectedCategory !== 'All' ? 'text-black' : ''}`}
+        {/* Mobile Filter & Sort Rail (Horizontal Scrollable Chips - Meesho/Ajio/Myntra pattern) */}
+        <div className="md:hidden flex items-center gap-2 overflow-x-auto pb-1.5 hide-scrollbar">
+          {/* Clear Filters Reset Pill (first pill when any filter is active) */}
+          {hasActiveFilters && (
+            <button
+              onClick={resetFilters}
+              className="flex-shrink-0 px-3 py-2 rounded-full bg-red-50 text-red-700 border border-red-200 text-[9.5px] font-black uppercase tracking-wider shadow-xs hover:bg-red-100 transition-colors flex items-center gap-1"
             >
-              Categories ({selectedCategory}) <span className="text-[8px] font-bold">▼</span>
+              <span>✕</span>
+              <span>Reset</span>
             </button>
-            {openDropdown === 'categories' && (
-              <div className="absolute left-0 mt-3 w-48 bg-white border border-zinc-150 shadow-xl py-2 rounded-lg z-50 animate-in fade-in slide-in-from-top-1 duration-200">
-                {categoriesList.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => { setSelectedCategory(cat); setOpenDropdown(null); }}
-                    className={`w-full text-left px-4 py-2 hover:bg-zinc-50 text-[10px] uppercase font-bold tracking-widest ${selectedCategory === cat ? 'text-chrome font-black' : 'text-zinc-600'}`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          )}
 
-          {/* Color Filter */}
-          <div className="relative">
-            <button 
-              onClick={() => toggleDropdown('colors')}
-              className={`hover:text-black flex items-center gap-1 transition-colors select-none ${selectedColor !== 'All Colors' ? 'text-black' : ''}`}
-            >
-              Color ({selectedColor}) <span className="text-[8px] font-bold">▼</span>
-            </button>
-            {openDropdown === 'colors' && (
-              <div className="absolute left-0 mt-3 w-48 bg-white border border-zinc-150 shadow-xl py-2 rounded-lg z-50 animate-in fade-in slide-in-from-top-1 duration-200">
-                {COLOR_OPTIONS.map(opt => (
-                  <button
-                    key={opt.name}
-                    onClick={() => { setSelectedColor(opt.name); setOpenDropdown(null); }}
-                    className="w-full flex items-center gap-3 text-left px-4 py-2 hover:bg-zinc-50 text-[10px] uppercase font-bold tracking-widest text-zinc-600"
-                  >
-                    {opt.hex && (
-                      <span className="w-3 h-3 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: opt.hex }} />
-                    )}
-                    <span className={selectedColor === opt.name ? 'text-chrome font-black' : ''}>{opt.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Size Filter */}
-          <div className="relative">
-            <button 
-              onClick={() => toggleDropdown('sizes')}
-              className={`hover:text-black flex items-center gap-1 transition-colors select-none ${selectedSize !== 'All Sizes' ? 'text-black' : ''}`}
-            >
-              Size ({selectedSize}) <span className="text-[8px] font-bold">▼</span>
-            </button>
-            {openDropdown === 'sizes' && (
-              <div className="absolute left-0 mt-3 w-40 bg-white border border-zinc-150 shadow-xl py-2 rounded-lg z-50 animate-in fade-in slide-in-from-top-1 duration-200">
-                {SIZE_OPTIONS.map(sz => (
-                  <button
-                    key={sz}
-                    onClick={() => { setSelectedSize(sz); setOpenDropdown(null); }}
-                    className={`w-full text-left px-4 py-2 hover:bg-zinc-50 text-[10px] uppercase font-bold tracking-widest ${selectedSize === sz ? 'text-chrome font-black' : 'text-zinc-600'}`}
-                  >
-                    {sz}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Price Filter */}
-          <div className="relative">
-            <button 
-              onClick={() => toggleDropdown('prices')}
-              className={`hover:text-black flex items-center gap-1 transition-colors select-none ${selectedPrice !== 0 ? 'text-black' : ''}`}
-            >
-              Price ({priceOptions[selectedPrice]?.label}) <span className="text-[8px] font-bold">▼</span>
-            </button>
-            {openDropdown === 'prices' && (
-              <div className="absolute left-0 mt-3 w-48 bg-white border border-zinc-150 shadow-xl py-2 rounded-lg z-50 animate-in fade-in slide-in-from-top-1 duration-200">
-                {priceOptions.map((opt, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => { setSelectedPrice(idx); setOpenDropdown(null); }}
-                    className={`w-full text-left px-4 py-2 hover:bg-zinc-50 text-[10px] uppercase font-bold tracking-widest ${selectedPrice === idx ? 'text-chrome font-black' : 'text-zinc-600'}`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right Side: Layout Grid & Sorting */}
-        <div className="flex items-center gap-6 text-[11px] font-bold uppercase tracking-widest">
-          {/* Default Sorting */}
-          <div className="relative">
-            <button 
+          {/* Sort Pill */}
+          <div className="relative flex-shrink-0">
+            <button
               onClick={() => toggleDropdown('sort')}
-              className="hover:text-black text-zinc-500 flex items-center gap-1 select-none"
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs ${
+                selectedSort !== 'default' 
+                  ? 'bg-onyx text-bone border-onyx' 
+                  : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
+              }`}
             >
-              {SORT_OPTIONS.find(opt => opt.value === selectedSort)?.label} <span className="text-[8px]">▼</span>
+              <span>⇅</span>
+              <span>{SORT_OPTIONS.find(opt => opt.value === selectedSort)?.label.replace(' Sorting', '')}</span>
+              <span className="text-[7px]">▼</span>
             </button>
             {openDropdown === 'sort' && (
-              <div className="absolute right-0 mt-3 w-48 bg-white border border-zinc-150 shadow-xl py-2 rounded-lg z-50 animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="fixed left-4 right-4 top-1/3 max-w-xs mx-auto bg-white border border-onyx/10 shadow-2xl py-2 rounded-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-4 py-2 border-b border-onyx/5 text-[9px] font-black uppercase tracking-widest text-chrome">
+                  Sort By
+                </div>
                 {SORT_OPTIONS.map(opt => (
                   <button
                     key={opt.value}
                     onClick={() => { setSelectedSort(opt.value); setOpenDropdown(null); }}
-                    className={`w-full text-left px-4 py-2 hover:bg-zinc-50 text-[10px] uppercase font-bold tracking-widest ${selectedSort === opt.value ? 'text-chrome font-black' : 'text-zinc-600'}`}
+                    className={`w-full text-left px-4 py-2.5 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-wider flex items-center justify-between ${
+                      selectedSort === opt.value ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                    }`}
                   >
-                    {opt.label}
+                    <span>{opt.label}</span>
+                    {selectedSort === opt.value && <span className="text-chrome font-black">✓</span>}
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Grid Layout Switcher */}
-          <div className="hidden sm:flex items-center gap-2 border-l border-zinc-100 pl-6 h-5">
-            {/* 2 Cols */}
-            <button 
-              onClick={() => setGridCols(2)}
-              className={`w-8 h-8 rounded border flex items-center justify-center transition-all ${gridCols === 2 ? 'border-black bg-zinc-50 text-black' : 'border-zinc-200 text-zinc-400 hover:text-black'}`}
-              title="2 Columns Grid"
+          {/* Category Pill */}
+          <div className="relative flex-shrink-0">
+            <button
+              onClick={() => toggleDropdown('categories')}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs ${
+                selectedCategory !== 'All' 
+                  ? 'bg-onyx text-bone border-onyx' 
+                  : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
+              }`}
             >
-              <span className="font-mono text-xs leading-none select-none tracking-tight">||</span>
+              <span>Category{selectedCategory !== 'All' ? `: ${selectedCategory}` : ''}</span>
+              <span className="text-[7px]">▼</span>
             </button>
-            {/* 3 Cols */}
-            <button 
-              onClick={() => setGridCols(3)}
-              className={`w-8 h-8 rounded border flex items-center justify-center transition-all ${gridCols === 3 ? 'border-black bg-zinc-50 text-black' : 'border-zinc-200 text-zinc-400 hover:text-black'}`}
-              title="3 Columns Grid"
+            {openDropdown === 'categories' && (
+              <div className="fixed left-4 right-4 top-1/3 max-w-xs mx-auto bg-white border border-onyx/10 shadow-2xl py-2 rounded-2xl z-50 animate-in fade-in zoom-in-95 duration-150 max-h-72 overflow-y-auto">
+                <div className="px-4 py-2 border-b border-onyx/5 text-[9px] font-black uppercase tracking-widest text-chrome">
+                  Filter by Category
+                </div>
+                {categoriesList.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => { setSelectedCategory(cat); setOpenDropdown(null); }}
+                    className={`w-full text-left px-4 py-2.5 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-wider flex items-center justify-between ${
+                      selectedCategory === cat ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                    }`}
+                  >
+                    <span>{cat}</span>
+                    {selectedCategory === cat && <span className="text-chrome font-black">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Price Pill */}
+          <div className="relative flex-shrink-0">
+            <button
+              onClick={() => toggleDropdown('prices')}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs ${
+                selectedPrice !== 0 
+                  ? 'bg-onyx text-bone border-onyx' 
+                  : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
+              }`}
             >
-              <span className="font-mono text-xs leading-none select-none tracking-tight">|||</span>
+              <span>{selectedPrice !== 0 ? priceOptions[selectedPrice]?.label : 'Price'}</span>
+              <span className="text-[7px]">▼</span>
             </button>
-            {/* 4 Cols */}
-            <button 
-              onClick={() => setGridCols(4)}
-              className={`w-8 h-8 rounded border flex items-center justify-center transition-all ${gridCols === 4 ? 'border-black bg-zinc-50 text-black' : 'border-zinc-200 text-zinc-400 hover:text-black'}`}
-              title="4 Columns Grid"
+            {openDropdown === 'prices' && (
+              <div className="fixed left-4 right-4 top-1/3 max-w-xs mx-auto bg-white border border-onyx/10 shadow-2xl py-2 rounded-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-4 py-2 border-b border-onyx/5 text-[9px] font-black uppercase tracking-widest text-chrome">
+                  Price Range
+                </div>
+                {priceOptions.map((opt, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => { setSelectedPrice(idx); setOpenDropdown(null); }}
+                    className={`w-full text-left px-4 py-2.5 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-wider flex items-center justify-between ${
+                      selectedPrice === idx ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {selectedPrice === idx && <span className="text-chrome font-black">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Color Pill */}
+          <div className="relative flex-shrink-0">
+            <button
+              onClick={() => toggleDropdown('colors')}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs ${
+                selectedColor !== 'All Colors' 
+                  ? 'bg-onyx text-bone border-onyx' 
+                  : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
+              }`}
             >
-              <span className="font-mono text-xs leading-none select-none tracking-tight">||||</span>
+              <span>{selectedColor !== 'All Colors' ? selectedColor : 'Color'}</span>
+              <span className="text-[7px]">▼</span>
             </button>
+            {openDropdown === 'colors' && (
+              <div className="fixed left-4 right-4 top-1/3 max-w-xs mx-auto bg-white border border-onyx/10 shadow-2xl py-2 rounded-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-4 py-2 border-b border-onyx/5 text-[9px] font-black uppercase tracking-widest text-chrome">
+                  Select Color
+                </div>
+                {COLOR_OPTIONS.map(opt => (
+                  <button
+                    key={opt.name}
+                    onClick={() => { setSelectedColor(opt.name); setOpenDropdown(null); }}
+                    className={`w-full flex items-center justify-between text-left px-4 py-2.5 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-wider ${
+                      selectedColor === opt.name ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      {opt.hex && (
+                        <span className="w-3.5 h-3.5 rounded-full border border-black/10 shadow-xs" style={{ backgroundColor: opt.hex }} />
+                      )}
+                      <span>{opt.name}</span>
+                    </div>
+                    {selectedColor === opt.name && <span className="text-chrome font-black">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Size Pill */}
+          <div className="relative flex-shrink-0">
+            <button
+              onClick={() => toggleDropdown('sizes')}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs ${
+                selectedSize !== 'All Sizes' 
+                  ? 'bg-onyx text-bone border-onyx' 
+                  : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
+              }`}
+            >
+              <span>{selectedSize !== 'All Sizes' ? selectedSize : 'Size'}</span>
+              <span className="text-[7px]">▼</span>
+            </button>
+            {openDropdown === 'sizes' && (
+              <div className="fixed left-4 right-4 top-1/3 max-w-xs mx-auto bg-white border border-onyx/10 shadow-2xl py-2 rounded-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-4 py-2 border-b border-onyx/5 text-[9px] font-black uppercase tracking-widest text-chrome">
+                  Select Size
+                </div>
+                {SIZE_OPTIONS.map(sz => (
+                  <button
+                    key={sz}
+                    onClick={() => { setSelectedSize(sz); setOpenDropdown(null); }}
+                    className={`w-full text-left px-4 py-2.5 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-wider flex items-center justify-between ${
+                      selectedSize === sz ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                    }`}
+                  >
+                    <span>{sz}</span>
+                    {selectedSize === sz && <span className="text-chrome font-black">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Clear Filters Reset Pill (if any filter active) */}
+          {hasActiveFilters && (
+            <button
+              onClick={resetFilters}
+              className="flex-shrink-0 px-3 py-2 rounded-full bg-red-50 text-red-700 border border-red-200 text-[9.5px] font-black uppercase tracking-wider shadow-xs hover:bg-red-100 transition-colors"
+            >
+              ✕ Reset
+            </button>
+          )}
+        </div>
+
+        {/* Desktop Filter & Control Bar */}
+        <div className="hidden md:flex items-center justify-between gap-6">
+          {/* Left Side: Filter Dropdowns as clean pill buttons */}
+          <div className="flex items-center gap-3 text-[11px] font-bold text-onyx uppercase tracking-wider flex-wrap">
+            <span className="text-onyx/40 font-black text-[10px] tracking-widest mr-1">Filter by</span>
+
+            {/* Categories */}
+            <div className="relative">
+              <button 
+                onClick={() => toggleDropdown('categories')}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-[10px] font-bold uppercase tracking-wider transition-all ${
+                  selectedCategory !== 'All' 
+                    ? 'bg-onyx text-white border-onyx' 
+                    : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
+                }`}
+              >
+                <span>Category{selectedCategory !== 'All' ? `: ${selectedCategory}` : ''}</span>
+                <span className="text-[8px]">▼</span>
+              </button>
+              {openDropdown === 'categories' && (
+                <div className="absolute left-0 mt-2 w-52 bg-white border border-onyx/10 shadow-xl py-2 rounded-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {categoriesList.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => { setSelectedCategory(cat); setOpenDropdown(null); }}
+                      className={`w-full text-left px-4 py-2 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-widest flex items-center justify-between ${
+                        selectedCategory === cat ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                      }`}
+                    >
+                      <span>{cat}</span>
+                      {selectedCategory === cat && <span className="text-chrome">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Color */}
+            <div className="relative">
+              <button 
+                onClick={() => toggleDropdown('colors')}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-[10px] font-bold uppercase tracking-wider transition-all ${
+                  selectedColor !== 'All Colors' 
+                    ? 'bg-onyx text-white border-onyx' 
+                    : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
+                }`}
+              >
+                <span>Color{selectedColor !== 'All Colors' ? `: ${selectedColor}` : ''}</span>
+                <span className="text-[8px]">▼</span>
+              </button>
+              {openDropdown === 'colors' && (
+                <div className="absolute left-0 mt-2 w-52 bg-white border border-onyx/10 shadow-xl py-2 rounded-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {COLOR_OPTIONS.map(opt => (
+                    <button
+                      key={opt.name}
+                      onClick={() => { setSelectedColor(opt.name); setOpenDropdown(null); }}
+                      className={`w-full flex items-center justify-between text-left px-4 py-2 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-widest ${
+                        selectedColor === opt.name ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        {opt.hex && (
+                          <span className="w-3.5 h-3.5 rounded-full border border-black/10 shadow-xs" style={{ backgroundColor: opt.hex }} />
+                        )}
+                        <span>{opt.name}</span>
+                      </div>
+                      {selectedColor === opt.name && <span className="text-chrome">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Size */}
+            <div className="relative">
+              <button 
+                onClick={() => toggleDropdown('sizes')}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-[10px] font-bold uppercase tracking-wider transition-all ${
+                  selectedSize !== 'All Sizes' 
+                    ? 'bg-onyx text-white border-onyx' 
+                    : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
+                }`}
+              >
+                <span>Size{selectedSize !== 'All Sizes' ? `: ${selectedSize}` : ''}</span>
+                <span className="text-[8px]">▼</span>
+              </button>
+              {openDropdown === 'sizes' && (
+                <div className="absolute left-0 mt-2 w-44 bg-white border border-onyx/10 shadow-xl py-2 rounded-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {SIZE_OPTIONS.map(sz => (
+                    <button
+                      key={sz}
+                      onClick={() => { setSelectedSize(sz); setOpenDropdown(null); }}
+                      className={`w-full text-left px-4 py-2 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-widest flex items-center justify-between ${
+                        selectedSize === sz ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                      }`}
+                    >
+                      <span>{sz}</span>
+                      {selectedSize === sz && <span className="text-chrome">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Price */}
+            <div className="relative">
+              <button 
+                onClick={() => toggleDropdown('prices')}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-[10px] font-bold uppercase tracking-wider transition-all ${
+                  selectedPrice !== 0 
+                    ? 'bg-onyx text-white border-onyx' 
+                    : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
+                }`}
+              >
+                <span>{selectedPrice !== 0 ? priceOptions[selectedPrice]?.label : 'Price'}</span>
+                <span className="text-[8px]">▼</span>
+              </button>
+              {openDropdown === 'prices' && (
+                <div className="absolute left-0 mt-2 w-52 bg-white border border-onyx/10 shadow-xl py-2 rounded-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {priceOptions.map((opt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => { setSelectedPrice(idx); setOpenDropdown(null); }}
+                      className={`w-full text-left px-4 py-2 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-widest flex items-center justify-between ${
+                        selectedPrice === idx ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                      }`}
+                    >
+                      <span>{opt.label}</span>
+                      {selectedPrice === idx && <span className="text-chrome">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Clear All Button on Desktop */}
+            {hasActiveFilters && (
+              <button
+                onClick={resetFilters}
+                className="px-3 py-1.5 text-[9px] font-black uppercase tracking-wider text-red-600 hover:text-red-800 transition-colors"
+              >
+                ✕ Clear All
+              </button>
+            )}
+          </div>
+
+          {/* Right Side: Layout Grid & Sorting */}
+          <div className="flex items-center gap-5 text-[11px] font-bold uppercase tracking-widest">
+            {/* Sorting Dropdown */}
+            <div className="relative">
+              <button 
+                onClick={() => toggleDropdown('sort')}
+                className="hover:text-black text-onyx/80 flex items-center gap-2 border border-onyx/15 bg-white px-4 py-2 rounded-full transition-all hover:border-onyx/40 select-none shadow-xs text-[10px]"
+              >
+                <span>{SORT_OPTIONS.find(opt => opt.value === selectedSort)?.label}</span>
+                <span className="text-[8px]">▼</span>
+              </button>
+              {openDropdown === 'sort' && (
+                <div className="absolute right-0 mt-2 w-52 bg-white border border-onyx/10 shadow-xl py-2 rounded-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {SORT_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => { setSelectedSort(opt.value); setOpenDropdown(null); }}
+                      className={`w-full text-left px-4 py-2 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-widest flex items-center justify-between ${
+                        selectedSort === opt.value ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                      }`}
+                    >
+                      <span>{opt.label}</span>
+                      {selectedSort === opt.value && <span className="text-chrome">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Grid Layout Switcher */}
+            <div className="flex items-center gap-1.5 border-l border-onyx/10 pl-5 h-6">
+              {/* 2 Cols */}
+              <button 
+                onClick={() => setGridCols(2)}
+                className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                  gridCols === 2 ? 'border-onyx bg-onyx text-white shadow-xs' : 'border-onyx/15 text-onyx/40 hover:text-onyx'
+                }`}
+                title="2 Columns Grid"
+              >
+                <span className="font-mono text-xs leading-none select-none tracking-tight">||</span>
+              </button>
+              {/* 3 Cols */}
+              <button 
+                onClick={() => setGridCols(3)}
+                className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                  gridCols === 3 ? 'border-onyx bg-onyx text-white shadow-xs' : 'border-onyx/15 text-onyx/40 hover:text-onyx'
+                }`}
+                title="3 Columns Grid"
+              >
+                <span className="font-mono text-xs leading-none select-none tracking-tight">|||</span>
+              </button>
+              {/* 4 Cols */}
+              <button 
+                onClick={() => setGridCols(4)}
+                className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                  gridCols === 4 ? 'border-onyx bg-onyx text-white shadow-xs' : 'border-onyx/15 text-onyx/40 hover:text-onyx'
+                }`}
+                title="4 Columns Grid"
+              >
+                <span className="font-mono text-xs leading-none select-none tracking-tight">||||</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -310,7 +594,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
       {/* Product Display Grid */}
       <div>
         {paginatedProducts.length > 0 ? (
-          <div className={`grid gap-3 sm:gap-6 md:gap-x-8 md:gap-y-12 transition-all duration-500 ${
+          <div id="products-grid" className={`grid gap-3 sm:gap-6 md:gap-x-8 md:gap-y-12 transition-all duration-500 scroll-mt-24 ${
             gridCols === 2 
               ? 'grid-cols-2 max-w-4xl mx-auto' 
               : gridCols === 3 
@@ -344,22 +628,96 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
         )}
       </div>
 
-      {/* Pagination component */}
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={filteredAndSorted.length}
-          pageSize={pageSize}
-          pageSizeOptions={[8, 16, 24, 48]}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={(newSize) => {
-            setPageSize(newSize);
-            setCurrentPage(1);
-          }}
-          itemLabel="products"
-          className="rounded-xl border border-zinc-100 mt-12"
-        />
+      {/* Myntra-Standard Catalog Loader & Pagination */}
+      {totalItems > 0 && (
+        <div className="mt-12 sm:mt-16 flex flex-col items-center justify-center text-center space-y-5 py-8 sm:py-10 px-4 sm:px-6 rounded-3xl bg-neutral-soft/50 border border-onyx/5 shadow-2xs">
+          {/* Progress Indicator */}
+          <div className="space-y-2 max-w-xs w-full">
+            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-onyx/60">
+              Showing <span className="font-black text-onyx">{currentlyShownCount}</span> of{' '}
+              <span className="font-black text-onyx">{totalItems}</span> Products
+            </p>
+            <div className="w-full h-1.5 bg-onyx/10 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-onyx rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${Math.min(100, Math.round((currentlyShownCount / totalItems) * 100))}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Load More Button (Myntra Standard) */}
+          {currentPage === 1 && currentlyShownCount < totalItems && (
+            <button
+              type="button"
+              onClick={() => setLoadedCount(prev => Math.min(totalItems, prev + PAGE_SIZE))}
+              className="w-full sm:w-auto px-8 py-3.5 bg-onyx hover:bg-black text-bone rounded-full text-[11px] sm:text-xs font-black uppercase tracking-[0.2em] shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Load More Products</span>
+              <span className="text-bone/60 font-semibold text-[10px]">
+                ({totalItems - currentlyShownCount} more)
+              </span>
+            </button>
+          )}
+
+          {/* Page Switcher Navigation (Clean Modern Pills) */}
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1.5 sm:gap-2 pt-1 select-none">
+              <button
+                type="button"
+                onClick={() => {
+                  const prevPage = Math.max(1, currentPage - 1);
+                  setCurrentPage(prevPage);
+                  setLoadedCount(PAGE_SIZE);
+                  const gridEl = document.getElementById('products-grid');
+                  if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth' });
+                }}
+                disabled={currentPage <= 1}
+                className="px-3.5 h-9 rounded-full border border-onyx/10 bg-white text-onyx font-bold text-[10px] sm:text-xs uppercase tracking-wider hover:bg-onyx hover:text-bone disabled:opacity-25 disabled:pointer-events-none transition-all shadow-2xs cursor-pointer"
+              >
+                ← Prev
+              </button>
+
+              <div className="flex items-center gap-1 sm:gap-1.5">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => {
+                  const isActive = pg === currentPage;
+                  return (
+                    <button
+                      key={pg}
+                      onClick={() => {
+                        setCurrentPage(pg);
+                        setLoadedCount(PAGE_SIZE);
+                        const gridEl = document.getElementById('products-grid');
+                        if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full text-xs font-black transition-all flex items-center justify-center cursor-pointer ${
+                        isActive
+                          ? 'bg-onyx text-bone shadow-sm scale-105'
+                          : 'bg-white border border-onyx/10 text-onyx hover:bg-neutral-soft'
+                      }`}
+                    >
+                      {pg}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const nextPage = Math.min(totalPages, currentPage + 1);
+                  setCurrentPage(nextPage);
+                  setLoadedCount(PAGE_SIZE);
+                  const gridEl = document.getElementById('products-grid');
+                  if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth' });
+                }}
+                disabled={currentPage >= totalPages}
+                className="px-3.5 h-9 rounded-full border border-onyx/10 bg-white text-onyx font-bold text-[10px] sm:text-xs uppercase tracking-wider hover:bg-onyx hover:text-bone disabled:opacity-25 disabled:pointer-events-none transition-all shadow-2xs cursor-pointer"
+              >
+                Next →
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

@@ -44,7 +44,7 @@ export default function HeroSlider({ images }: HeroSliderProps) {
 
       {/* Navigation Dots (Only show if multiple images exist) */}
       {validImages.length > 1 && (
-        <div className="absolute bottom-3 sm:bottom-4 lg:bottom-12 left-0 right-0 z-20 flex justify-center gap-2 lg:gap-3">
+        <div className="absolute bottom-3 sm:bottom-4 lg:bottom-16 left-0 right-0 z-20 flex justify-center gap-2 lg:gap-3">
           {validImages.map((_, index) => (
             <button
               key={index}

@@ -70,10 +70,24 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     relatedProducts = featured.filter(p => p._id !== product._id).slice(0, 4);
   }
 
+  // Resolve authentic photoshoot image if seeded with placeholder toy train
+  const resolvePhotoUrl = (url: string | null | undefined) => {
+    if (!url) return null;
+    if (url.includes('photo-1596461404969-9ae70f2830c1')) {
+      if (product.category?.toLowerCase().includes('skirt') || product.name?.toLowerCase().includes('pattu') || product.name?.toLowerCase().includes('skirt')) {
+        return '/images/banner-child.png';
+      } else if (product.category?.toLowerCase().includes('nighty') || product.name?.toLowerCase().includes('night')) {
+        return 'https://www.ankitadesigns.in/cdn/shop/files/350nilima.png?v=1777283189';
+      }
+    }
+    return url;
+  };
+
   const images: { url: string; thumbnailUrl: string }[] = [];
+  const resolvedMainImage = resolvePhotoUrl(product.imageUrl);
   
-  if (product.imageUrl) {
-    images.push({ url: product.imageUrl, thumbnailUrl: product.imageUrl });
+  if (resolvedMainImage) {
+    images.push({ url: resolvedMainImage, thumbnailUrl: resolvedMainImage });
   }
 
   // Add Sanity gallery images
