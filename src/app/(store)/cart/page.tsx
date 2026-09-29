@@ -118,7 +118,7 @@ export default function CartPage() {
   const isFreeDeliveryUnlocked = subtotal >= FREE_DELIVERY_THRESHOLD || freeShipping;
 
   return (
-    <div className="bg-[#FAF9F6] min-h-screen pb-36 md:pb-24 pt-3 md:pt-8 text-onyx">
+    <div className="bg-[#FAF9F6] min-h-screen pb-8 md:pb-12 pt-3 md:pt-8 text-onyx">
       <Container>
         {/* Top Stepper (Myntra / Ajio Fashion Standard) */}
         <div className="mb-5 border-b border-onyx/10 pb-4">

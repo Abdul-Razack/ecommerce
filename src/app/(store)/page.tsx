@@ -88,7 +88,7 @@ export default async function Homepage() {
   ]);
 
   return (
-    <main className="bg-bone pb-40">
+    <main className="bg-bone pb-4 md:pb-8">
       {/* SEO: FAQ + Breadcrumb JSON-LD */}
       <JsonLd data={faqSchema(homepageFaqs)} />
       <JsonLd

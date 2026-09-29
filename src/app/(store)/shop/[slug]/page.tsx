@@ -112,32 +112,6 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     });
   }
 
-  // Add variant specific images to the details gallery
-  if (product.variants && Array.isArray(product.variants)) {
-    product.variants.forEach((v: any) => {
-      if (v.images && Array.isArray(v.images)) {
-        v.images.forEach((img: any) => {
-          try {
-            const url = urlFor(img).width(800).height(1000).url();
-            const thumbnailUrl = urlFor(img).width(100).height(125).url();
-            if (url && !images.some(img => img.url === url)) {
-              images.push({ url, thumbnailUrl });
-            }
-          } catch (e) {
-            console.error('Error parsing variant image', e);
-          }
-        });
-      }
-      if (v.externalImageUrls && Array.isArray(v.externalImageUrls)) {
-        v.externalImageUrls.forEach((url: string) => {
-          if (url && !images.some(img => img.url === url)) {
-            images.push({ url, thumbnailUrl: url });
-          }
-        });
-      }
-    });
-  }
-
   // Fallback if no images
   if (images.length === 0) {
     images.push({

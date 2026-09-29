@@ -9,7 +9,7 @@ export default async function StoreLayout({ children }) {
   const { user } = await withAuth();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen" suppressHydrationWarning>
       <Navbar user={user} signInUrl="/api/auth/login" />
       <CartDrawer />
       <StoreMain>

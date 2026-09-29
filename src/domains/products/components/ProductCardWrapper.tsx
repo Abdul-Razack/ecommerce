@@ -177,15 +177,15 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
       )}
 
       {/* Modern Filter & Control Bar */}
-      <div className="border-b border-onyx/10 pb-3 sm:pb-5 relative z-50">
+      <div className="border-b border-onyx/10 pb-3 sm:pb-5 relative z-40">
         
-        {/* Mobile Filter & Sort Rail (Horizontal Scrollable Chips - Meesho/Ajio/Myntra pattern) */}
+        {/* Mobile Filter & Sort Rail (Horizontal Scrollable Chips) */}
         <div className="md:hidden flex items-center gap-2 overflow-x-auto pb-1.5 hide-scrollbar">
           {/* Clear Filters Reset Pill (first pill when any filter is active) */}
           {hasActiveFilters && (
             <button
               onClick={resetFilters}
-              className="flex-shrink-0 px-3 py-2 rounded-full bg-red-50 text-red-700 border border-red-200 text-[9.5px] font-black uppercase tracking-wider shadow-xs hover:bg-red-100 transition-colors flex items-center gap-1"
+              className="flex-shrink-0 px-3 py-2 rounded-full bg-red-50 text-red-700 border border-red-200 text-[9.5px] font-black uppercase tracking-wider shadow-xs hover:bg-red-100 transition-colors flex items-center gap-1 cursor-pointer"
             >
               <span>✕</span>
               <span>Reset</span>
@@ -193,10 +193,10 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
           )}
 
           {/* Sort Pill */}
-          <div className="relative flex-shrink-0">
+          <div className="flex-shrink-0">
             <button
               onClick={() => toggleDropdown('sort')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs cursor-pointer ${
                 selectedSort !== 'default' 
                   ? 'bg-onyx text-bone border-onyx' 
                   : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
@@ -206,32 +206,13 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
               <span>{SORT_OPTIONS.find(opt => opt.value === selectedSort)?.label.replace(' Sorting', '')}</span>
               <span className="text-[7px]">▼</span>
             </button>
-            {openDropdown === 'sort' && (
-              <div className="fixed left-4 right-4 top-1/3 max-w-xs mx-auto bg-white border border-onyx/10 shadow-2xl py-2 rounded-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="px-4 py-2 border-b border-onyx/5 text-[9px] font-black uppercase tracking-widest text-chrome">
-                  Sort By
-                </div>
-                {SORT_OPTIONS.map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => { setSelectedSort(opt.value); setOpenDropdown(null); }}
-                    className={`w-full text-left px-4 py-2.5 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-wider flex items-center justify-between ${
-                      selectedSort === opt.value ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
-                    }`}
-                  >
-                    <span>{opt.label}</span>
-                    {selectedSort === opt.value && <span className="text-chrome font-black">✓</span>}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Category Pill */}
-          <div className="relative flex-shrink-0">
+          <div className="flex-shrink-0">
             <button
               onClick={() => toggleDropdown('categories')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs cursor-pointer ${
                 selectedCategory !== 'All' 
                   ? 'bg-onyx text-bone border-onyx' 
                   : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
@@ -240,32 +221,13 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
               <span>Category{selectedCategory !== 'All' ? `: ${selectedCategory}` : ''}</span>
               <span className="text-[7px]">▼</span>
             </button>
-            {openDropdown === 'categories' && (
-              <div className="fixed left-4 right-4 top-1/3 max-w-xs mx-auto bg-white border border-onyx/10 shadow-2xl py-2 rounded-2xl z-50 animate-in fade-in zoom-in-95 duration-150 max-h-72 overflow-y-auto">
-                <div className="px-4 py-2 border-b border-onyx/5 text-[9px] font-black uppercase tracking-widest text-chrome">
-                  Filter by Category
-                </div>
-                {categoriesList.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => { setSelectedCategory(cat); setOpenDropdown(null); }}
-                    className={`w-full text-left px-4 py-2.5 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-wider flex items-center justify-between ${
-                      selectedCategory === cat ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
-                    }`}
-                  >
-                    <span>{cat}</span>
-                    {selectedCategory === cat && <span className="text-chrome font-black">✓</span>}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Price Pill */}
-          <div className="relative flex-shrink-0">
+          <div className="flex-shrink-0">
             <button
               onClick={() => toggleDropdown('prices')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs cursor-pointer ${
                 selectedPrice !== 0 
                   ? 'bg-onyx text-bone border-onyx' 
                   : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
@@ -274,32 +236,13 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
               <span>{selectedPrice !== 0 ? priceOptions[selectedPrice]?.label : 'Price'}</span>
               <span className="text-[7px]">▼</span>
             </button>
-            {openDropdown === 'prices' && (
-              <div className="fixed left-4 right-4 top-1/3 max-w-xs mx-auto bg-white border border-onyx/10 shadow-2xl py-2 rounded-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="px-4 py-2 border-b border-onyx/5 text-[9px] font-black uppercase tracking-widest text-chrome">
-                  Price Range
-                </div>
-                {priceOptions.map((opt, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => { setSelectedPrice(idx); setOpenDropdown(null); }}
-                    className={`w-full text-left px-4 py-2.5 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-wider flex items-center justify-between ${
-                      selectedPrice === idx ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
-                    }`}
-                  >
-                    <span>{opt.label}</span>
-                    {selectedPrice === idx && <span className="text-chrome font-black">✓</span>}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Color Pill */}
-          <div className="relative flex-shrink-0">
+          <div className="flex-shrink-0">
             <button
               onClick={() => toggleDropdown('colors')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs cursor-pointer ${
                 selectedColor !== 'All Colors' 
                   ? 'bg-onyx text-bone border-onyx' 
                   : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
@@ -308,17 +251,94 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
               <span>{selectedColor !== 'All Colors' ? selectedColor : 'Color'}</span>
               <span className="text-[7px]">▼</span>
             </button>
-            {openDropdown === 'colors' && (
-              <div className="fixed left-4 right-4 top-1/3 max-w-xs mx-auto bg-white border border-onyx/10 shadow-2xl py-2 rounded-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="px-4 py-2 border-b border-onyx/5 text-[9px] font-black uppercase tracking-widest text-chrome">
-                  Select Color
-                </div>
-                {COLOR_OPTIONS.map(opt => (
+          </div>
+
+          {/* Size Pill */}
+          <div className="flex-shrink-0">
+            <button
+              onClick={() => toggleDropdown('sizes')}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs cursor-pointer ${
+                selectedSize !== 'All Sizes' 
+                  ? 'bg-onyx text-bone border-onyx' 
+                  : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
+              }`}
+            >
+              <span>{selectedSize !== 'All Sizes' ? selectedSize : 'Size'}</span>
+              <span className="text-[7px]">▼</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Filter Sheet Modal Overlay */}
+        {openDropdown !== null && (
+          <div className="md:hidden">
+            <div 
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[180] animate-in fade-in duration-200"
+              onClick={() => setOpenDropdown(null)}
+            />
+            <div className="fixed inset-x-4 bottom-24 max-w-sm mx-auto bg-white border border-onyx/10 shadow-2xl rounded-3xl p-4 z-[190] animate-in slide-in-from-bottom-4 duration-200 flex flex-col max-h-[60vh]">
+              <div className="flex items-center justify-between px-2 pb-3 border-b border-onyx/10">
+                <span className="text-[10px] font-black uppercase tracking-widest text-chrome">
+                  {openDropdown === 'sort' && 'Sort By'}
+                  {openDropdown === 'categories' && 'Filter by Category'}
+                  {openDropdown === 'prices' && 'Price Range'}
+                  {openDropdown === 'colors' && 'Select Color'}
+                  {openDropdown === 'sizes' && 'Select Size'}
+                </span>
+                <button 
+                  onClick={() => setOpenDropdown(null)}
+                  className="w-7 h-7 rounded-full bg-neutral-soft text-onyx font-bold flex items-center justify-center text-xs hover:bg-onyx hover:text-white transition-colors cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto py-2 space-y-1 custom-scrollbar">
+                {openDropdown === 'sort' && SORT_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => { setSelectedSort(opt.value); setOpenDropdown(null); }}
+                    className={`w-full text-left px-4 py-2.5 rounded-xl text-[10px] uppercase font-bold tracking-wider flex items-center justify-between transition-colors cursor-pointer ${
+                      selectedSort === opt.value ? 'text-chrome font-black bg-neutral-soft' : 'text-onyx/80 hover:bg-neutral-soft/50'
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {selectedSort === opt.value && <span className="text-chrome font-black">✓</span>}
+                  </button>
+                ))}
+
+                {openDropdown === 'categories' && categoriesList.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => { setSelectedCategory(cat); setOpenDropdown(null); }}
+                    className={`w-full text-left px-4 py-2.5 rounded-xl text-[10px] uppercase font-bold tracking-wider flex items-center justify-between transition-colors cursor-pointer ${
+                      selectedCategory === cat ? 'text-chrome font-black bg-neutral-soft' : 'text-onyx/80 hover:bg-neutral-soft/50'
+                    }`}
+                  >
+                    <span>{cat}</span>
+                    {selectedCategory === cat && <span className="text-chrome font-black">✓</span>}
+                  </button>
+                ))}
+
+                {openDropdown === 'prices' && priceOptions.map((opt, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => { setSelectedPrice(idx); setOpenDropdown(null); }}
+                    className={`w-full text-left px-4 py-2.5 rounded-xl text-[10px] uppercase font-bold tracking-wider flex items-center justify-between transition-colors cursor-pointer ${
+                      selectedPrice === idx ? 'text-chrome font-black bg-neutral-soft' : 'text-onyx/80 hover:bg-neutral-soft/50'
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {selectedPrice === idx && <span className="text-chrome font-black">✓</span>}
+                  </button>
+                ))}
+
+                {openDropdown === 'colors' && COLOR_OPTIONS.map(opt => (
                   <button
                     key={opt.name}
                     onClick={() => { setSelectedColor(opt.name); setOpenDropdown(null); }}
-                    className={`w-full flex items-center justify-between text-left px-4 py-2.5 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-wider ${
-                      selectedColor === opt.name ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                    className={`w-full flex items-center justify-between text-left px-4 py-2.5 rounded-xl text-[10px] uppercase font-bold tracking-wider transition-colors cursor-pointer ${
+                      selectedColor === opt.name ? 'text-chrome font-black bg-neutral-soft' : 'text-onyx/80 hover:bg-neutral-soft/50'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -330,34 +350,13 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
                     {selectedColor === opt.name && <span className="text-chrome font-black">✓</span>}
                   </button>
                 ))}
-              </div>
-            )}
-          </div>
 
-          {/* Size Pill */}
-          <div className="relative flex-shrink-0">
-            <button
-              onClick={() => toggleDropdown('sizes')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs ${
-                selectedSize !== 'All Sizes' 
-                  ? 'bg-onyx text-bone border-onyx' 
-                  : 'bg-white border-onyx/15 text-onyx hover:border-onyx/40'
-              }`}
-            >
-              <span>{selectedSize !== 'All Sizes' ? selectedSize : 'Size'}</span>
-              <span className="text-[7px]">▼</span>
-            </button>
-            {openDropdown === 'sizes' && (
-              <div className="fixed left-4 right-4 top-1/3 max-w-xs mx-auto bg-white border border-onyx/10 shadow-2xl py-2 rounded-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="px-4 py-2 border-b border-onyx/5 text-[9px] font-black uppercase tracking-widest text-chrome">
-                  Select Size
-                </div>
-                {SIZE_OPTIONS.map(sz => (
+                {openDropdown === 'sizes' && SIZE_OPTIONS.map(sz => (
                   <button
                     key={sz}
                     onClick={() => { setSelectedSize(sz); setOpenDropdown(null); }}
-                    className={`w-full text-left px-4 py-2.5 hover:bg-neutral-soft/50 text-[10px] uppercase font-bold tracking-wider flex items-center justify-between ${
-                      selectedSize === sz ? 'text-chrome font-black bg-neutral-soft/30' : 'text-onyx/80'
+                    className={`w-full text-left px-4 py-2.5 rounded-xl text-[10px] uppercase font-bold tracking-wider flex items-center justify-between transition-colors cursor-pointer ${
+                      selectedSize === sz ? 'text-chrome font-black bg-neutral-soft' : 'text-onyx/80 hover:bg-neutral-soft/50'
                     }`}
                   >
                     <span>{sz}</span>
@@ -365,19 +364,9 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
                   </button>
                 ))}
               </div>
-            )}
+            </div>
           </div>
-
-          {/* Clear Filters Reset Pill (if any filter active) */}
-          {hasActiveFilters && (
-            <button
-              onClick={resetFilters}
-              className="flex-shrink-0 px-3 py-2 rounded-full bg-red-50 text-red-700 border border-red-200 text-[9.5px] font-black uppercase tracking-wider shadow-xs hover:bg-red-100 transition-colors"
-            >
-              ✕ Reset
-            </button>
-          )}
-        </div>
+        )}
 
         {/* Desktop Filter & Control Bar */}
         <div className="hidden md:flex items-center justify-between gap-6">
@@ -630,7 +619,7 @@ export default function ProductCardWrapper({ products }: ProductCardWrapperProps
 
       {/* Myntra-Standard Catalog Loader & Pagination */}
       {totalItems > 0 && (
-        <div className="mt-12 sm:mt-16 flex flex-col items-center justify-center text-center space-y-5 py-8 sm:py-10 px-4 sm:px-6 rounded-3xl bg-neutral-soft/50 border border-onyx/5 shadow-2xs">
+        <div className="mt-6 sm:mt-8 flex flex-col items-center justify-center text-center space-y-4 py-5 sm:py-6 px-4 sm:px-6 rounded-3xl bg-neutral-soft/50 border border-onyx/5 shadow-2xs">
           {/* Progress Indicator */}
           <div className="space-y-2 max-w-xs w-full">
             <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-onyx/60">

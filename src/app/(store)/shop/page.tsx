@@ -179,7 +179,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       </div>
 
       {/* Main Grid */}
-      <section className="py-6 sm:py-10 md:py-16 pb-36">
+      <section className="py-6 sm:py-8 md:py-10 pb-4 md:pb-6">
         <Container>
           {products.length > 0 ? (
             <ProductCardWrapper products={products} />

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Container from '@/shared/ui/layout/Container';
 import Button from '@/shared/ui/Button';
@@ -70,9 +70,97 @@ export default function ProductDetails({ product, relatedProducts }) {
     return url;
   };
 
+  // Derive color-aware images for active gallery display
+  const activeGalleryImages = useMemo(() => {
+    const list: { url: string; thumbnailUrl: string }[] = [];
+    const addedUrls = new Set<string>();
+
+    // 1. Check if variants for selectedColor have specific images
+    if (selectedColor && product.variants && Array.isArray(product.variants)) {
+      const colorVariants = product.variants.filter((v: any) => v.color === selectedColor);
+      colorVariants.forEach((v: any) => {
+        if (v.images && Array.isArray(v.images)) {
+          v.images.forEach((img: any) => {
+            try {
+              const url = urlFor(img).width(800).height(1000).url();
+              const thumbnailUrl = urlFor(img).width(100).height(125).url();
+              const resolved = resolvePhotoUrl(url);
+              if (resolved && !addedUrls.has(resolved)) {
+                addedUrls.add(resolved);
+                list.push({ url: resolved, thumbnailUrl: resolvePhotoUrl(thumbnailUrl) });
+              }
+            } catch (e) {}
+          });
+        }
+        if (v.externalImageUrls && Array.isArray(v.externalImageUrls)) {
+          v.externalImageUrls.forEach((url: string) => {
+            const resolved = resolvePhotoUrl(url);
+            if (resolved && !addedUrls.has(resolved)) {
+              addedUrls.add(resolved);
+              list.push({ url: resolved, thumbnailUrl: resolved });
+            }
+          });
+        }
+      });
+    }
+
+    // If color-specific variant images were found, return them!
+    if (list.length > 0) {
+      return list;
+    }
+
+    // 2. Fallback to main product images
+    const mainUrl = resolvePhotoUrl(product.imageUrl);
+    if (mainUrl && !addedUrls.has(mainUrl)) {
+      addedUrls.add(mainUrl);
+      list.push({ url: mainUrl, thumbnailUrl: mainUrl });
+    }
+
+    if (product.gallery && Array.isArray(product.gallery)) {
+      product.gallery.forEach((img: any) => {
+        try {
+          const url = urlFor(img).width(800).height(1000).url();
+          const thumbnailUrl = urlFor(img).width(100).height(125).url();
+          const resolved = resolvePhotoUrl(url);
+          if (resolved && !addedUrls.has(resolved)) {
+            addedUrls.add(resolved);
+            list.push({ url: resolved, thumbnailUrl: resolvePhotoUrl(thumbnailUrl) });
+          }
+        } catch (e) {}
+      });
+    }
+
+    if (product.externalGalleryUrls && Array.isArray(product.externalGalleryUrls)) {
+      product.externalGalleryUrls.forEach((url: string) => {
+        const resolved = resolvePhotoUrl(url);
+        if (resolved && !addedUrls.has(resolved)) {
+          addedUrls.add(resolved);
+          list.push({ url: resolved, thumbnailUrl: resolved });
+        }
+      });
+    }
+
+    // 3. Fallback to product.processedImages if provided
+    if (list.length === 0 && product.processedImages && Array.isArray(product.processedImages)) {
+      return product.processedImages;
+    }
+
+    return list;
+  }, [selectedColor, product]);
+
   const [activeImage, setActiveImage] = useState(
-    resolvePhotoUrl(product.processedImages?.[0]?.url || product.imageUrl)
+    resolvePhotoUrl(activeGalleryImages?.[0]?.url || product.imageUrl)
   );
+
+  // Keep activeImage in sync when activeGalleryImages updates on color change
+  useEffect(() => {
+    if (activeGalleryImages && activeGalleryImages.length > 0) {
+      const isAlreadyInGallery = activeGalleryImages.some(img => resolvePhotoUrl(img.url) === activeImage);
+      if (!isAlreadyInGallery) {
+        setActiveImage(resolvePhotoUrl(activeGalleryImages[0].url));
+      }
+    }
+  }, [activeGalleryImages]);
 
   const favorited = isInWishlist(product._id);
   const [openSection, setOpenSection] = useState('details');
@@ -94,23 +182,28 @@ export default function ProductDetails({ product, relatedProducts }) {
 
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
-    // Find first variant for this color and set its image if available
+
+    // Auto-select first available size for new color
+    const colorSizes = product.variants?.filter((v) => v.color === color).map((v) => v.size) || [];
+    if (colorSizes.length > 0) {
+      setSelectedSize(colorSizes[0]);
+    }
+
+    // Update active main image to match the first image of the selected color
     const firstVar = product.variants?.find((v) => v.color === color);
+    let newImg: string | null = null;
     if (firstVar) {
       if (firstVar.images?.[0]) {
         try {
           const url = urlFor(firstVar.images[0]).width(800).height(1000).url();
-          if (url) setActiveImage(resolvePhotoUrl(url));
+          if (url) newImg = resolvePhotoUrl(url);
         } catch (e) {}
       } else if (firstVar.externalImageUrls?.[0]) {
-        setActiveImage(resolvePhotoUrl(firstVar.externalImageUrls[0]));
+        newImg = resolvePhotoUrl(firstVar.externalImageUrls[0]);
       }
-      
-      // Auto-select first available size for new color
-      const colorSizes = product.variants?.filter((v) => v.color === color).map((v) => v.size) || [];
-      if (colorSizes.length > 0) {
-        setSelectedSize(colorSizes[0]);
-      }
+    }
+    if (newImg) {
+      setActiveImage(newImg);
     }
   };
 
@@ -178,14 +271,14 @@ export default function ProductDetails({ product, relatedProducts }) {
   }, []);
 
   return (
-    <div className="bg-bone min-h-screen pt-8 sm:pt-12 pb-36 lg:pb-24">
+    <div className="bg-bone min-h-screen pt-3 sm:pt-10 pb-8 lg:pb-12">
       <Container>
         {/* Core Detail Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
           
-          {/* Gallery Layer with High-Class FX */}
-          <div className="lg:col-span-5 lg:sticky lg:top-32 space-y-6 h-fit">
-            <div className="aspect-[4/5] rounded-2xl md:rounded-[3rem] overflow-hidden bg-neutral-soft/50 shadow-tactile tactile-card border border-onyx/5 relative flex items-center justify-center">
+          {/* Gallery Layer with High-Class FX & Single Cohesive Frame */}
+          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-2.5 sm:space-y-3.5 h-fit p-2.5 sm:p-3.5 rounded-2xl md:rounded-[2rem] bg-white/70 border border-onyx/10 shadow-sm backdrop-blur-sm max-w-md xl:max-w-lg mx-auto lg:mx-0 w-full">
+            <div className="h-[260px] xs:h-[300px] sm:h-[360px] md:h-[400px] lg:h-[440px] max-h-[52vh] w-full rounded-xl md:rounded-[1.75rem] overflow-hidden bg-neutral-soft/50 shadow-tactile tactile-card border border-onyx/5 relative flex items-center justify-center">
               <img 
                 src={activeImage} 
                 className={`w-full h-full transition-all duration-700 hover:scale-105 ${
@@ -193,23 +286,23 @@ export default function ProductDetails({ product, relatedProducts }) {
                     ? 'object-cover object-[75%_center]'
                     : activeImage.includes('unsplash') || activeImage.includes('mirraw') || activeImage.includes('ankitadesigns') || activeImage.includes('pochampallysarees')
                       ? 'object-cover object-top'
-                      : 'object-contain p-4'
+                      : 'object-contain p-2.5 sm:p-3.5'
                 }`}
                 alt={cleanName} 
               />
             </div>
             
-            {/* Thumbnails: Refined Scroll */}
-            {product.processedImages && product.processedImages.length > 1 && (
-              <div className="flex gap-2.5 sm:gap-4 overflow-x-auto pb-4 hide-scrollbar">
-                {product.processedImages.map((img, i) => {
+            {/* Thumbnails: Color-Aware Dynamic Alignment */}
+            {activeGalleryImages && activeGalleryImages.length > 1 && (
+              <div className="flex gap-2 sm:gap-2.5 overflow-x-auto justify-center py-0.5 hide-scrollbar">
+                {activeGalleryImages.map((img, i) => {
                   const resolvedUrl = resolvePhotoUrl(img.url);
                   const isCurActive = activeImage === resolvedUrl;
                   return (
                     <button 
                       key={i}
                       onClick={() => setActiveImage(resolvedUrl)}
-                      className={`w-14 h-18 sm:w-20 sm:h-24 flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden border-2 transition-all duration-500 ${isCurActive ? 'border-chrome scale-95 bg-white' : 'border-transparent opacity-40 bg-white hover:opacity-100'}`}
+                      className={`w-11 h-14 sm:w-14 sm:h-17 flex-shrink-0 rounded-lg sm:rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer ${isCurActive ? 'border-chrome scale-95 bg-white shadow-sm ring-2 ring-chrome/20' : 'border-transparent opacity-60 bg-white hover:opacity-100'}`}
                     >
                       <img 
                         src={resolvePhotoUrl(img.thumbnailUrl || img.url)} 
@@ -224,7 +317,7 @@ export default function ProductDetails({ product, relatedProducts }) {
           </div>
 
           {/* Configuration Layer */}
-          <div className="lg:col-span-7 flex flex-col justify-start space-y-8">
+          <div className="lg:col-span-7 flex flex-col justify-start space-y-5 sm:space-y-8">
             
             {/* Category and Title */}
             <div className="space-y-4">
@@ -323,7 +416,7 @@ export default function ProductDetails({ product, relatedProducts }) {
                           key={sz}
                           disabled={!isAvailable}
                           onClick={() => setSelectedSize(sz)}
-                          className={`min-w-[4rem] h-10 px-3 rounded-lg border text-xs font-black uppercase transition-all tracking-wider ${
+                          className={`min-w-[3.25rem] h-9 px-3 rounded-full border text-[11px] font-bold uppercase transition-all tracking-wide cursor-pointer ${
                             !isAvailable 
                               ? 'border-onyx/5 text-onyx/20 line-through cursor-not-allowed bg-neutral-soft/50' 
                               : isSelected
@@ -340,20 +433,22 @@ export default function ProductDetails({ product, relatedProducts }) {
               )}
 
               {/* Quantity and Availability row */}
-              <div className="flex flex-wrap gap-8 items-center pt-2">
-                <div className="space-y-2">
+              <div className="flex flex-wrap gap-6 items-center pt-1">
+                <div className="space-y-1.5">
                   <span className="technical text-onyx/40 text-[8px] uppercase tracking-widest block">Quantity</span>
-                  <div className="flex items-center border border-onyx/10 rounded-lg bg-white/80 overflow-hidden">
+                  <div className="flex items-center border border-onyx/15 rounded-full bg-white overflow-hidden h-9">
                     <button
+                      type="button"
                       onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                      className="px-3 h-10 font-black hover:bg-neutral-soft text-onyx/70 transition-colors"
+                      className="w-8 h-full font-black hover:bg-neutral-soft text-onyx/70 transition-colors flex items-center justify-center cursor-pointer text-sm"
                     >
                       -
                     </button>
-                    <span className="px-4 font-bold text-xs min-w-[2rem] text-center select-none">{quantity}</span>
+                    <span className="px-3 font-bold text-xs min-w-[1.75rem] text-center select-none">{quantity}</span>
                     <button
+                      type="button"
                       onClick={() => setQuantity(q => q + 1)}
-                      className="px-3 h-10 font-black hover:bg-neutral-soft text-onyx/70 transition-colors"
+                      className="w-8 h-full font-black hover:bg-neutral-soft text-onyx/70 transition-colors flex items-center justify-center cursor-pointer text-sm"
                     >
                       +
                     </button>
@@ -362,7 +457,7 @@ export default function ProductDetails({ product, relatedProducts }) {
 
                 <div className="space-y-1">
                   <span className="technical text-onyx/20 text-[8px] uppercase tracking-widest block">Stock status</span>
-                  <span className={`text-[10px] font-black uppercase tracking-wider block ${activeStock > 0 ? 'text-green-700' : 'text-red-600'}`}>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider block ${activeStock > 0 ? 'text-green-700' : 'text-red-600'}`}>
                     {activeStock > 0 ? `✓ IN STOCK (${activeStock} units left)` : '× OUT OF STOCK'}
                   </span>
                 </div>
@@ -370,7 +465,7 @@ export default function ProductDetails({ product, relatedProducts }) {
             </div>
 
             {/* Coupons / Promo Codes */}
-            <div className="bg-neutral-soft border border-dashed border-onyx/10 rounded-2xl p-6 space-y-4">
+            <div className="bg-neutral-soft border border-dashed border-onyx/10 rounded-xl p-4 sm:p-5 space-y-3">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-onyx/70" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01"/>
@@ -384,14 +479,14 @@ export default function ProductDetails({ product, relatedProducts }) {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {coupons.map((c) => (
-                    <div key={c._id || c.code} className="bg-white/80 border border-onyx/5 p-4 rounded-xl flex items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <span className="font-mono text-xs font-black bg-bone text-onyx px-2 py-0.5 rounded border border-onyx/10 uppercase">
+                    <div key={c._id || c.code} className="bg-white/80 border border-onyx/5 p-3 rounded-xl flex items-center justify-between gap-3">
+                      <div className="space-y-0.5">
+                        <span className="font-mono text-[11px] font-bold bg-bone text-onyx px-2 py-0.5 rounded border border-onyx/10 uppercase">
                           {c.code}
                         </span>
-                        <p className="text-[9px] text-onyx/50 font-bold leading-tight">{c.description}</p>
+                        <p className="text-[9px] text-onyx/50 font-medium leading-tight">{c.description}</p>
                         {c.scope && (
-                          <p className="text-[9px] text-onyx/30 font-bold uppercase tracking-wider">
+                          <p className="text-[8px] text-onyx/30 font-bold uppercase tracking-wider">
                             {c.scope}
                           </p>
                         )}
@@ -399,7 +494,7 @@ export default function ProductDetails({ product, relatedProducts }) {
                       <button
                         type="button"
                         onClick={() => handleCopyCoupon(c.code)}
-                        className={`text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded transition-all flex-shrink-0 ${
+                        className={`text-[8px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded transition-all flex-shrink-0 cursor-pointer ${
                           copiedCoupon === c.code 
                             ? 'bg-green-700 text-bone' 
                             : 'bg-onyx text-bone hover:bg-black'
@@ -414,20 +509,20 @@ export default function ProductDetails({ product, relatedProducts }) {
             </div>
 
             {/* CTAs: High-Velocity Action Bar */}
-            <div className="space-y-4 pt-4 border-t border-onyx/5">
-              <div className="flex gap-2 sm:gap-4 items-center">
+            <div className="space-y-3 pt-3 border-t border-onyx/5">
+              <div className="flex gap-2 sm:gap-3 items-center">
                 <Button 
                   onClick={handleAddToCart}
                   variant="outline"
                   disabled={activeStock <= 0}
-                  className="h-12 sm:h-16 flex-1 rounded-full border-onyx text-onyx hover:bg-onyx hover:text-white text-[9px] sm:text-[10px] font-black tracking-wider sm:tracking-[0.4em] uppercase hover:shadow-tactile transition-all duration-300 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-onyx truncate"
+                  className="h-11 sm:h-12 flex-1 rounded-full border-onyx text-onyx hover:bg-onyx hover:text-white text-[10px] sm:text-xs font-bold tracking-wider uppercase transition-all duration-200 disabled:opacity-40 truncate cursor-pointer"
                 >
                   ADD TO CART
                 </Button>
                 <Button 
                   onClick={handleBuyNow}
                   disabled={activeStock <= 0}
-                  className="h-12 sm:h-16 flex-1 rounded-full bg-onyx text-white hover:bg-chrome hover:text-onyx text-[9px] sm:text-[10px] font-black tracking-wider sm:tracking-[0.4em] uppercase shadow-kinetic transition-all duration-300 disabled:opacity-40 disabled:hover:bg-onyx truncate"
+                  className="h-11 sm:h-12 flex-1 rounded-full bg-onyx text-white hover:bg-black text-[10px] sm:text-xs font-bold tracking-wider uppercase shadow-md transition-all duration-200 disabled:opacity-40 truncate cursor-pointer"
                 >
                   BUY NOW
                 </Button>
@@ -436,8 +531,8 @@ export default function ProductDetails({ product, relatedProducts }) {
                 <button
                   type="button"
                   onClick={() => toggleWishlist(product)}
-                  className={`w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 bg-white ${
-                    favorited ? 'border-red-200 text-red-600 shadow-md' : 'border-onyx/10 text-onyx/40 hover:border-onyx/40'
+                  className={`w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0 rounded-full border flex items-center justify-center transition-all duration-200 active:scale-95 bg-white cursor-pointer ${
+                    favorited ? 'border-red-200 text-red-600 shadow-sm' : 'border-onyx/15 text-onyx/40 hover:border-onyx/40'
                   }`}
                   title="Add to Wishlist"
                 >
@@ -448,7 +543,7 @@ export default function ProductDetails({ product, relatedProducts }) {
                     fill={favorited ? "currentColor" : "none"} 
                     stroke="currentColor" 
                     strokeWidth="2"
-                    className="sm:w-5 sm:h-5"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                   >
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
@@ -558,26 +653,36 @@ export default function ProductDetails({ product, relatedProducts }) {
         </section>
       )}
 
-      {/* Size Guide Modal */}
+      {/* Size Guide Modal - Centered, Sticky Header & Clean Alignment */}
       {showSizeChart && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl relative border border-onyx/10 max-h-[90vh] overflow-y-auto">
-            <button
-              onClick={() => setShowSizeChart(false)}
-              className="absolute top-6 right-6 text-onyx/40 hover:text-onyx w-8 h-8 rounded-full border border-onyx/10 flex items-center justify-center bg-bone hover:bg-neutral-soft transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="space-y-6">
-              <div className="space-y-1 border-b border-onyx/10 pb-4">
-                <span className="technical text-[9px] font-black uppercase tracking-widest text-chrome">Size & Measurement Standard</span>
-                <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight">Women's Apparel Size Guide</h3>
-                <p className="text-xs text-onyx/60">Standard waist & hip measurements in inches for Leggings, Inskirts, Chudidars & Nighties.</p>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
+          <div 
+            className="absolute inset-0"
+            onClick={() => setShowSizeChart(false)}
+          />
+          <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl relative border border-onyx/10 flex flex-col max-h-[85vh] overflow-hidden z-10">
+            
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 border-b border-onyx/10 flex items-start justify-between bg-bone/50 flex-shrink-0">
+              <div className="space-y-1 pr-6">
+                <span className="technical text-[9px] font-black uppercase tracking-widest text-chrome block">Size & Measurement Standard</span>
+                <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-onyx">Women's Apparel Size Guide</h3>
+                <p className="text-[11px] sm:text-xs text-onyx/60">Standard waist & hip measurements in inches for Leggings, Inskirts, Chudidars & Nighties.</p>
               </div>
+              <button
+                type="button"
+                onClick={() => setShowSizeChart(false)}
+                className="text-onyx/50 hover:text-onyx w-9 h-9 rounded-full border border-onyx/15 flex items-center justify-center bg-white hover:bg-neutral-soft transition-colors flex-shrink-0 cursor-pointer shadow-sm"
+                title="Close Size Guide"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
+            {/* Modal Body - Scrollable */}
+            <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 hide-scrollbar">
               {/* Table */}
-              <div className="overflow-x-auto rounded-2xl border border-onyx/10">
+              <div className="overflow-x-auto rounded-2xl border border-onyx/10 shadow-sm">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-bone text-onyx font-black uppercase tracking-wider text-[10px] border-b border-onyx/10">
                     <tr>
@@ -641,7 +746,7 @@ export default function ProductDetails({ product, relatedProducts }) {
               </div>
 
               {/* Measurement Tips */}
-              <div className="bg-bone p-4 rounded-2xl space-y-2 border border-onyx/5">
+              <div className="bg-bone/70 p-4 rounded-2xl space-y-2 border border-onyx/5">
                 <h4 className="text-[10px] font-black uppercase tracking-wider text-onyx">How to Measure:</h4>
                 <ul className="text-xs text-onyx/70 space-y-1 list-disc pl-4">
                   <li><strong>Waist:</strong> Measure around your natural waistline, keeping tape comfortably loose.</li>
@@ -649,16 +754,17 @@ export default function ProductDetails({ product, relatedProducts }) {
                   <li><strong>Free Size:</strong> Fabric includes high elastic stretch suitable for waist sizes 28" up to 42".</li>
                 </ul>
               </div>
+            </div>
 
-              <div className="pt-2 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setShowSizeChart(false)}
-                  className="px-6 py-2.5 bg-onyx text-bone font-black text-xs rounded-full uppercase tracking-wider hover:bg-black transition-all"
-                >
-                  Got It
-                </button>
-              </div>
+            {/* Modal Footer */}
+            <div className="p-4 sm:p-5 border-t border-onyx/10 bg-bone/30 flex justify-end flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowSizeChart(false)}
+                className="px-6 py-2.5 bg-onyx text-bone font-black text-xs rounded-full uppercase tracking-wider hover:bg-black transition-all cursor-pointer shadow-md active:scale-95"
+              >
+                Got It
+              </button>
             </div>
           </div>
         </div>

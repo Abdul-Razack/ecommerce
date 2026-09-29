@@ -67,7 +67,7 @@ export default function Navbar({ user, signInUrl }) {
   const userDisplayName = user?.firstName || user?.email?.split('@')[0];
 
   return (
-    <header className="sticky top-0 left-0 right-0 z-[100] w-full bg-white shadow-sm font-sans">
+    <header className="sticky top-0 left-0 right-0 z-[100] w-full bg-white shadow-sm font-sans" suppressHydrationWarning>
       {/* 1. Slim Announcement Bar */}
       <div className="bg-black text-white border-b border-white/5">
         <Container className="h-8 flex items-center justify-between gap-4 text-[9px] uppercase font-bold tracking-widest">
