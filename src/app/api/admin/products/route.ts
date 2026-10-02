@@ -61,7 +61,7 @@ export async function GET() {
   } catch (error: any) {
     console.error('Products fetch error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch products: ' + error.message },
+      { success: false, error: 'Failed to fetch products' },
       { status: 500 }
     );
   }
@@ -188,7 +188,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('Product create error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to create product: ' + error.message },
+      { success: false, error: 'Failed to create product' },
       { status: 500 }
     );
   }
@@ -298,7 +298,7 @@ export async function PUT(request: Request) {
   } catch (error: any) {
     console.error('Product update error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to update product: ' + error.message },
+      { success: false, error: 'Failed to update product' },
       { status: 500 }
     );
   }
@@ -351,7 +351,7 @@ export async function DELETE(request: Request) {
   } catch (error: any) {
     console.error('Product delete error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to delete product: ' + error.message },
+      { success: false, error: 'Failed to delete product' },
       { status: 500 }
     );
   }

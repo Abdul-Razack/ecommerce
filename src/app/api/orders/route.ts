@@ -5,6 +5,8 @@ import { orderService } from '@/domains/orders/services/order.service';
 import { checkoutService } from '@/domains/orders/services/checkout.service';
 import { pricingService } from '@/domains/orders/services/pricing.service';
 import { couponService } from '@/domains/coupons/services/coupon.service';
+import { syncCustomerToSanity } from '@/shared/lib/customerSync';
+import { writeClient } from '@/shared/lib/sanity';
 import {
   calculateTotals,
   evaluateCoupon,
@@ -19,6 +21,19 @@ import {
 // even though the storefront already previewed it.
 export async function POST(request) {
   try {
+    // Check if there is an authenticated user session
+    let user = null;
+    let customer = null;
+    try {
+      const authResult = await withAuth();
+      user = authResult?.user || null;
+      if (user) {
+        customer = await syncCustomerToSanity(user);
+      }
+    } catch {
+      // Unauthenticated / guest checkout
+    }
+
     const body = await request.json();
     const {
       name,
@@ -33,16 +48,28 @@ export async function POST(request) {
       razorpayOrderId,
       razorpayPaymentId,
       currency = 'INR',
-      exchangeRate = 1,
     } = body;
+
+    // Validate required fields
+    if (!name || !email || !phone || !address || !items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required order details' },
+        { status: 400 }
+      );
+    }
+
+    // Use a fixed rate of 1 for INR; the actual MYR rate is fetched server-side
+    // when storing for display. Financial calculations always use INR.
+    const exchangeRate = 1;
+
 
     // 1. Re-price the cart from Sanity. Any client-supplied price is discarded.
     const { lines, missingIds } = await pricingService.repriceCart(items || []);
 
     if (missingIds.length > 0) {
       return NextResponse.json(
-        { success: false, error: 'Some items are no longer available. Please review your cart.' },
-        { status: 400 }
+        { success: false, error: 'Some items are no longer available. Please review your cart.', missingIds },
+        { status: 404 }
       );
     }
 
@@ -181,10 +208,10 @@ export async function POST(request) {
       paymentType: paymentType || 'cod',
       razorpayOrderId: generatedRazorpayOrderId || razorpayOrderId || null,
       razorpayPaymentId: razorpayPaymentId || null,
-      ...(body.customerId && {
+      ...(customer?._id && {
         customerRef: {
           _type: 'reference',
-          _ref: body.customerId
+          _ref: customer._id
         }
       })
     };
@@ -217,23 +244,29 @@ export async function POST(request) {
       await couponService.incrementUsage(coupon._id);
     }
 
-    // Save address to customer profile if requested
-    if (body.saveAddress && body.customerId) {
-      const { writeClient } = await import('@/shared/lib/sanity');
-      const newAddress = {
-        _key: crypto.randomUUID(),
-        street: address,
-        city: city,
-        state: state,
-        zipCode: pincode,
-        country: 'India',
-        isDefault: false
-      };
-      await writeClient.patch(body.customerId)
-        .setIfMissing({ savedAddresses: [] })
-        .append('savedAddresses', [newAddress])
-        .commit();
+    // Save address to customer profile if requested.
+    if (body.saveAddress && customer?._id) {
+      try {
+        const newAddress = {
+          _key: crypto.randomUUID(),
+          street: address,
+          city: city,
+          state: state,
+          zipCode: pincode,
+          country: 'India',
+          isDefault: false,
+        };
+        await writeClient
+          .patch(customer._id)
+          .setIfMissing({ savedAddresses: [] })
+          .append('savedAddresses', [newAddress])
+          .commit();
+      } catch (addrErr) {
+        // Address save failure must never fail the order
+        console.error('Failed to save address to customer profile:', addrErr);
+      }
     }
+
 
     return NextResponse.json({
       success: true,
@@ -247,42 +280,59 @@ export async function POST(request) {
   } catch (error: any) {
     console.error('Order creation error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to create order: ' + (JSON.stringify(error)) },
+      { success: false, error: 'Failed to create order. Please try again.' },
       { status: 500 }
     );
   }
 }
 
-// GET - Fetch orders by email via Order Service
+// GET - Fetch orders or track specific order
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const email = searchParams.get('email');
+    const orderId = searchParams.get('orderId')?.trim();
+    const email = searchParams.get('email')?.trim().toLowerCase();
 
-    if (!email) {
+    if (!orderId && !email) {
       return NextResponse.json(
-        { success: false, error: 'Email is required' },
+        { success: false, error: 'Email or Order ID is required' },
         { status: 400 }
       );
     }
 
-    // Security Fix: Enforce authorization to prevent IDOR
+    // Mode 1: Track a specific order by Order ID + Email (Public tracking for customers/guests)
+    if (orderId && email) {
+      const order = await orderService.getOrderByOrderIdAndEmail(orderId, email);
+      if (!order) {
+        return NextResponse.json(
+          { success: false, error: 'No order found with the provided Order ID and email' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({
+        success: true,
+        order,
+      });
+    }
+
+    // Mode 2: Fetch customer orders (Requires authenticated session)
     const { user } = await withAuth();
     if (!user) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
+        { success: false, error: 'Please sign in to view your complete order history' },
         { status: 401 }
       );
     }
 
-    if (user.email !== email) {
+    const queryEmail = email || user.email?.toLowerCase();
+    if (user.email?.toLowerCase() !== queryEmail) {
       return NextResponse.json(
         { success: false, error: 'Forbidden: Cannot access orders belonging to another user' },
         { status: 403 }
       );
     }
 
-    const orders = await orderService.getOrdersByEmail(email);
+    const orders = await orderService.getOrdersByEmail(queryEmail);
 
     return NextResponse.json({
       success: true,

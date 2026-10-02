@@ -1,28 +1,16 @@
 import { NextResponse } from 'next/server';
-import { razorpay } from '@/shared/lib/razorpay';
 
-// Create Razorpay order
-export async function POST(request) {
-  try {
-    const { amount, currency = 'INR' } = await request.json();
-
-    const options = {
-      amount: Math.round(amount * 100), // Razorpay expects amount in paise/cents
-      currency,
-      receipt: `receipt_${Date.now()}`,
-    };
-
-    const order = await razorpay.orders.create(options);
-
-    return NextResponse.json({
-      success: true,
-      order,
-    });
-  } catch (error) {
-    console.error('Razorpay order creation error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to create payment order' },
-      { status: 500 }
-    );
-  }
+/**
+ * DEPRECATED: Standalone Razorpay order creation has been retired for security.
+ * Razorpay orders are now created authoritatively via POST /api/orders after
+ * server-side price recalculation from Sanity.
+ */
+export async function POST() {
+  return NextResponse.json(
+    {
+      success: false,
+      error: 'Direct Razorpay order creation is disabled. Please create orders via POST /api/orders.',
+    },
+    { status: 400 }
+  );
 }

@@ -35,7 +35,7 @@ export class ShopPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.heading             = page.locator('h1').filter({ hasText: /shop/i });
+    this.heading             = page.locator('h1').filter({ hasText: /shop/i }).first();
     this.productGrid         = page.locator('[class*="grid-cols-"]').first();
     this.filterBar           = page.locator('text=Filter by').first();
 

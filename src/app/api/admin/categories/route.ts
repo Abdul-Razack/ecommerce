@@ -20,7 +20,7 @@ export async function GET() {
     return NextResponse.json({ success: true, categories });
   } catch (error: any) {
     console.error('Error fetching categories:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Operation failed' }, { status: 500 });
   }
 }
 
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, category: newCategory });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Operation failed' }, { status: 500 });
   }
 }
 
@@ -63,7 +63,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ success: true, category: updated });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Operation failed' }, { status: 500 });
   }
 }
 
@@ -81,6 +81,6 @@ export async function DELETE(req: NextRequest) {
     await writeClient.delete(id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Operation failed' }, { status: 500 });
   }
 }

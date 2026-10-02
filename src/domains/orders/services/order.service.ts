@@ -27,6 +27,40 @@ export const orderService = {
   },
 
   /**
+   * Fetch a single order by Order ID and Customer Email for secure tracking
+   */
+  async getOrderByOrderIdAndEmail(orderId: string, email: string) {
+    return await writeClient.fetch(`
+      *[_type == "order" && (orderId == $orderId || _id == $orderId) && lower(customer.email) == lower($email)][0] {
+        _id,
+        orderId,
+        _createdAt,
+        totalAmount,
+        currency,
+        status,
+        paymentType,
+        paymentStatus,
+        trackingId,
+        trackingUpdates,
+        "customer": {
+          "name": customer.name,
+          "city": customer.city,
+          "state": customer.state
+        },
+        items[] {
+          name,
+          price,
+          quantity,
+          color,
+          size,
+          "productImage": product->mainImage.asset->url,
+          "productName": product->name
+        }
+      }
+    `, { orderId, email });
+  },
+
+  /**
    * Update order status or tracking details
    */
   async updateOrder(orderId: string, patch: any) {

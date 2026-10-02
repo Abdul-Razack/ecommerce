@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('Coupon create error:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: 'Operation failed' },
       { status: 500 }
     );
   }
@@ -202,7 +202,7 @@ export async function PATCH(req: NextRequest) {
   } catch (error: any) {
     console.error('Coupon update error:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: 'Operation failed' },
       { status: 500 }
     );
   }
@@ -229,7 +229,7 @@ export async function DELETE(req: NextRequest) {
   } catch (error: any) {
     console.error('Coupon delete error:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: 'Operation failed' },
       { status: 500 }
     );
   }

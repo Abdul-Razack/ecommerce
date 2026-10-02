@@ -13,7 +13,6 @@ export async function GET() {
       name: p.name,
       stock: p.stock || p.quantity || 0,
       price: p.price,
-      costPrice: p.costPrice || 0
     }));
 
     return NextResponse.json({

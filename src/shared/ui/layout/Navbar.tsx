@@ -299,6 +299,14 @@ export default function Navbar({ user, signInUrl }) {
                         <span>MY DASHBOARD</span>
                         <ArrowRight className="w-3 h-3" />
                       </Link>
+                      <Link 
+                        href="/account?tab=orders"
+                        onClick={() => setIsUserDropdownOpen(false)}
+                        className="text-[9px] font-black uppercase tracking-wider text-zinc-600 hover:text-black transition-colors flex items-center justify-between py-1"
+                      >
+                        <span>MY ORDERS</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
                       <button 
                         onClick={() => {
                           setIsUserDropdownOpen(false);

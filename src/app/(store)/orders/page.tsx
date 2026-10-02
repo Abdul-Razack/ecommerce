@@ -28,21 +28,45 @@ function formatOrderPrice(amount: number, orderCurrency?: string) {
 function OrdersContent() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState(searchParams.get('email') || '');
+  const [orderId, setOrderId] = useState(searchParams.get('orderId') || '');
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [authRequired, setAuthRequired] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const fetchOrders = async (searchEmail) => {
-    if (!searchEmail) return;
+  const fetchOrders = async (searchEmail: string, searchOrderId?: string) => {
+    if (!searchEmail && !searchOrderId) return;
     setLoading(true);
+    setAuthRequired(false);
+    setErrorMessage('');
     try {
-      const res = await fetch(`/api/orders?email=${encodeURIComponent(searchEmail)}`);
+      let url = '/api/orders?';
+      if (searchOrderId && searchEmail) {
+        url += `orderId=${encodeURIComponent(searchOrderId.trim())}&email=${encodeURIComponent(searchEmail.trim())}`;
+      } else if (searchEmail) {
+        url += `email=${encodeURIComponent(searchEmail.trim())}`;
+      }
+      const res = await fetch(url);
       const data = await res.json();
       if (data.success) {
-        setOrders(data.orders);
+        if (data.order) {
+          setOrders([data.order]);
+        } else if (data.orders) {
+          setOrders(data.orders);
+        }
+      } else {
+        setOrders([]);
+        if (res.status === 401) {
+          setAuthRequired(true);
+          setErrorMessage(data.error || 'Please sign in to view your complete order history, or enter both Order ID and Email to track a specific shipment.');
+        } else {
+          setErrorMessage(data.error || 'No orders found matching your details.');
+        }
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
+      setErrorMessage('Failed to search orders. Please try again.');
     } finally {
       setLoading(false);
       setSearched(true);
@@ -51,15 +75,17 @@ function OrdersContent() {
 
   useEffect(() => {
     const emailParam = searchParams.get('email');
-    if (emailParam) {
-      setEmail(emailParam);
-      fetchOrders(emailParam);
+    const orderIdParam = searchParams.get('orderId');
+    if (emailParam || orderIdParam) {
+      if (emailParam) setEmail(emailParam);
+      if (orderIdParam) setOrderId(orderIdParam);
+      fetchOrders(emailParam || '', orderIdParam || '');
     }
   }, [searchParams]);
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchOrders(email);
+    fetchOrders(email, orderId);
   };
 
   const {
@@ -79,26 +105,34 @@ function OrdersContent() {
     <div className="bg-bone min-h-screen">
       <Section 
         spacing=""
-        title="My Orders" 
-        description="Monitor the progress of your premium activewear orders. Enter your registered email to search your history."
+        title="My Orders & Tracking" 
+        description="Monitor shipment milestones and real-time delivery status for your Posh Pigeon orders."
         className="bg-neutral-soft border-b border-onyx/5 pt-10 md:pt-12 pb-20"
         action={
           <form onSubmit={handleSearch} className="flex-shrink-0">
-              <div className="flex flex-col md:flex-row items-end gap-3 w-full md:max-w-md mt-6 md:mt-0">
-                <Input
-                  label="Registered Email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="john@example.com"
-                  required
-                  className="w-full md:w-72"
-                />
-                <Button type="submit" disabled={loading} className="h-[60px] w-full md:w-auto px-10 font-bold uppercase tracking-widest text-[11px] rounded-xl">
-                  {loading ? '...' : 'Search'}
-                </Button>
-              </div>
-            </form>
+            <div className="flex flex-col md:flex-row items-end gap-3 w-full md:max-w-xl mt-6 md:mt-0">
+              <Input
+                label="Registered Email *"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="john@example.com"
+                required
+                className="w-full md:w-56"
+              />
+              <Input
+                label="Order ID (Optional for signed-in users)"
+                type="text"
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+                placeholder="e.g. PP-839201"
+                className="w-full md:w-56"
+              />
+              <Button type="submit" disabled={loading} className="h-[60px] w-full md:w-auto px-8 font-bold uppercase tracking-widest text-[11px] rounded-xl flex-shrink-0">
+                {loading ? '...' : 'Track'}
+              </Button>
+            </div>
+          </form>
         }
       />
 
@@ -252,19 +286,46 @@ function OrdersContent() {
             )}
           </div>
         ) : searched ? (
-          <div className="flex flex-col items-center justify-center py-40 text-center">
+          <div className="flex flex-col items-center justify-center py-32 text-center max-w-lg mx-auto">
             <div className="flex justify-center mb-8">
-              <svg className="w-16 h-16 text-onyx/30" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0l-3.586 3.586a2 2 0 01-2.828 0L9 13" /></svg>
+              <svg className="w-16 h-16 text-onyx/30" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0l-3.586 3.586a2 2 0 01-2.828 0L9 13" />
+              </svg>
             </div>
-            <h2 className="text-2xl font-black text-onyx mb-4 uppercase tracking-tight">No Order History Found</h2>
-            <p className="text-onyx/60 mb-10 max-w-sm text-sm font-medium leading-relaxed">
-              We couldn't find any historical data for <span className="font-bold text-onyx border-b border-onyx">{email}</span>. Please verify your email and try again.
-            </p>
-            <Link href="/shop">
-              <Button size="lg" className="px-16 font-bold uppercase tracking-widest text-[11px] rounded-xl h-16">
-                Explore Shop
-              </Button>
-            </Link>
+            {authRequired ? (
+              <>
+                <h2 className="text-2xl font-black text-onyx mb-3 uppercase tracking-tight">Sign In Required</h2>
+                <p className="text-onyx/60 mb-8 text-sm font-medium leading-relaxed">
+                  To view your full order history, please sign in to your Posh Pigeon account. If you placed an order as a guest, enter both your <span className="font-bold text-onyx">Order ID</span> and <span className="font-bold text-onyx">Email</span> in the fields above to track that shipment directly.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <a href="/api/auth/login">
+                    <Button size="lg" className="px-12 font-bold uppercase tracking-widest text-[11px] rounded-xl h-14 w-full sm:w-auto">
+                      Sign In Now
+                    </Button>
+                  </a>
+                  <Link href="/shop">
+                    <Button variant="outline" size="lg" className="px-10 font-bold uppercase tracking-widest text-[11px] rounded-xl h-14 border-onyx/20 text-onyx w-full sm:w-auto">
+                      Explore Shop
+                    </Button>
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-2xl font-black text-onyx mb-3 uppercase tracking-tight">No Order Found</h2>
+                <p className="text-onyx/60 mb-8 text-sm font-medium leading-relaxed">
+                  {errorMessage || (
+                    <>We couldn't find any orders matching the details for <span className="font-bold text-onyx border-b border-onyx">{email}</span>. Please verify your details and try again.</>
+                  )}
+                </p>
+                <Link href="/shop">
+                  <Button size="lg" className="px-16 font-bold uppercase tracking-widest text-[11px] rounded-xl h-16">
+                    Explore Shop
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-40 text-center border-2 border-dashed border-onyx/10 rounded-[2rem] bg-neutral-soft mt-16 group hover:border-onyx transition-colors duration-500">

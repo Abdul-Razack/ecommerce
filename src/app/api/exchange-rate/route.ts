@@ -3,7 +3,17 @@ import { NextResponse } from 'next/server';
 const FALLBACK_MYR_RATE = 0.053;
 
 export async function GET() {
-  const apiKey = process.env.EXCHANGERATE_API_KEY || '588d4c5321687bbccd4fa3db';
+  const apiKey = process.env.EXCHANGERATE_API_KEY;
+
+  if (!apiKey) {
+    console.error('EXCHANGERATE_API_KEY is not set. Using static fallback rate.');
+    return NextResponse.json({
+      success: false,
+      rate: FALLBACK_MYR_RATE,
+      source: 'fallback',
+      error: 'Exchange rate service not configured',
+    });
+  }
 
   try {
     // Cache the third-party API request for 24 hours (86400 seconds) to avoid rate limits
@@ -34,7 +44,6 @@ export async function GET() {
       success: false,
       rate: FALLBACK_MYR_RATE,
       source: 'fallback',
-      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 }
