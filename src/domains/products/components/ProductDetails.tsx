@@ -274,50 +274,52 @@ export default function ProductDetails({ product, relatedProducts }) {
     <div className="bg-bone min-h-screen pt-3 sm:pt-10 pb-8 lg:pb-12">
       <Container>
         {/* Core Detail Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start">
           
-          {/* Gallery Layer with High-Class FX & Single Cohesive Frame */}
-          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-2.5 sm:space-y-3.5 h-fit p-2.5 sm:p-3.5 rounded-2xl md:rounded-[2rem] bg-white/70 border border-onyx/10 shadow-sm backdrop-blur-sm max-w-md xl:max-w-lg mx-auto lg:mx-0 w-full">
-            <div className="h-[260px] xs:h-[300px] sm:h-[360px] md:h-[400px] lg:h-[440px] max-h-[52vh] w-full rounded-xl md:rounded-[1.75rem] overflow-hidden bg-neutral-soft/50 shadow-tactile tactile-card border border-onyx/5 relative flex items-center justify-center">
-              <img 
-                src={activeImage} 
-                className={`w-full h-full transition-all duration-700 hover:scale-105 ${
-                  activeImage.includes('banner-child')
-                    ? 'object-cover object-[75%_center]'
-                    : activeImage.includes('unsplash') || activeImage.includes('mirraw') || activeImage.includes('ankitadesigns') || activeImage.includes('pochampallysarees')
-                      ? 'object-cover object-top'
-                      : 'object-contain p-2.5 sm:p-3.5'
-                }`}
-                alt={cleanName} 
-              />
-            </div>
-            
-            {/* Thumbnails: Color-Aware Dynamic Alignment */}
-            {activeGalleryImages && activeGalleryImages.length > 1 && (
-              <div className="flex gap-2 sm:gap-2.5 overflow-x-auto justify-center py-0.5 hide-scrollbar">
-                {activeGalleryImages.map((img, i) => {
-                  const resolvedUrl = resolvePhotoUrl(img.url);
-                  const isCurActive = activeImage === resolvedUrl;
-                  return (
-                    <button 
-                      key={i}
-                      onClick={() => setActiveImage(resolvedUrl)}
-                      className={`w-11 h-14 sm:w-14 sm:h-17 flex-shrink-0 rounded-lg sm:rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer ${isCurActive ? 'border-chrome scale-95 bg-white shadow-sm ring-2 ring-chrome/20' : 'border-transparent opacity-60 bg-white hover:opacity-100'}`}
-                    >
-                      <img 
-                        src={resolvePhotoUrl(img.thumbnailUrl || img.url)} 
-                        className={`w-full h-full ${resolvedUrl.includes('banner-child') || resolvedUrl.includes('unsplash') || resolvedUrl.includes('mirraw') || resolvedUrl.includes('ankitadesigns') ? 'object-cover' : 'object-contain p-1'}`} 
-                        alt={`${cleanName} View ${i}`} 
-                      />
-                    </button>
-                  );
-                })}
+          {/* Gallery Layer with Vertical Left Thumbnails & Wide High-Res Frame */}
+          <div className="lg:col-span-6 lg:sticky lg:top-24 h-fit p-2 sm:p-3 rounded-2xl md:rounded-[2rem] bg-white/90 border border-onyx/10 shadow-sm backdrop-blur-sm w-full">
+            <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3.5 items-start">
+              
+              {/* Left Vertical Thumbnails on Desktop, Compact Horizontal Strip on Mobile */}
+              {activeGalleryImages && activeGalleryImages.length > 1 && (
+                <div className="flex sm:flex-col gap-2 sm:gap-2.5 overflow-x-auto sm:overflow-y-auto max-h-[72px] sm:max-h-[640px] w-full sm:w-20 flex-shrink-0 hide-scrollbar py-0.5 sm:py-0">
+                  {activeGalleryImages.map((img, i) => {
+                    const resolvedUrl = resolvePhotoUrl(img.url);
+                    const isCurActive = activeImage === resolvedUrl;
+                    return (
+                      <button 
+                        key={i}
+                        onClick={() => setActiveImage(resolvedUrl)}
+                        className={`w-12 h-14 sm:w-18 sm:h-22 flex-shrink-0 rounded-lg sm:rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer ${
+                          isCurActive 
+                            ? 'border-black scale-95 bg-white shadow-md ring-2 ring-black/10' 
+                            : 'border-onyx/10 opacity-60 bg-white hover:opacity-100 hover:border-onyx/30'
+                        }`}
+                      >
+                        <img 
+                          src={resolvePhotoUrl(img.thumbnailUrl || img.url)} 
+                          className="w-full h-full object-contain p-1" 
+                          alt={`${cleanName} View ${i + 1}`} 
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Right Main Image Showcase - Compact on Mobile Screens */}
+              <div className="flex-1 w-full h-[280px] xs:h-[340px] sm:h-[480px] md:h-[560px] lg:h-[620px] max-h-[50vh] sm:max-h-[82vh] rounded-xl md:rounded-[1.75rem] overflow-hidden bg-neutral-soft/30 shadow-tactile tactile-card border border-onyx/5 relative flex items-center justify-center p-2 sm:p-3">
+                <img 
+                  src={activeImage} 
+                  className="w-full h-full object-contain max-h-[48vh] sm:max-h-[80vh] transition-all duration-500 hover:scale-[1.02]"
+                  alt={cleanName} 
+                />
               </div>
-            )}
+            </div>
           </div>
 
           {/* Configuration Layer */}
-          <div className="lg:col-span-7 flex flex-col justify-start space-y-5 sm:space-y-8">
+          <div className="lg:col-span-6 flex flex-col justify-start space-y-5 sm:space-y-8">
             
             {/* Category and Title */}
             <div className="space-y-4">
@@ -646,7 +648,7 @@ export default function ProductDetails({ product, relatedProducts }) {
               </div>
               <p className="technical text-onyx/40 md:text-right max-w-xs text-[10px]">Customers who viewed this item <br />also viewed.</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
               {relatedProducts.slice(0, 4).map(p => <ProductCard key={p._id} product={p} onQuickView={() => {}} />)}
             </div>
           </Container>

@@ -79,13 +79,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           <img 
             src={displayImage} 
             alt={cleanName}
-            className={`w-full h-full ${
-              displayImage.includes('banner-child')
-                ? 'object-cover object-[75%_center]'
-                : displayImage.includes('unsplash') || displayImage.includes('mirraw') || displayImage.includes('ankitadesigns') || displayImage.includes('pochampallysarees')
-                  ? 'object-cover object-top'
-                  : 'object-contain p-2'
-            } transition-all duration-700 group-hover:scale-105`}
+            className="w-full h-full object-contain p-2.5 bg-white/50 transition-all duration-500 group-hover:scale-105"
             onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://placehold.co/400x500?text=Product'; }}
           />
         </Link>

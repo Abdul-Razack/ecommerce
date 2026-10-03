@@ -20,10 +20,8 @@ const MobileNav = ({ user, signInUrl }) => {
     { href: '/', label: 'HOME', icon: <HomeIcon />, isExternal: false },
     { href: '/shop', label: 'SHOP', icon: <ShopIcon />, isExternal: false },
     { href: '/cart', label: 'CART', icon: <CartIcon count={cartCount} />, isExternal: false },
-    { href: user ? '/account' : '/orders', label: user ? 'ACCOUNT' : 'ORDERS', icon: <OrdersIcon />, isExternal: false },
-    user 
-      ? { onClick: handleSignOut, label: 'LOGOUT', icon: <UserIcon /> }
-      : { href: signInUrl, label: 'LOGIN', icon: <UserIcon />, isExternal: true }
+    { href: '/orders', label: 'ORDERS', icon: <OrdersIcon />, isExternal: false },
+    { href: '/account', label: 'ACCOUNT', icon: <UserIcon />, isExternal: false }
   ];
 
   if (mounted && pathname === '/cart' && cartCount > 0) {
@@ -42,18 +40,6 @@ const MobileNav = ({ user, signInUrl }) => {
             <span className="text-[6px] md:text-[7px] font-black uppercase tracking-[0.2em] leading-none">{item.label}</span>
           </>
         );
-
-        if (item.onClick) {
-          return (
-            <button 
-              key={item.label} 
-              onClick={() => item.onClick()}
-              className="flex flex-col items-center justify-center gap-3 text-white/30 hover:text-white transition-all duration-500 scale-100 hover:scale-110 bg-transparent border-none p-0 cursor-pointer"
-            >
-              {content}
-            </button>
-          );
-        }
 
         if (item.isExternal) {
           return (

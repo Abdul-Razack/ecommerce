@@ -321,13 +321,13 @@ export default function Navbar({ user, signInUrl }) {
                   )}
                 </>
               ) : (
-                <a 
-                  href={signInUrl}
+                <Link 
+                  href="/account"
                   className="p-1.5 text-zinc-600 hover:text-black transition-colors flex items-center justify-center"
-                  title="Login"
+                  title="My Account"
                 >
                   <UserIcon className="w-4 h-4" />
-                </a>
+                </Link>
               )}
             </div>
 

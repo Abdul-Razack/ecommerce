@@ -5,11 +5,9 @@ import { useSearchParams } from 'next/navigation';
 import OrderTimeline from '@/domains/orders/components/OrderTimeline';
 import Container from '@/shared/ui/layout/Container';
 import Button from '@/shared/ui/Button';
-import Input from '@/shared/ui/Input';
 import Card from '@/shared/ui/Card';
 import Badge from '@/shared/ui/Badge';
 import Skeleton from '@/shared/ui/Skeleton';
-import Section from '@/shared/ui/Section';
 import Link from 'next/link';
 import Pagination, { usePagination } from '@/shared/ui/Pagination';
 
@@ -102,175 +100,228 @@ function OrdersContent() {
   });
 
   return (
-    <div className="bg-bone min-h-screen">
-      <Section 
-        spacing=""
-        title="My Orders & Tracking" 
-        description="Monitor shipment milestones and real-time delivery status for your Posh Pigeon orders."
-        className="bg-neutral-soft border-b border-onyx/5 pt-10 md:pt-12 pb-20"
-        action={
-          <form onSubmit={handleSearch} className="flex-shrink-0">
-            <div className="flex flex-col md:flex-row items-end gap-3 w-full md:max-w-xl mt-6 md:mt-0">
-              <Input
-                label="Registered Email *"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="john@example.com"
-                required
-                className="w-full md:w-56"
-              />
-              <Input
-                label="Order ID (Optional for signed-in users)"
-                type="text"
-                value={orderId}
-                onChange={(e) => setOrderId(e.target.value)}
-                placeholder="e.g. PP-839201"
-                className="w-full md:w-56"
-              />
-              <Button type="submit" disabled={loading} className="h-[60px] w-full md:w-auto px-8 font-bold uppercase tracking-widest text-[11px] rounded-xl flex-shrink-0">
-                {loading ? '...' : 'Track'}
-              </Button>
-            </div>
-          </form>
-        }
-      />
+    <div className="bg-bone min-h-screen pb-20">
+      {/* Compact Header Hero */}
+      <div className="bg-neutral-soft border-b border-onyx/5 py-10 sm:py-14 text-center px-4">
+        <Container className="max-w-3xl">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <span className="w-2 h-2 rounded-full bg-onyx animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-onyx/50">Shipment Intelligence</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-black uppercase tracking-tight text-onyx mb-3">
+            Track Your Order
+          </h1>
+          <p className="text-xs sm:text-sm text-onyx/60 max-w-lg mx-auto font-medium leading-relaxed">
+            Enter your email address or order ID below to view real-time delivery status and milestone updates.
+          </p>
+        </Container>
+      </div>
 
-      <Container className="pb-32">
+      {/* Centered Search Card */}
+      <Container className="max-w-xl">
+        <div className="-mt-8 sm:-mt-10 bg-white rounded-2xl border border-onyx/10 p-5 sm:p-7 shadow-md relative z-10 mb-10">
+          <form onSubmit={handleSearch} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase tracking-wider font-black text-onyx/60 block">
+                  Registered Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  required
+                  className="w-full px-3.5 py-2.5 bg-neutral-soft/50 border border-onyx/15 rounded-xl text-xs font-semibold text-onyx focus:outline-none focus:border-onyx focus:bg-white transition-all placeholder:text-onyx/30"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase tracking-wider font-black text-onyx/60 block">
+                  Order ID <span className="text-onyx/30 font-normal">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={orderId}
+                  onChange={(e) => setOrderId(e.target.value)}
+                  placeholder="e.g. PP-839201"
+                  className="w-full px-3.5 py-2.5 bg-neutral-soft/50 border border-onyx/15 rounded-xl text-xs font-semibold text-onyx focus:outline-none focus:border-onyx focus:bg-white transition-all placeholder:text-onyx/30"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 bg-onyx text-white hover:bg-black font-black uppercase tracking-widest text-[11px] rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Searching...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  Track Shipment
+                </span>
+              )}
+            </Button>
+          </form>
+        </div>
+      </Container>
+
+      {/* Main Results Container */}
+      <Container className="max-w-4xl">
         {loading ? (
-          <div className="space-y-12">
-            {[1, 2].map(i => <Skeleton key={i} className="h-96 w-full rounded-2xl" />)}
+          <div className="space-y-6">
+            {[1, 2].map(i => <Skeleton key={i} className="h-64 w-full rounded-2xl" />)}
           </div>
         ) : orders.length > 0 ? (
-          <div className="space-y-16 mt-16">
+          <div className="space-y-8">
             {paginatedOrders.map((order: any) => (
-              <Card key={order.orderId || order._id} variant="outline" padding="p-0" className="overflow-hidden bg-neutral-soft shadow-sm border-onyx/5">
-                <div className="bg-bone/50 border-b border-onyx/5 px-10 py-6 flex flex-col md:flex-row justify-between md:items-center gap-6">
-                  <div className="flex flex-col md:flex-row gap-8 md:gap-16">
+              <Card key={order.orderId || order._id} variant="outline" padding="p-0" className="overflow-hidden bg-white shadow-sm border-onyx/10 rounded-2xl">
+                {/* Order Top Bar */}
+                <div className="bg-neutral-soft/60 border-b border-onyx/5 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex flex-wrap items-center gap-6 sm:gap-10">
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest font-black text-onyx/40 mb-2">Order Date</p>
-                      <p className="text-sm font-bold text-onyx">
+                      <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40">Order Date</p>
+                      <p className="text-xs font-bold text-onyx mt-0.5">
                         {new Date(order._createdAt).toLocaleDateString('en-IN', {
                           day: 'numeric',
-                          month: 'long',
+                          month: 'short',
                           year: 'numeric',
                         })}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest font-black text-onyx/40 mb-2">Total Amount</p>
-                      <p className="text-sm font-black text-onyx">{formatOrderPrice(parseFloat(order.totalAmount || 0), order.currency)}</p>
+                      <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40">Total Amount</p>
+                      <p className="text-xs font-black text-onyx mt-0.5">{formatOrderPrice(parseFloat(order.totalAmount || 0), order.currency)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest font-black text-onyx/40 mb-2">Delivery To</p>
-                      <p className="text-sm font-bold text-onyx line-clamp-1">{order.customer?.city || order.city}, {order.customer?.state || order.state}</p>
+                      <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40">Delivery To</p>
+                      <p className="text-xs font-bold text-onyx mt-0.5 line-clamp-1">{order.customer?.city || order.city || 'India'}, {order.customer?.state || order.state || ''}</p>
                     </div>
                   </div>
-                  <div className="flex flex-col md:items-end">
-                    <p className="text-[10px] uppercase tracking-widest font-black text-onyx/40 mb-2">Order Identification</p>
-                    <p className="text-xs font-mono font-black text-onyx bg-onyx/10/50 px-3 py-1 rounded">#{order.orderId || order._id.slice(-8).toUpperCase()}</p>
+                  <div>
+                    <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40 text-right">Order Ref</p>
+                    <p className="text-xs font-mono font-black text-onyx bg-white px-2.5 py-0.5 rounded border border-onyx/10 mt-0.5">
+                      #{order.orderId || order._id.slice(-8).toUpperCase()}
+                    </p>
                   </div>
                 </div>
 
-                <div className="p-10">
-                  <div className="flex flex-col lg:flex-row gap-16">
-                    <div className="flex-grow space-y-10">
-                      <div className="flex items-center gap-4">
-                        <Badge variant={order.status === 'delivered' ? 'success' : 'primary'} className="h-7 px-4 font-black uppercase text-[9px] tracking-widest">
-                          {order.status?.replace(/_/g, ' ') || 'processing'}
-                        </Badge>
-                        <Badge variant="neutral" className="h-7 px-4 font-black uppercase text-[9px] tracking-widest bg-onyx/5 border-none flex items-center gap-1 text-onyx/80">
-                          {order.paymentType === 'cod' ? (
-                            <>
-                              <svg className="w-3 h-3 text-onyx/60" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                              <span>COD</span>
-                            </>
-                          ) : (
-                            <>
-                              <svg className="w-3 h-3 text-onyx/60" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>
-                              <span>Online</span>
-                            </>
-                          )}
-                        </Badge>
+                {/* Order Content */}
+                <div className="p-6 sm:p-8 space-y-8">
+                  {/* Status Badges Header */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-onyx/5">
+                    <div className="flex items-center gap-3">
+                      <Badge variant={order.status === 'delivered' ? 'success' : 'primary'} className="h-6 px-3 font-black uppercase text-[9px] tracking-widest">
+                        {order.status?.replace(/_/g, ' ') || 'processing'}
+                      </Badge>
+                      <Badge variant="neutral" className="h-6 px-3 font-black uppercase text-[9px] tracking-widest bg-neutral-soft border-none flex items-center gap-1.5 text-onyx/80">
+                        {order.paymentType === 'cod' ? (
+                          <>
+                            <svg className="w-3 h-3 text-onyx/60" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                            <span>COD</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-3 h-3 text-onyx/60" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>
+                            <span>Online Payment</span>
+                          </>
+                        )}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Tracking Timeline Component */}
+                  <OrderTimeline status={order.status} />
+
+                  {/* Carrier Details & Updates */}
+                  {order.trackingId && (
+                    <div className="bg-neutral-soft/40 border border-onyx/5 p-4 rounded-xl space-y-3">
+                      <div className="flex items-center gap-3">
+                        <svg className="w-4 h-4 text-onyx/70" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 8h7.88a1 1 0 01.97 1.2l-.96 4.8a1 1 0 01-.97.8H13" />
+                        </svg>
+                        <div>
+                          <p className="text-[8px] uppercase tracking-widest font-black text-onyx/40">Carrier Waybill ID</p>
+                          <p className="text-xs font-black text-onyx tracking-wider uppercase">{order.trackingId}</p>
+                        </div>
                       </div>
 
-                      <OrderTimeline status={order.status} />
-
-                      {order.trackingId && (
-                        <div className="bg-bone border border-onyx/5 p-6 rounded-xl flex flex-col gap-4">
-                          <div className="flex items-center gap-4">
-                            <svg className="w-5 h-5 text-onyx/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 8h7.88a1 1 0 01.97 1.2l-.96 4.8a1 1 0 01-.97.8H13" />
-                            </svg>
-                            <div>
-                              <p className="text-[9px] uppercase tracking-[0.2em] font-black text-onyx/40 mb-1">Carrier Tracking ID</p>
-                              <p className="text-sm font-black text-onyx tracking-widest uppercase">{order.trackingId}</p>
-                            </div>
-                          </div>
-
-                          {order.trackingUpdates && order.trackingUpdates.length > 0 && (
-                            <div className="mt-4 border-t border-onyx/10 pt-4 space-y-4">
-                              <p className="text-[9px] uppercase tracking-[0.2em] font-black text-onyx/40">Tracking Timeline</p>
-                              <div className="relative pl-6 space-y-6 border-l border-zinc-200 mt-2">
-                                {order.trackingUpdates.map((update: any, idx: number) => (
-                                  <div key={idx} className="relative">
-                                    <div className={`absolute -left-[30px] top-1 w-2 h-2 rounded-full border-2 bg-neutral-soft ${
-                                      idx === 0 ? 'border-onyx ring-4 ring-onyx/10 scale-125' : 'border-zinc-300'
-                                    }`} />
-                                    <div className="space-y-1 text-left">
-                                      <p className={`text-xs font-bold ${idx === 0 ? 'text-onyx' : 'text-onyx/70'}`}>
-                                        {update.status} - {update.location}
-                                      </p>
-                                      <p className="text-[10px] text-onyx/40 font-medium">
-                                        {new Date(update.timestamp).toLocaleString('en-IN', {
-                                          day: 'numeric',
-                                          month: 'short',
-                                          hour: '2-digit',
-                                          minute: '2-digit'
-                                        })}
-                                      </p>
-                                      {update.description && (
-                                        <p className="text-[11px] text-onyx/60 mt-1 italic">{update.description}</p>
-                                      )}
-                                    </div>
-                                  </div>
-                                ))}
+                      {order.trackingUpdates && order.trackingUpdates.length > 0 && (
+                        <div className="border-t border-onyx/5 pt-3 space-y-3">
+                          <p className="text-[8px] uppercase tracking-widest font-black text-onyx/40">Shipment Logs</p>
+                          <div className="relative pl-5 space-y-4 border-l border-zinc-200 ml-1">
+                            {order.trackingUpdates.map((update: any, idx: number) => (
+                              <div key={idx} className="relative">
+                                <div className={`absolute -left-[25px] top-1 w-2 h-2 rounded-full border-2 bg-white ${
+                                  idx === 0 ? 'border-onyx ring-2 ring-onyx/20 scale-110' : 'border-zinc-300'
+                                }`} />
+                                <div>
+                                  <p className={`text-xs font-bold ${idx === 0 ? 'text-onyx' : 'text-onyx/70'}`}>
+                                    {update.status} - {update.location}
+                                  </p>
+                                  <p className="text-[9px] text-onyx/40 font-medium">
+                                    {new Date(update.timestamp).toLocaleString('en-IN', {
+                                      day: 'numeric',
+                                      month: 'short',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </p>
+                                  {update.description && (
+                                    <p className="text-[10px] text-onyx/60 mt-0.5 italic">{update.description}</p>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
+                  )}
 
-                    <div className="lg:w-80 border-t lg:border-t-0 lg:border-l border-onyx/5 pt-10 lg:pt-0 lg:pl-16 flex-shrink-0">
-                      <h4 className="text-[10px] uppercase tracking-[0.3em] font-black text-onyx/40 mb-8">Order Details</h4>
-                      <div className="space-y-6">
-                        {order.items?.map((item, idx) => (
-                          <div key={idx} className="flex gap-5 items-center">
-                            <div className="w-16 h-20 bg-bone flex-shrink-0 overflow-hidden rounded-lg border border-onyx/5 relative group">
-                              {item.productImage && (
-                                <img 
-                                  src={item.productImage} 
-                                  alt={item.productName} 
-                                  className="w-full h-full object-cover mix-blend-multiply transition-transform duration-500 group-hover:scale-110" 
-                                />
-                              )}
-                              <span className="absolute -top-1 -right-1 bg-onyx text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-black">
-                                {item.quantity}
-                              </span>
-                            </div>
-                            <div className="flex flex-col">
-                              <p className="text-xs font-black text-onyx uppercase leading-tight line-clamp-1">{item.productName}</p>
-                              <p className="text-[10px] font-bold text-onyx/40 mt-2 uppercase tracking-widest">{formatOrderPrice(item.price || 0, order.currency)}</p>
-                            </div>
+                  {/* Order Items */}
+                  <div className="border-t border-onyx/5 pt-6">
+                    <h4 className="text-[9px] uppercase tracking-widest font-black text-onyx/40 mb-4">Purchased Items</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {order.items?.map((item: any, idx: number) => (
+                        <div key={idx} className="flex gap-3 items-center bg-neutral-soft/30 p-2.5 rounded-xl border border-onyx/5">
+                          <div className="w-12 h-14 bg-white flex-shrink-0 overflow-hidden rounded-lg border border-onyx/10 relative p-1 flex items-center justify-center">
+                            {item.productImage ? (
+                              <img 
+                                src={item.productImage} 
+                                alt={item.productName} 
+                                className="w-full h-full object-contain" 
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-onyx/5 rounded flex items-center justify-center text-[9px] font-bold text-onyx/30">IMG</div>
+                            )}
+                            <span className="absolute -top-1 -right-1 bg-onyx text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-black">
+                              {item.quantity}
+                            </span>
                           </div>
-                        ))}
-                      </div>
+                          <div className="flex flex-col min-w-0">
+                            <p className="text-xs font-bold text-onyx uppercase leading-tight truncate">{item.productName}</p>
+                            <p className="text-[10px] font-black text-onyx/60 mt-1">{formatOrderPrice(item.price || 0, order.currency)}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
               </Card>
             ))}
+
             {totalPages > 1 && (
               <Pagination
                 currentPage={currentPage}
@@ -281,46 +332,44 @@ function OrdersContent() {
                 onPageChange={setCurrentPage}
                 onPageSizeChange={setPageSize}
                 itemLabel="orders"
-                className="rounded-2xl border border-onyx/5 shadow-sm mt-8"
+                className="rounded-xl border border-onyx/5 shadow-sm mt-6"
               />
             )}
           </div>
         ) : searched ? (
-          <div className="flex flex-col items-center justify-center py-32 text-center max-w-lg mx-auto">
-            <div className="flex justify-center mb-8">
-              <svg className="w-16 h-16 text-onyx/30" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0l-3.586 3.586a2 2 0 01-2.828 0L9 13" />
+          <div className="bg-white rounded-2xl border border-onyx/10 p-8 text-center max-w-md mx-auto shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-neutral-soft border border-onyx/10 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-onyx/40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
             {authRequired ? (
               <>
-                <h2 className="text-2xl font-black text-onyx mb-3 uppercase tracking-tight">Sign In Required</h2>
-                <p className="text-onyx/60 mb-8 text-sm font-medium leading-relaxed">
-                  To view your full order history, please sign in to your Posh Pigeon account. If you placed an order as a guest, enter both your <span className="font-bold text-onyx">Order ID</span> and <span className="font-bold text-onyx">Email</span> in the fields above to track that shipment directly.
+                <h3 className="text-base font-black text-onyx uppercase mb-2">Sign In Required</h3>
+                <p className="text-xs text-onyx/60 mb-6 font-medium leading-relaxed">
+                  Please sign in to view complete history, or enter both Order ID & Registered Email above.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <a href="/api/auth/login">
-                    <Button size="lg" className="px-12 font-bold uppercase tracking-widest text-[11px] rounded-xl h-14 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a href="/api/auth/login" className="w-full">
+                    <Button className="w-full h-10 font-bold uppercase text-[10px] rounded-xl">
                       Sign In Now
                     </Button>
                   </a>
-                  <Link href="/shop">
-                    <Button variant="outline" size="lg" className="px-10 font-bold uppercase tracking-widest text-[11px] rounded-xl h-14 border-onyx/20 text-onyx w-full sm:w-auto">
-                      Explore Shop
+                  <Link href="/shop" className="w-full">
+                    <Button variant="outline" className="w-full h-10 font-bold uppercase text-[10px] rounded-xl border-onyx/20 text-onyx">
+                      Shop Now
                     </Button>
                   </Link>
                 </div>
               </>
             ) : (
               <>
-                <h2 className="text-2xl font-black text-onyx mb-3 uppercase tracking-tight">No Order Found</h2>
-                <p className="text-onyx/60 mb-8 text-sm font-medium leading-relaxed">
-                  {errorMessage || (
-                    <>We couldn't find any orders matching the details for <span className="font-bold text-onyx border-b border-onyx">{email}</span>. Please verify your details and try again.</>
-                  )}
+                <h3 className="text-base font-black text-onyx uppercase mb-2">No Order Found</h3>
+                <p className="text-xs text-onyx/60 mb-6 font-medium leading-relaxed">
+                  {errorMessage || `We couldn't find any orders matching "${email}". Please double check your details.`}
                 </p>
                 <Link href="/shop">
-                  <Button size="lg" className="px-16 font-bold uppercase tracking-widest text-[11px] rounded-xl h-16">
+                  <Button className="px-8 h-10 font-bold uppercase text-[10px] rounded-xl">
                     Explore Shop
                   </Button>
                 </Link>
@@ -328,13 +377,31 @@ function OrdersContent() {
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-40 text-center border-2 border-dashed border-onyx/10 rounded-[2rem] bg-neutral-soft mt-16 group hover:border-onyx transition-colors duration-500">
-            <div className="flex justify-center mb-10 opacity-20 group-hover:opacity-100 transition-opacity duration-500">
-              <svg className="w-12 h-12 text-onyx" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          /* Pre-search features card */
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            <div className="bg-white p-5 rounded-2xl border border-onyx/10 shadow-2xs text-center space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-neutral-soft flex items-center justify-center mx-auto text-onyx">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              </div>
+              <h4 className="text-xs font-black uppercase text-onyx">Real-Time Tracking</h4>
+              <p className="text-[11px] text-onyx/50 font-medium">Instant dispatch and carrier movement updates.</p>
             </div>
-            <h3 className="text-xs font-black text-onyx/40 uppercase tracking-[0.4em] group-hover:text-onyx transition-colors duration-500">
-              Enter your email above to track your orders
-            </h3>
+
+            <div className="bg-white p-5 rounded-2xl border border-onyx/10 shadow-2xs text-center space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-neutral-soft flex items-center justify-center mx-auto text-onyx">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+              </div>
+              <h4 className="text-xs font-black uppercase text-onyx">Insured Shipping</h4>
+              <p className="text-[11px] text-onyx/50 font-medium">100% safe & door-step express delivery.</p>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-onyx/10 shadow-2xs text-center space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-neutral-soft flex items-center justify-center mx-auto text-onyx">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <h4 className="text-xs font-black uppercase text-onyx">Easy Support</h4>
+              <p className="text-[11px] text-onyx/50 font-medium">Instant help for exchange or address changes.</p>
+            </div>
           </div>
         )}
       </Container>
@@ -345,11 +412,12 @@ function OrdersContent() {
 export default function OrdersPage() {
   return (
     <Suspense fallback={
-      <Container className="py-32">
-        <Skeleton className="h-[400px] w-full" />
+      <Container className="py-20">
+        <Skeleton className="h-[300px] w-full max-w-xl mx-auto rounded-2xl" />
       </Container>
     }>
       <OrdersContent />
     </Suspense>
   );
 }
+

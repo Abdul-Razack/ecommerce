@@ -14,6 +14,8 @@ import Pagination, { usePagination } from '@/shared/ui/Pagination';
 interface AccountDashboardProps {
   customer: any;
   orders: any[];
+  isGuest?: boolean;
+  signInUrl?: string;
 }
 
 function formatOrderPrice(amount: number, orderCurrency?: string) {
@@ -28,7 +30,7 @@ function formatOrderPrice(amount: number, orderCurrency?: string) {
   }
 }
 
-export default function AccountDashboard({ customer, orders }: AccountDashboardProps) {
+export default function AccountDashboard({ customer, orders, isGuest = false, signInUrl = '/api/auth/login' }: AccountDashboardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showToast } = useToast();
@@ -179,24 +181,23 @@ export default function AccountDashboard({ customer, orders }: AccountDashboardP
 
         {/* TAB 1: OVERVIEW */}
         {activeTab === 'overview' && (
-          <div className="space-y-10 animate-fade-in">
+          <div className="space-y-8 animate-fade-in">
             {/* Header Greeting */}
             <div>
-              <span className="text-[10px] tracking-[0.3em] font-black text-onyx/40 uppercase">Welcome Back</span>
-              <h2 className="text-3xl md:text-4xl font-black tracking-tight text-onyx mt-1">
-                Hello, {customer?.name?.split(' ')[0] || 'User'}!
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight uppercase text-onyx">
+                {customer?.name ? `Welcome back, ${customer.name}!` : 'Account Overview'}
               </h2>
-              <p className="text-onyx/60 font-medium mt-2">
-                Here is a summary of your account and recent activities.
+              <p className="text-onyx/60 font-medium text-xs sm:text-sm mt-1">
+                Manage your personal profile, saved delivery destinations, and track active orders.
               </p>
             </div>
 
-            {/* Bento Statistics Grid */}
+            {/* Overview Bento Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card variant="outline" className="bg-neutral-soft border-onyx/5 flex flex-col justify-between p-8 min-h-[160px]">
+              <Card variant="outline" className="bg-neutral-soft border-onyx/5 flex flex-col justify-between p-6 min-h-[140px]">
                 <div className="space-y-1">
                   <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40">Total Orders</p>
-                  <p className="text-4xl font-black text-onyx">{orders.length}</p>
+                  <p className="text-3xl font-black text-onyx">{orders.length}</p>
                 </div>
                 <button 
                   onClick={() => handleTabChange('orders')}
@@ -206,35 +207,44 @@ export default function AccountDashboard({ customer, orders }: AccountDashboardP
                 </button>
               </Card>
 
-              <Card variant="outline" className="bg-neutral-soft border-onyx/5 flex flex-col justify-between p-8 min-h-[160px]">
+              <Card variant="outline" className="bg-neutral-soft border-onyx/5 flex flex-col justify-between p-6 min-h-[140px]">
                 <div className="space-y-1">
-                  <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40">Default Shipping</p>
+                  <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40">Default Shipping Address</p>
                   {defaultAddress ? (
-                    <div className="text-sm font-bold text-onyx mt-2 truncate">
+                    <div className="text-xs font-bold text-onyx mt-1 truncate">
                       <p className="truncate">{defaultAddress.street}</p>
-                      <p className="text-xs text-onyx/40 font-medium mt-1">{defaultAddress.city}, {defaultAddress.state}</p>
+                      <p className="text-[10px] text-onyx/40 font-medium">{defaultAddress.city}, {defaultAddress.state}</p>
                     </div>
                   ) : (
-                    <p className="text-xs text-onyx/40 font-medium italic mt-2">No address set</p>
+                    <p className="text-xs text-onyx/40 font-medium italic mt-1">No address saved</p>
                   )}
                 </div>
                 <button 
                   onClick={() => handleTabChange('addresses')}
                   className="text-left text-[9px] font-black uppercase tracking-widest text-onyx underline underline-offset-4 decoration-2 hover:text-onyx/60 cursor-pointer border-none bg-transparent"
                 >
-                  Manage Book →
+                  Manage Address Book →
                 </button>
               </Card>
 
-              <Card variant="outline" className="bg-neutral-soft border-onyx/5 flex flex-col justify-between p-8 min-h-[160px]">
+              <Card variant="outline" className="bg-neutral-soft border-onyx/5 flex flex-col justify-between p-6 min-h-[140px]">
                 <div className="space-y-1">
-                  <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40">Loyalty Status</p>
-                  <p className="text-xl font-black text-[#C5A059] uppercase tracking-wider mt-2">POSH VIP MEMBER</p>
-                  <p className="text-[9px] text-onyx/40 font-medium mt-1">Free Delivery on all orders</p>
+                  <p className="text-[9px] uppercase tracking-widest font-black text-onyx/40">Account Status</p>
+                  <p className="text-sm font-black text-onyx uppercase mt-1">
+                    {isGuest ? 'Guest Session' : 'Active Account'}
+                  </p>
+                  <p className="text-[10px] text-onyx/50 font-medium truncate">
+                    {customer?.email ? customer.email : 'Sign in to save address book and track orders'}
+                  </p>
                 </div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-[#C5A059] flex items-center gap-1">
-                  Tier: Gold <svg className="w-3 h-3 text-[#C5A059] fill-[#C5A059] inline-block" viewBox="0 0 24 24"><path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" /></svg>
-                </div>
+                {isGuest && (
+                  <a 
+                    href={signInUrl}
+                    className="text-left text-[9px] font-black uppercase tracking-widest text-onyx underline underline-offset-4 decoration-2 hover:text-onyx/60 flex items-center gap-1"
+                  >
+                    Sign In Now →
+                  </a>
+                )}
               </Card>
             </div>
 

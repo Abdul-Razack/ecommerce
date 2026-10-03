@@ -3,7 +3,16 @@ import { urlFor } from '@/shared/lib/sanity';
 import { notFound } from 'next/navigation';
 import ProductDetails from '@/domains/products/components/ProductDetails';
 import JsonLd from '@/shared/ui/JsonLd';
-import { productSchema, breadcrumbSchema, faqSchema, categoryFaqs, siteUrl, BRAND } from '@/shared/lib/seo';
+import { 
+  productSchema, 
+  breadcrumbSchema, 
+  faqSchema, 
+  categoryFaqs, 
+  generateProductFaqs,
+  generateProductKeywords,
+  siteUrl, 
+  BRAND 
+} from '@/shared/lib/seo';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -19,22 +28,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
-  const title = product.seo?.metaTitle || `${product.name} — Premium ${product.category || 'Apparel'} | Posh Pigeon`;
+  const title = product.seo?.metaTitle || `${product.name} — Buy Online | Posh Pigeon`;
   const description =
     product.seo?.metaDescription ||
     product.description ||
-    `Buy ${product.name} at the best price on Posh Pigeon. Premium ${product.category || 'women\'s apparel'}. Free shipping on orders above ₹999.`;
+    `Buy ${product.name} at ₹${product.price} on Posh Pigeon. Premium ${product.category || 'women\'s apparel'} with 4-way stretch & 100% opacity. Free shipping on orders above ₹999 across India.`;
 
   return {
     title,
     description,
-    keywords: [
-      product.name,
-      `buy ${product.name}`,
-      `${product.category} online`,
-      'Posh Pigeon',
-      'premium women apparel India',
-    ],
+    keywords: generateProductKeywords({ name: product.name, category: product.category }),
     alternates: { canonical: siteUrl(`/shop/${slug}`) },
     openGraph: {
       title,
@@ -133,20 +136,29 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   }
   breadcrumbItems.push({ name: product.name, url: siteUrl(`/shop/${product.slug}`) });
 
-  // Category-specific FAQ for AEO
+  // Dynamic Product AEO FAQs combined with category FAQs
+  const dynamicProductFaqs = generateProductFaqs({
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    description: product.description,
+  });
+
   const categorySlug = product.category?.toLowerCase().replace(/\s+/g, '') || '';
   const categoryFaqKey = Object.keys(categoryFaqs).find(
     (k) => k === categorySlug || categorySlug.includes(k),
   );
-  const faqItems = categoryFaqKey ? categoryFaqs[categoryFaqKey] : [];
+  const staticCategoryFaqs = categoryFaqKey ? categoryFaqs[categoryFaqKey] : [];
+
+  const allFaqs = [...dynamicProductFaqs, ...staticCategoryFaqs];
 
   return (
     <>
       <JsonLd data={productSchema({
         name: product.name,
         description: product.description || undefined,
-        slug: product.slug,
-        imageUrl: product.imageUrl,
+        slug: product.slug?.current || product.slug,
+        imageUrl: resolvedMainImage || product.imageUrl,
         price: product.price,
         comparePrice: product.comparePrice,
         stock: product.stock,
@@ -159,7 +171,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         })),
       })} />
       <JsonLd data={breadcrumbSchema(breadcrumbItems)} />
-      {faqItems.length > 0 && <JsonLd data={faqSchema(faqItems)} />}
+      {allFaqs.length > 0 && <JsonLd data={faqSchema(allFaqs)} />}
 
       <ProductDetails
         product={{
