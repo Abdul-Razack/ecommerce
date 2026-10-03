@@ -3,7 +3,7 @@ import { auth } from '@/shared/lib/auth';
 import { analyticsService } from '@/domains/analytics/services/analytics.service';
 
 // GET - Dashboard stats via Analytics Service
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await auth();
     if (session?.user?.role !== 'admin') {
@@ -13,7 +13,10 @@ export async function GET() {
       );
     }
 
-    const stats = await analyticsService.getDashboardStats();
+    const { searchParams } = new URL(request.url);
+    const region = (searchParams.get('region') || 'ALL').toUpperCase() as 'ALL' | 'IN' | 'MY';
+
+    const stats = await analyticsService.getDashboardStats(region);
 
     return NextResponse.json({
       success: true,

@@ -27,8 +27,8 @@ export const BRAND = {
   legalName: 'Posh Pigeon Collective',
   slogan: 'Premium Women\'s Apparel — Leggings, Sarees & Nighties',
   url: SITE_URL,
-  logo: siteUrl('/images/logo.png'),
-  ogImage: siteUrl('/images/hero.png'),
+  logo: siteUrl('/images/logo-icon.png'),
+  ogImage: siteUrl('/images/logo-full.png'),
   email: 'support@poshpigeon.in',
   phone: '+91-98765-43210',
   sameAs: [

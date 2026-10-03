@@ -65,7 +65,7 @@ function AdminLayoutInner({ children }) {
     { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
     { href: '/admin/coupons', label: 'Coupons', icon: TicketPercent },
     { href: '/admin/stock', label: 'Inventory', icon: Boxes },
-    { href: '/admin/reports', label: 'Performance', icon: BarChart3 },
+    { href: '/admin/reports', label: 'Reports & Analytics', icon: BarChart3 },
     { href: '/admin/storefront', label: 'Storefront', icon: Store },
     { href: '/', label: 'View Store', icon: ExternalLink },
   ];

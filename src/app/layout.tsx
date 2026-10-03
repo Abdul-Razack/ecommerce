@@ -54,8 +54,12 @@ export const metadata: Metadata = {
     creator: '@poshpigeon',
   },
   icons: {
-    icon: '/images/logo.png',
-    apple: '/images/logo.png',
+    icon: [
+      { url: '/images/logo-icon.png', type: 'image/png' },
+      { url: '/favicon.ico' },
+    ],
+    shortcut: '/images/logo-icon.png',
+    apple: '/images/logo-icon.png',
   },
   other: {
     'theme-color': '#1C1917',
